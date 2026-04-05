@@ -6,8 +6,8 @@ struct DocumentView: View {
     @State private var document: TaskDocument?
     @State private var searchText = ""
     @State private var isSearching = false
-    @State private var showConflicts = false
     @State private var error: Error?
+    @State private var editorVC: DocumentEditorViewController?
 
     var body: some View {
         Group {
@@ -18,16 +18,21 @@ struct DocumentView: View {
                     theme: appState.preferences.editorTheme,
                     onDocumentChanged: {
                         appState.documentService.scheduleAutosave()
+                    },
+                    onViewControllerCreated: { vc in
+                        editorVC = vc
                     }
                 )
             } else if appState.documentService.isLoading {
                 ProgressView("Loading...")
-            } else {
+            } else if let error {
                 ContentUnavailableView(
                     "Unable to Open",
                     systemImage: "doc.questionmark",
-                    description: Text(error?.localizedDescription ?? "Unknown error")
+                    description: Text(error.localizedDescription)
                 )
+            } else {
+                ProgressView("Opening...")
             }
         }
         .navigationTitle(fileURL.deletingPathExtension().lastPathComponent)
@@ -36,8 +41,9 @@ struct DocumentView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Add Task", systemImage: "plus") {
-                    // Will be wired to the editor VC
+                    editorVC?.addNewItem()
                 }
+                .disabled(editorVC == nil)
             }
         }
         .task {

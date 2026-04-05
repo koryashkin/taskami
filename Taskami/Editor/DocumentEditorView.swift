@@ -6,6 +6,8 @@ struct DocumentEditorView: UIViewControllerRepresentable {
     var searchFilter: ((TaskItem) -> Bool)?
     var theme: EditorTheme
     var onDocumentChanged: (() -> Void)?
+    /// Called once after the view controller is created, providing a reference for calling actions.
+    var onViewControllerCreated: ((DocumentEditorViewController) -> Void)?
 
     func makeUIViewController(context: Context) -> DocumentEditorViewController {
         let vc = DocumentEditorViewController()
@@ -13,6 +15,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
         vc.searchFilter = searchFilter
         vc.setDocument(document)
         vc.onDocumentChanged = onDocumentChanged
+        onViewControllerCreated?(vc)
         return vc
     }
 

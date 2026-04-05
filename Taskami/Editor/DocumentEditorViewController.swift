@@ -180,16 +180,17 @@ final class DocumentEditorViewController: UIViewController {
             document.appendItem(newItem)
         }
 
-        applySnapshot(animated: true)
+        applySnapshot(animated: false)
         onDocumentChanged?()
 
-        // Begin editing the new item
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+        // Begin editing the new item after layout completes
+        DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             let allItems = document.allItems
             guard let index = allItems.firstIndex(where: { $0.id == newItem.id }) else { return }
             let indexPath = IndexPath(item: index, section: 0)
-            self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: true)
+            self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+            self.collectionView.layoutIfNeeded()
             if let cell = self.collectionView.cellForItem(at: indexPath) as? TaskItemCell {
                 self.fieldEditor.beginEditing(item: newItem, in: cell, highlighter: self.highlighter)
             }
