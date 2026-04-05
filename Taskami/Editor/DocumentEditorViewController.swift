@@ -143,6 +143,7 @@ final class DocumentEditorViewController: UIViewController {
     // MARK: - Theme
 
     private func applyTheme() {
+        log.debug("applyTheme: editingCell=\(self.editingCell != nil)")
         view.backgroundColor = theme.backgroundColor.uiColor
         collectionView?.backgroundColor = .clear
         // Skip reloadData while a cell is editing to avoid _UIReparentingView issues
@@ -173,7 +174,8 @@ final class DocumentEditorViewController: UIViewController {
             filteredItems = allItems.filter(filter)
         }
 
-        log.debug("applySnapshot: \(filteredItems.count) items (animated=\(animated)) from \(caller)")
+        let visibleBefore = collectionView.indexPathsForVisibleItems.sorted()
+        log.debug("applySnapshot [\(caller)]: \(filteredItems.count) items, visible before=\(visibleBefore.map(\.item))")
 
         var snapshot = NSDiffableDataSourceSnapshot<Int, UUID>()
         snapshot.appendSections([0])
@@ -182,6 +184,9 @@ final class DocumentEditorViewController: UIViewController {
         isApplyingSnapshot = true
         dataSource.apply(snapshot, animatingDifferences: animated)
         isApplyingSnapshot = false
+
+        let visibleAfter = collectionView.indexPathsForVisibleItems.sorted()
+        log.debug("applySnapshot done: visible after=\(visibleAfter.map(\.item)), editingCell=\(self.editingCell != nil)")
     }
 
     // MARK: - Item Access

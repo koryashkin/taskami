@@ -83,6 +83,7 @@ final class TaskItemCell: UICollectionViewCell {
     // MARK: - Configure (display mode)
 
     func configure(with item: TaskItem, highlighter: TaskPaperTextHighlighter) {
+        log.debug("configure: '\(item.content.prefix(30))' editMode=\(self.isInEditMode)")
         self.item = item
         self.highlighter = highlighter
 
@@ -106,6 +107,8 @@ final class TaskItemCell: UICollectionViewCell {
         if !isInEditMode {
             textView.attributedText = highlighter.highlight(item)
             contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+        } else {
+            log.debug("configure: skipping display update — cell is in edit mode")
         }
     }
 
@@ -159,6 +162,7 @@ final class TaskItemCell: UICollectionViewCell {
     }
 
     private func endEditMode() {
+        log.debug("endEditMode: '\((item?.content ?? "").prefix(30))'")
         isInEditMode = false
         textView.isEditable = false
         textView.isSelectable = false
@@ -172,6 +176,8 @@ final class TaskItemCell: UICollectionViewCell {
         if let item, let highlighter {
             textView.attributedText = highlighter.highlight(item)
             contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+        } else {
+            log.warning("endEditMode: no item or highlighter — cell will show blank")
         }
     }
 
@@ -179,6 +185,7 @@ final class TaskItemCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        log.debug("prepareForReuse: '\((item?.content ?? "").prefix(30))' editMode=\(self.isInEditMode)")
         // Never reuse a cell mid-edit
         if isInEditMode { dismissEditing() }
         textView.attributedText = nil
