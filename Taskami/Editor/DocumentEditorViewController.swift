@@ -142,6 +142,9 @@ final class DocumentEditorViewController: UIViewController {
         let inset = frame.height - view.safeAreaInsets.bottom
         let offsetBefore = collectionView.contentOffset.y
         log.debug("keyboardWillShow: frame=\(frame.height) inset=\(inset) duration=\(duration) offsetBefore=\(offsetBefore)")
+        // Disable drag-to-reorder while editing — the interactive keyboard dismiss pan
+        // gesture would otherwise be misinterpreted as a drop operation.
+        collectionView.dragInteractionEnabled = false
         UIView.animate(
             withDuration: duration,
             delay: 0,
@@ -158,6 +161,7 @@ final class DocumentEditorViewController: UIViewController {
         let curveRaw = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt ?? 0
         let offsetBefore = collectionView.contentOffset.y
         log.debug("keyboardWillHide: duration=\(duration) offsetBefore=\(offsetBefore)")
+        collectionView.dragInteractionEnabled = true
         UIView.animate(
             withDuration: duration,
             delay: 0,
@@ -335,7 +339,7 @@ final class DocumentEditorViewController: UIViewController {
 
         document.removeItem(item)
         docUndoManager.registerDelete(item: item, parent: parent, index: index, document: document)
-        applySnapshot(animated: true)
+        applySnapshot(animated: false)
         onDocumentChanged?()
     }
 

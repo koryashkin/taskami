@@ -50,6 +50,7 @@ final class EditorDragDropHandler: NSObject, UICollectionViewDragDelegate, UICol
         guard let editorVC,
               let document = editorVC.document else { return }
 
+        var movedAny = false
         for dropItem in coordinator.items {
             guard let draggedItem = dropItem.dragItem.localObject as? TaskItem else { continue }
 
@@ -72,10 +73,16 @@ final class EditorDragDropHandler: NSObject, UICollectionViewDragDelegate, UICol
 
             // Perform the move
             document.moveItem(draggedItem, toParent: newParent, atIndex: targetIndex)
-
             coordinator.drop(dropItem.dragItem, toItemAt: destinationIndexPath)
+            movedAny = true
         }
 
-        editorVC.applySnapshot(animated: true)
+        // Only refresh when something actually moved.
+        // Use animated:false — animated apply is async on iOS 15+ and races with the
+        // isApplyingSnapshot guard.
+        if movedAny {
+            editorVC.applySnapshot(animated: false)
+            editorVC.onDocumentChanged?()
+        }
     }
 }
