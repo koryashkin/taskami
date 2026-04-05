@@ -3,7 +3,13 @@ import UIKit
 final class DocumentEditorViewController: UIViewController {
 
     private(set) var document: TaskDocument?
-    var searchFilter: ((TaskItem) -> Bool)?
+    /// Raw search text; changing it recompiles the filter and refreshes the snapshot.
+    var searchText: String = "" {
+        didSet {
+            guard oldValue != searchText, isViewLoaded else { return }
+            applySnapshot(animated: false)
+        }
+    }
     var theme: EditorTheme = .light {
         didSet { applyTheme() }
     }
@@ -146,11 +152,13 @@ final class DocumentEditorViewController: UIViewController {
     func applySnapshot(animated: Bool) {
         guard let document else { return }
 
+        let allItems = document.allItems
         let filteredItems: [TaskItem]
-        if let filter = searchFilter {
-            filteredItems = document.allItems.filter(filter)
+        if searchText.isEmpty {
+            filteredItems = allItems
         } else {
-            filteredItems = document.allItems
+            let filter = QueryEngine.compile(searchText)
+            filteredItems = allItems.filter(filter)
         }
 
         var snapshot = NSDiffableDataSourceSnapshot<Int, UUID>()

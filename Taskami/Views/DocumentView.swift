@@ -14,7 +14,7 @@ struct DocumentView: View {
             if let document {
                 DocumentEditorView(
                     document: document,
-                    searchFilter: searchFilter,
+                    searchText: searchText,
                     theme: appState.preferences.editorTheme,
                     onDocumentChanged: {
                         appState.documentService.scheduleAutosave()
@@ -55,11 +55,6 @@ struct DocumentView: View {
                 appState.documentService.close()
             }
         }
-    }
-
-    private var searchFilter: ((TaskItem) -> Bool)? {
-        guard !searchText.isEmpty else { return nil }
-        return QueryEngine.compile(searchText)
     }
 
     private func loadDocument() async {

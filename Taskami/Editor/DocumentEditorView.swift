@@ -3,7 +3,8 @@ import UIKit
 
 struct DocumentEditorView: UIViewControllerRepresentable {
     let document: TaskDocument
-    var searchFilter: ((TaskItem) -> Bool)?
+    /// Plain search text — equatable, so updateUIViewController only calls applySnapshot when it actually changes.
+    var searchText: String
     var theme: EditorTheme
     var onDocumentChanged: (() -> Void)?
     /// Called once after the view controller is created, providing a reference for calling actions.
@@ -12,7 +13,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> DocumentEditorViewController {
         let vc = DocumentEditorViewController()
         vc.theme = theme
-        vc.searchFilter = searchFilter
+        vc.searchText = searchText
         vc.setDocument(document)
         vc.onDocumentChanged = onDocumentChanged
         // Defer to avoid "modifying state during view update" warning —
@@ -23,13 +24,12 @@ struct DocumentEditorView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ vc: DocumentEditorViewController, context: Context) {
         vc.theme = theme
-        vc.searchFilter = searchFilter
+        // searchText has a didSet on the VC that calls applySnapshot only when the value
+        // actually changes — no closure allocation, no spurious snapshot on every render.
+        vc.searchText = searchText
 
-        // If the document instance changed, update it; otherwise just refresh the snapshot
         if vc.document?.id != document.id {
             vc.setDocument(document)
-        } else {
-            vc.applySnapshot(animated: false)
         }
     }
 }
