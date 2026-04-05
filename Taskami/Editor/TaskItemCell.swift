@@ -156,7 +156,7 @@ final class TaskItemCell: UICollectionViewCell {
     func placeCursor(at pointInTextView: CGPoint) {
         guard isInEditMode,
               let position = textView.closestPosition(to: pointInTextView) else { return }
-        log.debug("placeCursor at \(pointInTextView)")
+        log.debug("placeCursor at (\(pointInTextView.x), \(pointInTextView.y))")
         textView.selectedTextRange = textView.textRange(from: position, to: position)
     }
 
@@ -174,7 +174,7 @@ final class TaskItemCell: UICollectionViewCell {
     }
 
     private func endEditMode() {
-        log.debug("endEditMode: '\((item?.content ?? "").prefix(30))'")
+        log.debug("endEditMode: '\((self.item?.content ?? "").prefix(30))'")
         isInEditMode = false
         textView.isEditable = false
         textView.isSelectable = false
@@ -197,7 +197,7 @@ final class TaskItemCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        log.debug("prepareForReuse: '\((item?.content ?? "").prefix(30))' editMode=\(self.isInEditMode)")
+        log.debug("prepareForReuse: '\((self.item?.content ?? "").prefix(30))' editMode=\(self.isInEditMode)")
         // Never reuse a cell mid-edit
         if isInEditMode { dismissEditing() }
         textView.attributedText = nil
@@ -224,7 +224,7 @@ final class TaskItemCell: UICollectionViewCell {
         let newHeight = max(size.height, 32)
         attributes.frame.size.height = newHeight
         if abs(oldHeight - newHeight) > 1 {
-            log.debug("preferredLayoutAttributesFitting: '\((item?.content ?? "").prefix(20))' height \(oldHeight) → \(newHeight) editMode=\(self.isInEditMode)")
+            log.debug("preferredLayoutAttributesFitting: '\((self.item?.content ?? "").prefix(20))' height \(oldHeight) → \(newHeight) editMode=\(self.isInEditMode)")
         }
         return attributes
     }
