@@ -1,13 +1,33 @@
 import UIKit
 
-final class TaskItemCell: UICollectionViewCell {
-    static let reuseIdentifier = "TaskItemCell"
+protocol TaskItemCellDelegate: AnyObject {
+    func cellDidCommit(_ cell: TaskItemCell, newContent: String)
+    func cellDidRequestNewItem(after cell: TaskItemCell)
+    func cellDidRequestDelete(_ cell: TaskItemCell)
+    func cellDidRequestIndent(_ cell: TaskItemCell)
+    func cellDidRequestOutdent(_ cell: TaskItemCell)
+    func cellDidChange(_ cell: TaskItemCell, content: String)
+}
 
-    private let contentLabel = UITextView()
+final class TaskItemCell: UICollectionViewCell {
+
+    weak var delegate: TaskItemCellDelegate?
+
+    // The single UITextView serves dual purpose: display (non-editable attributed) and edit (editable plain)
+    private let textView = UITextView()
     private let dashLabel = UILabel()
-    // Stored reference so configure() can update it directly — no constraint search loop
     private var indentLeadingConstraint: NSLayoutConstraint!
     private var dashWidthConstraint: NSLayoutConstraint!
+
+    private(set) var item: TaskItem?
+    private var highlighter: TaskPaperTextHighlighter?
+    private(set) var isInEditMode = false
+
+    /// The live text content while editing (for accessory actions that need it mid-edit).
+    var textViewCurrentContent: String { textView.text ?? "" }
+
+    /// Exposes the textView to the VC for cursor movement accessory buttons.
+    var editingTextView: UITextView? { isInEditMode ? textView : nil }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -19,13 +39,15 @@ final class TaskItemCell: UICollectionViewCell {
     }
 
     private func setupViews() {
-        contentLabel.isEditable = false
-        contentLabel.isSelectable = false
-        contentLabel.isScrollEnabled = false
-        contentLabel.textContainerInset = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 8)
-        contentLabel.textContainer.lineFragmentPadding = 0
-        contentLabel.backgroundColor = .clear
-        contentLabel.translatesAutoresizingMaskIntoConstraints = false
+        // textView — shared for display and editing
+        textView.isEditable = false
+        textView.isSelectable = false
+        textView.isScrollEnabled = false
+        textView.textContainerInset = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 8)
+        textView.textContainer.lineFragmentPadding = 0
+        textView.backgroundColor = .clear
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.delegate = self
 
         dashLabel.text = "- "
         dashLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -33,7 +55,7 @@ final class TaskItemCell: UICollectionViewCell {
         dashLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
         contentView.addSubview(dashLabel)
-        contentView.addSubview(contentLabel)
+        contentView.addSubview(textView)
 
         indentLeadingConstraint = dashLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16)
         dashWidthConstraint = dashLabel.widthAnchor.constraint(equalToConstant: 0)
@@ -42,41 +64,103 @@ final class TaskItemCell: UICollectionViewCell {
             indentLeadingConstraint,
             dashLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
 
-            contentLabel.leadingAnchor.constraint(equalTo: dashLabel.trailingAnchor),
-            contentLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            contentLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
-            contentLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            textView.leadingAnchor.constraint(equalTo: dashLabel.trailingAnchor),
+            textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            textView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
         ])
     }
 
-    func configure(with item: TaskItem, highlighter: TaskPaperTextHighlighter) {
-        let indentOffset = CGFloat(item.indentLevel) * highlighter.theme.indentWidth + 16
+    // MARK: - Configure (display mode)
 
-        // Update indent
+    func configure(with item: TaskItem, highlighter: TaskPaperTextHighlighter) {
+        self.item = item
+        self.highlighter = highlighter
+
+        let indentOffset = CGFloat(item.indentLevel) * highlighter.theme.indentWidth + 16
         indentLeadingConstraint.constant = indentOffset
 
-        // Show/hide dash for tasks — zero-width when hidden avoids layout gaps
         let isTask = item.type == .task
         dashLabel.isHidden = !isTask
         if isTask {
             dashLabel.text = "- "
             dashLabel.font = highlighter.theme.font
-            dashLabel.textColor = item.isDone ? highlighter.theme.doneColor.uiColor : highlighter.theme.taskColor.uiColor
+            dashLabel.textColor = item.isDone
+                ? highlighter.theme.doneColor.uiColor
+                : highlighter.theme.taskColor.uiColor
             dashWidthConstraint.isActive = false
         } else {
             dashWidthConstraint.isActive = true
         }
 
-        contentLabel.attributedText = highlighter.highlight(item)
-        contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+        // Only update display if not currently editing
+        if !isInEditMode {
+            textView.attributedText = highlighter.highlight(item)
+            contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+        }
     }
+
+    // MARK: - Edit mode
+
+    func beginEditing(inputAccessoryView: UIView?) {
+        guard let item, let highlighter, !isInEditMode else { return }
+        isInEditMode = true
+
+        // Switch to plain text for editing
+        textView.attributedText = nil
+        textView.text = item.content
+        textView.font = highlighter.theme.font
+        textView.textColor = highlighter.theme.textColor.uiColor
+        textView.tintColor = highlighter.theme.cursorColor.uiColor
+        textView.autocorrectionType = .default
+        textView.autocapitalizationType = .sentences
+        textView.isEditable = true
+        textView.isSelectable = true
+        textView.inputAccessoryView = inputAccessoryView
+        textView.becomeFirstResponder()
+        // Place cursor at end
+        textView.selectedRange = NSRange(location: textView.text.utf16.count, length: 0)
+    }
+
+    func commitEditing() {
+        guard isInEditMode else { return }
+        let newContent = textView.text ?? ""
+        endEditMode()
+        delegate?.cellDidCommit(self, newContent: newContent)
+    }
+
+    func dismissEditing() {
+        guard isInEditMode else { return }
+        endEditMode()
+    }
+
+    private func endEditMode() {
+        isInEditMode = false
+        textView.isEditable = false
+        textView.isSelectable = false
+        textView.resignFirstResponder()
+        // Restore attributed display
+        if let item, let highlighter {
+            textView.attributedText = highlighter.highlight(item)
+            contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+        }
+    }
+
+    // MARK: - Reuse
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        contentLabel.attributedText = nil
+        // Never reuse a cell mid-edit
+        if isInEditMode { dismissEditing() }
+        textView.attributedText = nil
         dashWidthConstraint.isActive = false
         dashLabel.isHidden = false
+        item = nil
+        delegate = nil
+        highlighter = nil
     }
+
+    // MARK: - Self-sizing
 
     override func preferredLayoutAttributesFitting(
         _ layoutAttributes: UICollectionViewLayoutAttributes
@@ -90,5 +174,39 @@ final class TaskItemCell: UICollectionViewCell {
         )
         attributes.frame.size.height = max(size.height, 32)
         return attributes
+    }
+}
+
+// MARK: - UITextViewDelegate
+
+extension TaskItemCell: UITextViewDelegate {
+
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        // Return key → commit + new item below
+        if text == "\n" {
+            let current = textView.text ?? ""
+            item?.content = current
+            item?.tags = TagParser.parseTags(in: current)
+            delegate?.cellDidRequestNewItem(after: self)
+            return false
+        }
+
+        // Backspace at beginning of empty line → delete item
+        if text == "" && range.location == 0 && range.length == 0 && (textView.text ?? "").isEmpty {
+            delegate?.cellDidRequestDelete(self)
+            return false
+        }
+
+        return true
+    }
+
+    func textViewDidChange(_ textView: UITextView) {
+        delegate?.cellDidChange(self, content: textView.text ?? "")
+    }
+
+    func textViewDidEndEditing(_ textView: UITextView) {
+        // Commit when focus leaves (e.g. user taps another cell or dismisses keyboard)
+        guard isInEditMode else { return }
+        commitEditing()
     }
 }

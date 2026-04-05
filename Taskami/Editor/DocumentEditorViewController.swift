@@ -21,10 +21,12 @@ final class DocumentEditorViewController: UIViewController {
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<Int, UUID>!
 
-    let fieldEditor = FieldEditorController()
     private let dragDropHandler = EditorDragDropHandler()
     private let keyboardAccessory = EditorKeyboardAccessoryView()
     private let docUndoManager = DocumentUndoManager()
+
+    /// The cell currently in edit mode (at most one at a time).
+    private weak var editingCell: TaskItemCell?
 
     private var highlighter: TaskPaperTextHighlighter {
         TaskPaperTextHighlighter(theme: theme)
@@ -36,20 +38,15 @@ final class DocumentEditorViewController: UIViewController {
         super.viewDidLoad()
         setupCollectionView()
         setupDataSource()
-        setupFieldEditor()
         setupDragDrop()
         setupKeyboardAccessory()
         setupKeyboardObservers()
         applyTheme()
-        // Apply snapshot now that dataSource is ready (document may have been set
-        // before viewDidLoad via setDocument called from makeUIViewController)
         applySnapshot(animated: false)
     }
 
     func setDocument(_ document: TaskDocument) {
         self.document = document
-        // Only apply snapshot if viewDidLoad has run and dataSource is set up.
-        // If not yet loaded, viewDidLoad will call applySnapshot after setup.
         if isViewLoaded {
             applySnapshot(animated: false)
         }
@@ -82,30 +79,24 @@ final class DocumentEditorViewController: UIViewController {
         }
 
         let layout = UICollectionViewCompositionalLayout.list(using: config)
-
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.keyboardDismissMode = .interactive
-
         view.addSubview(collectionView)
     }
 
     private func setupDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<TaskItemCell, UUID> { [weak self] cell, indexPath, itemID in
+        let cellRegistration = UICollectionView.CellRegistration<TaskItemCell, UUID> { [weak self] cell, _, itemID in
             guard let self, let item = self.document?.item(withID: itemID) else { return }
             cell.configure(with: item, highlighter: self.highlighter)
+            cell.delegate = self
         }
 
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemID in
             collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemID)
         }
-    }
-
-    private func setupFieldEditor() {
-        fieldEditor.delegate = self
-        fieldEditor.textView.inputAccessoryView = keyboardAccessory
     }
 
     private func setupDragDrop() {
@@ -147,10 +138,8 @@ final class DocumentEditorViewController: UIViewController {
     private func applyTheme() {
         view.backgroundColor = theme.backgroundColor.uiColor
         collectionView?.backgroundColor = .clear
-        // Skip reloadData while the field editor is active: the textView is the first
-        // responder inside a UIHostingController hierarchy and reloadData causes UIKit to
-        // create a _UIReparentingView, which is unsupported and triggers layout cycles.
-        if fieldEditor.editingItem == nil {
+        // Skip reloadData while a cell is editing to avoid _UIReparentingView issues
+        if editingCell == nil {
             collectionView?.reloadData()
         }
     }
@@ -182,10 +171,35 @@ final class DocumentEditorViewController: UIViewController {
         return document?.item(withID: itemID)
     }
 
-    // MARK: - Actions
+    // MARK: - Begin editing
+
+    func beginEditing(item: TaskItem) {
+        guard let document else { return }
+        let allItems = document.allItems
+        guard let index = allItems.firstIndex(where: { $0.id == item.id }) else { return }
+        let indexPath = IndexPath(item: index, section: 0)
+
+        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+        collectionView.layoutIfNeeded()
+
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else { return }
+        commitCurrentEdit()
+        editingCell = cell
+        cell.beginEditing(inputAccessoryView: keyboardAccessory)
+    }
+
+    private func commitCurrentEdit() {
+        editingCell?.commitEditing()
+        editingCell = nil
+    }
+
+    // MARK: - Add new item
 
     func addNewItem(after item: TaskItem? = nil) {
         guard let document else { return }
+
+        // Commit any in-progress edit first
+        commitCurrentEdit()
 
         let newItem = TaskItem(type: .task, content: "", indentLevel: item?.indentLevel ?? 0)
 
@@ -199,21 +213,14 @@ final class DocumentEditorViewController: UIViewController {
         applySnapshot(animated: false)
         onDocumentChanged?()
 
-        // Begin editing the new item after layout completes
         DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            let allItems = document.allItems
-            guard let index = allItems.firstIndex(where: { $0.id == newItem.id }) else { return }
-            let indexPath = IndexPath(item: index, section: 0)
-            self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-            self.collectionView.layoutIfNeeded()
-            if let cell = self.collectionView.cellForItem(at: indexPath) as? TaskItemCell {
-                self.fieldEditor.beginEditing(item: newItem, in: cell, highlighter: self.highlighter)
-            }
+            self?.beginEditing(item: newItem)
         }
     }
 
-    private func deleteItem(_ item: TaskItem) {
+    // MARK: - Delete item
+
+    func deleteItem(_ item: TaskItem) {
         guard let document else { return }
         let parent = item.parent
         let index: Int
@@ -229,11 +236,33 @@ final class DocumentEditorViewController: UIViewController {
         onDocumentChanged?()
     }
 
-    private func toggleDone(_ item: TaskItem) {
+    // MARK: - Toggle done
+
+    func toggleDone(_ item: TaskItem) {
         let oldContent = item.content
         item.toggleDone()
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document!)
-        applySnapshot(animated: true)
+        applySnapshot(animated: false)
+        onDocumentChanged?()
+    }
+
+    // MARK: - Indent / Outdent
+
+    private func indentItem(_ item: TaskItem) {
+        guard let document else { return }
+        let oldLevel = item.indentLevel
+        document.indentItem(item)
+        docUndoManager.registerIndentChange(item: item, oldLevel: oldLevel, newLevel: item.indentLevel, document: document)
+        applySnapshot(animated: false)
+        onDocumentChanged?()
+    }
+
+    private func outdentItem(_ item: TaskItem) {
+        guard let document else { return }
+        let oldLevel = item.indentLevel
+        document.outdentItem(item)
+        docUndoManager.registerIndentChange(item: item, oldLevel: oldLevel, newLevel: item.indentLevel, document: document)
+        applySnapshot(animated: false)
         onDocumentChanged?()
     }
 }
@@ -242,92 +271,107 @@ final class DocumentEditorViewController: UIViewController {
 
 extension DocumentEditorViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: true)
-
-        // Commit any existing edit
-        fieldEditor.commit()
+        collectionView.deselectItem(at: indexPath, animated: false)
 
         guard let item = item(at: indexPath),
               let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else { return }
 
-        fieldEditor.beginEditing(item: item, in: cell, highlighter: highlighter)
+        // If tapping the already-editing cell, do nothing
+        if cell === editingCell { return }
+
+        commitCurrentEdit()
+        editingCell = cell
+        cell.beginEditing(inputAccessoryView: keyboardAccessory)
     }
 }
 
-// MARK: - FieldEditorDelegate
+// MARK: - TaskItemCellDelegate
 
-extension DocumentEditorViewController: FieldEditorDelegate {
-    func fieldEditorDidCommit(item: TaskItem, newContent: String) {
+extension DocumentEditorViewController: TaskItemCellDelegate {
+
+    func cellDidCommit(_ cell: TaskItemCell, newContent: String) {
+        guard let item = cell.item else { return }
+        let oldContent = item.content
+        item.content = newContent
+        item.tags = TagParser.parseTags(in: newContent)
+        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: newContent, document: document!)
+        if cell === editingCell { editingCell = nil }
         applySnapshot(animated: false)
         onDocumentChanged?()
     }
 
-    func fieldEditorDidRequestNewItem(after item: TaskItem) {
-        fieldEditor.dismiss()
+    func cellDidRequestNewItem(after cell: TaskItemCell) {
+        guard let item = cell.item else { return }
+        // Cell already updated item.content in shouldChangeTextIn before calling this
+        if cell === editingCell { editingCell = nil }
         addNewItem(after: item)
     }
 
-    func fieldEditorDidRequestIndent(item: TaskItem) {
-        guard let document else { return }
-        let oldLevel = item.indentLevel
-        document.indentItem(item)
-        docUndoManager.registerIndentChange(item: item, oldLevel: oldLevel, newLevel: item.indentLevel, document: document)
-        applySnapshot(animated: true)
-        onDocumentChanged?()
-    }
-
-    func fieldEditorDidRequestOutdent(item: TaskItem) {
-        guard let document else { return }
-        let oldLevel = item.indentLevel
-        document.outdentItem(item)
-        docUndoManager.registerIndentChange(item: item, oldLevel: oldLevel, newLevel: item.indentLevel, document: document)
-        applySnapshot(animated: true)
-        onDocumentChanged?()
-    }
-
-    func fieldEditorDidRequestDelete(item: TaskItem) {
+    func cellDidRequestDelete(_ cell: TaskItemCell) {
+        guard let item = cell.item else { return }
+        if cell === editingCell { editingCell = nil }
         deleteItem(item)
     }
 
-    func fieldEditorDidChange(item: TaskItem) {
+    func cellDidRequestIndent(_ cell: TaskItemCell) {
+        guard let item = cell.item else { return }
+        indentItem(item)
+        // Re-begin editing so the cell stays active after snapshot refresh
+        DispatchQueue.main.async { [weak self] in self?.beginEditing(item: item) }
+    }
+
+    func cellDidRequestOutdent(_ cell: TaskItemCell) {
+        guard let item = cell.item else { return }
+        outdentItem(item)
+        DispatchQueue.main.async { [weak self] in self?.beginEditing(item: item) }
+    }
+
+    func cellDidChange(_ cell: TaskItemCell, content: String) {
         document?.hasUnsavedChanges = true
+        onDocumentChanged?()
     }
 }
 
 // MARK: - EditorKeyboardAccessoryDelegate
 
 extension DocumentEditorViewController: EditorKeyboardAccessoryDelegate {
+
     func accessoryDidTapIndent() {
-        guard let item = fieldEditor.editingItem else { return }
-        fieldEditorDidRequestIndent(item: item)
+        guard let cell = editingCell, let item = cell.item else { return }
+        // Save current text before indent so content isn't lost
+        item.content = cell.textViewCurrentContent
+        cellDidRequestIndent(cell)
     }
 
     func accessoryDidTapOutdent() {
-        guard let item = fieldEditor.editingItem else { return }
-        fieldEditorDidRequestOutdent(item: item)
+        guard let cell = editingCell, let item = cell.item else { return }
+        item.content = cell.textViewCurrentContent
+        cellDidRequestOutdent(cell)
     }
 
     func accessoryDidTapToggleDone() {
-        guard let item = fieldEditor.editingItem else { return }
+        guard let cell = editingCell, let item = cell.item else { return }
+        item.content = cell.textViewCurrentContent
+        cell.commitEditing()
+        editingCell = nil
         toggleDone(item)
-        fieldEditor.commit()
     }
 
     func accessoryDidTapCursorLeft() {
-        let tv = fieldEditor.textView
-        guard let range = tv.selectedTextRange,
+        guard let tv = editingCell?.editingTextView,
+              let range = tv.selectedTextRange,
               let newPos = tv.position(from: range.start, offset: -1) else { return }
         tv.selectedTextRange = tv.textRange(from: newPos, to: newPos)
     }
 
     func accessoryDidTapCursorRight() {
-        let tv = fieldEditor.textView
-        guard let range = tv.selectedTextRange,
+        guard let tv = editingCell?.editingTextView,
+              let range = tv.selectedTextRange,
               let newPos = tv.position(from: range.end, offset: 1) else { return }
         tv.selectedTextRange = tv.textRange(from: newPos, to: newPos)
     }
 
     func accessoryDidTapDismiss() {
-        fieldEditor.commit()
+        commitCurrentEdit()
     }
 }
