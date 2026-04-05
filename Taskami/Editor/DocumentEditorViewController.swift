@@ -434,7 +434,7 @@ extension DocumentEditorViewController: UICollectionViewDelegate {
             log.warning("didSelectItemAt: no item at \(indexPath), scheduling retry")
             DispatchQueue.main.async { [weak self] in
                 guard let self, let item = self.item(at: indexPath) else {
-                    self?.log.error("didSelectItemAt: retry also failed for \(indexPath)")
+                    log.error("didSelectItemAt: retry also failed for \(indexPath)")
                     return
                 }
                 if self.editingCell?.item?.id == item.id { return }
