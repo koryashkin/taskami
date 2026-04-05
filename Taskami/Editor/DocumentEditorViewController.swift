@@ -55,7 +55,6 @@ final class DocumentEditorViewController: UIViewController {
         setupDragDrop()
         setupKeyboardAccessory()
         setupKeyboardObservers()
-        setupTapToCursor()
         applyTheme()
         applySnapshot(animated: false)
     }
@@ -134,26 +133,6 @@ final class DocumentEditorViewController: UIViewController {
             self, selector: #selector(keyboardWillHide(_:)),
             name: UIResponder.keyboardWillHideNotification, object: nil
         )
-    }
-
-    private func setupTapToCursor() {
-        // A secondary tap recognizer that runs simultaneously with the collection view's
-        // own selection recognizer. It captures the tap point so beginEditing can place
-        // the cursor where the finger landed rather than always at end-of-text.
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTapForCursor(_:)))
-        tap.delegate = self
-        collectionView.addGestureRecognizer(tap)
-    }
-
-    @objc private func handleTapForCursor(_ gesture: UITapGestureRecognizer) {
-        guard gesture.state == .ended else { return }
-        let point = gesture.location(in: collectionView)
-        guard let indexPath = collectionView.indexPathForItem(at: point),
-              let item = item(at: indexPath) else { return }
-        // Already editing this item — UITextView handles the tap natively; don't override.
-        if editingCell?.item?.id == item.id { return }
-        log.debug("handleTapForCursor: storing tap at (\(point.x), \(point.y)) for item '\(item.content.prefix(20))'")
-        pendingTapLocation = (itemID: item.id, point: point)
     }
 
     @objc private func keyboardWillShow(_ notification: Notification) {
@@ -428,22 +407,21 @@ extension DocumentEditorViewController: UICollectionViewDelegate {
             return
         }
 
+        // Read the tap location from the collection view's own tap recognizer while it
+        // is still in .ended state — no separate gesture recognizer needed, no conflict.
+        let tapLocation = collectionView.gestureRecognizers?
+            .compactMap { $0 as? UITapGestureRecognizer }
+            .first { $0.state == .ended }
+            .map { $0.location(in: collectionView) }
+
+        if let loc = tapLocation {
+            log.debug("didSelectItemAt: tap at (\(loc.x), \(loc.y))")
+            pendingTapLocation = (itemID: item.id, point: loc)
+        }
+
         DispatchQueue.main.async { [weak self] in
             self?.beginEditing(item: item)
         }
-    }
-}
-
-// MARK: - UIGestureRecognizerDelegate
-
-extension DocumentEditorViewController: UIGestureRecognizerDelegate {
-    func gestureRecognizer(
-        _ gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer
-    ) -> Bool {
-        // Allow our tap-to-cursor recognizer to fire at the same time as the
-        // collection view's built-in selection recognizer.
-        return true
     }
 }
 
