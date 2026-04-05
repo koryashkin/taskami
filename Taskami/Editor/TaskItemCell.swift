@@ -1,4 +1,7 @@
 import UIKit
+import OSLog
+
+private let log = Logger(subsystem: "com.taskami", category: "Cell")
 
 enum NavigationDirection { case previous, next }
 
@@ -109,7 +112,12 @@ final class TaskItemCell: UICollectionViewCell {
     // MARK: - Edit mode
 
     func beginEditing(inputAccessoryView: UIView?) {
-        guard let item, let highlighter, !isInEditMode else { return }
+        guard let item, let highlighter, !isInEditMode else {
+            log.debug("beginEditing skipped: isInEditMode=\(self.isInEditMode) hasItem=\(self.item != nil)")
+            return
+        }
+        log.debug("beginEditing: '\(item.content.prefix(40))'")
+
         isInEditMode = true
 
         // Re-enable interaction so the textView can become first responder
@@ -140,6 +148,7 @@ final class TaskItemCell: UICollectionViewCell {
     func commitEditing() {
         guard isInEditMode else { return }
         let newContent = textView.text ?? ""
+        log.debug("commitEditing: '\(newContent.prefix(40))'")
         endEditMode()
         delegate?.cellDidCommit(self, newContent: newContent)
     }
@@ -205,6 +214,7 @@ extension TaskItemCell: UITextViewDelegate {
         // Return key → commit + new item below
         if text == "\n" {
             let current = textView.text ?? ""
+            log.debug("shouldChangeText: Return key → new item after '\(current.prefix(30))'")
             item?.content = current
             item?.tags = TagParser.parseTags(in: current)
             delegate?.cellDidRequestNewItem(after: self)
@@ -213,6 +223,7 @@ extension TaskItemCell: UITextViewDelegate {
 
         // Backspace at beginning of empty line → delete item
         if text == "" && range.location == 0 && range.length == 0 && (textView.text ?? "").isEmpty {
+            log.debug("shouldChangeText: Backspace on empty → delete item")
             delegate?.cellDidRequestDelete(self)
             return false
         }
@@ -227,6 +238,7 @@ extension TaskItemCell: UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         // Commit when focus leaves (e.g. user taps another cell or dismisses keyboard)
         guard isInEditMode else { return }
+        log.debug("textViewDidEndEditing → commitEditing")
         commitEditing()
     }
 }

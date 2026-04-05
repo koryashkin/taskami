@@ -1,4 +1,7 @@
 import UIKit
+import OSLog
+
+private let log = Logger(subsystem: "com.taskami", category: "Editor")
 
 final class DocumentEditorViewController: UIViewController {
 
@@ -156,6 +159,7 @@ final class DocumentEditorViewController: UIViewController {
         // Guard against nested applies (e.g. a UITextView delegate callback fires
         // mid-apply and tries to apply again). Defer one run loop tick instead.
         guard !isApplyingSnapshot else {
+            log.debug("applySnapshot deferred (already applying)")
             DispatchQueue.main.async { [weak self] in self?.applySnapshot(animated: animated) }
             return
         }
@@ -168,6 +172,8 @@ final class DocumentEditorViewController: UIViewController {
             let filter = QueryEngine.compile(searchText)
             filteredItems = allItems.filter(filter)
         }
+
+        log.debug("applySnapshot: \(filteredItems.count) items (animated=\(animated))")
 
         var snapshot = NSDiffableDataSourceSnapshot<Int, UUID>()
         snapshot.appendSections([0])
@@ -190,22 +196,32 @@ final class DocumentEditorViewController: UIViewController {
     func beginEditing(item: TaskItem) {
         guard let document else { return }
 
+        log.debug("beginEditing: '\(item.content.prefix(40))'")
+
         // Commit the current edit first; this may trigger applySnapshot which can
         // shift index paths, so resolve the target cell AFTER committing.
         commitCurrentEdit()
 
-        guard let index = document.allItems.firstIndex(where: { $0.id == item.id }) else { return }
+        guard let index = document.allItems.firstIndex(where: { $0.id == item.id }) else {
+            log.warning("beginEditing: item not found in allItems")
+            return
+        }
         let indexPath = IndexPath(item: index, section: 0)
 
         collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
         collectionView.layoutIfNeeded()
 
-        guard let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else { return }
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else {
+            log.warning("beginEditing: no cell at indexPath \(indexPath)")
+            return
+        }
+        log.debug("beginEditing: activating cell at \(indexPath)")
         editingCell = cell
         cell.beginEditing(inputAccessoryView: keyboardAccessory)
     }
 
     private func commitCurrentEdit() {
+        if editingCell != nil { log.debug("commitCurrentEdit") }
         editingCell?.commitEditing()
         editingCell = nil
     }
@@ -290,11 +306,19 @@ extension DocumentEditorViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: false)
 
+        log.debug("didSelectItemAt \(indexPath)")
+
         guard let item = item(at: indexPath),
-              let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else { return }
+              let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else {
+            log.warning("didSelectItemAt: no item or cell at \(indexPath)")
+            return
+        }
 
         // If tapping the already-editing cell, do nothing
-        if cell === editingCell { return }
+        if cell === editingCell {
+            log.debug("didSelectItemAt: already editing this cell")
+            return
+        }
 
         commitCurrentEdit()
         editingCell = cell
