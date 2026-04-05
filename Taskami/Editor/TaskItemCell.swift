@@ -39,10 +39,13 @@ final class TaskItemCell: UICollectionViewCell {
     }
 
     private func setupViews() {
-        // textView — shared for display and editing
+        // textView — shared for display and editing.
+        // User interaction is OFF in display mode so taps reach the collection view
+        // (didSelectItemAt) rather than being absorbed by the UITextView.
         textView.isEditable = false
         textView.isSelectable = false
         textView.isScrollEnabled = false
+        textView.isUserInteractionEnabled = false
         textView.textContainerInset = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 8)
         textView.textContainer.lineFragmentPadding = 0
         textView.backgroundColor = .clear
@@ -106,6 +109,8 @@ final class TaskItemCell: UICollectionViewCell {
         guard let item, let highlighter, !isInEditMode else { return }
         isInEditMode = true
 
+        // Re-enable interaction so the textView can become first responder
+        textView.isUserInteractionEnabled = true
         // Switch to plain text for editing
         textView.attributedText = nil
         textView.text = item.content
@@ -138,6 +143,7 @@ final class TaskItemCell: UICollectionViewCell {
         isInEditMode = false
         textView.isEditable = false
         textView.isSelectable = false
+        textView.isUserInteractionEnabled = false
         textView.resignFirstResponder()
         // Restore attributed display
         if let item, let highlighter {
