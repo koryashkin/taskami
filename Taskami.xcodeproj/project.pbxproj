@@ -29,6 +29,7 @@
 		5B5BD0BC3416585821165EB8 /* DocumentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E66BC38BCD21E41296D8E5E /* DocumentService.swift */; };
 		5BC9E0F8C0266898279D54E5 /* FileCoordinatorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */; };
 		5EA560C6BDC3390F580EE26B /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C3B0D3ED32EDB931C39FE4 /* FileItem.swift */; };
+		65968549AA302F8A2EE44E02 /* TaskItemTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F499F67987EC0169DE19455 /* TaskItemTextView.swift */; };
 		66F887D34514A96EAE268B32 /* TaskPaperSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED09CE4BB446155BA6786D5D /* TaskPaperSerializer.swift */; };
 		69DC92B0F85F223A1E6F5505 /* FileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CA9B3CA0C10EE6B5C0FA5D /* FileRowView.swift */; };
 		6E64DC629D7FAB60C87449D4 /* TaskItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138C1974381E6BAE06CEB5FD /* TaskItem.swift */; };
@@ -94,6 +95,7 @@
 		909E0A91A8311C1D396039E8 /* DocumentUndoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentUndoManager.swift; sourceTree = "<group>"; };
 		93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
 		96C05BF5A6FF3FC63E950EA1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		9F499F67987EC0169DE19455 /* TaskItemTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTextView.swift; sourceTree = "<group>"; };
 		A4E426425116A580458A046B /* ErrorBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBannerView.swift; sourceTree = "<group>"; };
 		A8CA9B3CA0C10EE6B5C0FA5D /* FileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRowView.swift; sourceTree = "<group>"; };
 		B560B7ECE8F5F51783AB3E7C /* EditorDragDropHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorDragDropHandler.swift; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 				B560B7ECE8F5F51783AB3E7C /* EditorDragDropHandler.swift */,
 				86863540DA0FEE4D05FC2268 /* EditorKeyboardAccessoryView.swift */,
 				C7D80466DA9339A66D949CD1 /* TaskItemCell.swift */,
+				9F499F67987EC0169DE19455 /* TaskItemTextView.swift */,
 				DE2DE47D5AD4A42A8D5227A3 /* TaskPaperTextHighlighter.swift */,
 			);
 			path = Editor;
@@ -443,6 +446,7 @@
 				9734359D646656D5B72B8539 /* TaskDocument.swift in Sources */,
 				6E64DC629D7FAB60C87449D4 /* TaskItem.swift in Sources */,
 				25BADDEDB51A6CC683F0CDFF /* TaskItemCell.swift in Sources */,
+				65968549AA302F8A2EE44E02 /* TaskItemTextView.swift in Sources */,
 				3C7AED98E545D7C11AFE320F /* TaskPaperParser.swift in Sources */,
 				66F887D34514A96EAE268B32 /* TaskPaperSerializer.swift in Sources */,
 				577304BF7184DE5CD6A2983B /* TaskPaperTextHighlighter.swift in Sources */,

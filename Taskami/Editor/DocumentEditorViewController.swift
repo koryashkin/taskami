@@ -332,6 +332,28 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         document?.hasUnsavedChanges = true
         onDocumentChanged?()
     }
+
+    func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection) {
+        guard let item = cell.item, let document else { return }
+        let allItems = document.allItems
+        guard let currentIndex = allItems.firstIndex(where: { $0.id == item.id }) else { return }
+
+        let targetIndex: Int
+        switch direction {
+        case .previous: targetIndex = currentIndex - 1
+        case .next:     targetIndex = currentIndex + 1
+        }
+
+        guard allItems.indices.contains(targetIndex) else { return }
+        let targetItem = allItems[targetIndex]
+
+        // Save current content before moving
+        item.content = cell.textViewCurrentContent
+
+        DispatchQueue.main.async { [weak self] in
+            self?.beginEditing(item: targetItem)
+        }
+    }
 }
 
 // MARK: - EditorKeyboardAccessoryDelegate

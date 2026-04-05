@@ -1,5 +1,7 @@
 import UIKit
 
+enum NavigationDirection { case previous, next }
+
 protocol TaskItemCellDelegate: AnyObject {
     func cellDidCommit(_ cell: TaskItemCell, newContent: String)
     func cellDidRequestNewItem(after cell: TaskItemCell)
@@ -7,6 +9,7 @@ protocol TaskItemCellDelegate: AnyObject {
     func cellDidRequestIndent(_ cell: TaskItemCell)
     func cellDidRequestOutdent(_ cell: TaskItemCell)
     func cellDidChange(_ cell: TaskItemCell, content: String)
+    func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection)
 }
 
 final class TaskItemCell: UICollectionViewCell {
@@ -14,7 +17,7 @@ final class TaskItemCell: UICollectionViewCell {
     weak var delegate: TaskItemCellDelegate?
 
     // The single UITextView serves dual purpose: display (non-editable attributed) and edit (editable plain)
-    private let textView = UITextView()
+    private let textView = TaskItemTextView()
     private let dashLabel = UILabel()
     private var indentLeadingConstraint: NSLayoutConstraint!
     private var dashWidthConstraint: NSLayoutConstraint!
@@ -122,6 +125,13 @@ final class TaskItemCell: UICollectionViewCell {
         textView.isEditable = true
         textView.isSelectable = true
         textView.inputAccessoryView = inputAccessoryView
+
+        // Hardware keyboard navigation
+        textView.onIndent  = { [weak self] in guard let self else { return }; delegate?.cellDidRequestIndent(self) }
+        textView.onOutdent = { [weak self] in guard let self else { return }; delegate?.cellDidRequestOutdent(self) }
+        textView.onNavigatePrevious = { [weak self] in guard let self else { return }; delegate?.cellDidRequestNavigate(self, direction: .previous) }
+        textView.onNavigateNext     = { [weak self] in guard let self else { return }; delegate?.cellDidRequestNavigate(self, direction: .next) }
+
         textView.becomeFirstResponder()
         // Place cursor at end
         textView.selectedRange = NSRange(location: textView.text.utf16.count, length: 0)
@@ -144,6 +154,10 @@ final class TaskItemCell: UICollectionViewCell {
         textView.isEditable = false
         textView.isSelectable = false
         textView.isUserInteractionEnabled = false
+        textView.onIndent = nil
+        textView.onOutdent = nil
+        textView.onNavigatePrevious = nil
+        textView.onNavigateNext = nil
         textView.resignFirstResponder()
         // Restore attributed display
         if let item, let highlighter {
