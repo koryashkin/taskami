@@ -35,6 +35,9 @@ final class DocumentEditorViewController: UIViewController {
     /// fires during an existing apply). Nested calls are deferred one run loop tick.
     private var isApplyingSnapshot = false
 
+    /// Tracks scroll position for unexpected-jump detection in scrollViewDidScroll.
+    private var lastKnownContentOffset: CGFloat = 0
+
     private var highlighter: TaskPaperTextHighlighter {
         TaskPaperTextHighlighter(theme: theme)
     }
@@ -89,7 +92,7 @@ final class DocumentEditorViewController: UIViewController {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
         collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         collectionView.backgroundColor = .clear
-        collectionView.delegate = self
+        collectionView.delegate = self   // also serves as UIScrollViewDelegate
         collectionView.keyboardDismissMode = .interactive
         view.addSubview(collectionView)
     }
@@ -130,14 +133,36 @@ final class DocumentEditorViewController: UIViewController {
 
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+        let curveRaw = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt ?? 0
         let inset = frame.height - view.safeAreaInsets.bottom
-        collectionView.contentInset.bottom = inset
-        collectionView.verticalScrollIndicatorInsets.bottom = inset
+        let offsetBefore = collectionView.contentOffset.y
+        log.debug("keyboardWillShow: frame=\(frame.height) inset=\(inset) duration=\(duration) offsetBefore=\(offsetBefore)")
+        UIView.animate(
+            withDuration: duration,
+            delay: 0,
+            options: UIView.AnimationOptions(rawValue: curveRaw << 16),
+            animations: {
+                self.collectionView.contentInset.bottom = inset
+                self.collectionView.verticalScrollIndicatorInsets.bottom = inset
+            }
+        )
     }
 
     @objc private func keyboardWillHide(_ notification: Notification) {
-        collectionView.contentInset.bottom = 0
-        collectionView.verticalScrollIndicatorInsets.bottom = 0
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+        let curveRaw = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt ?? 0
+        let offsetBefore = collectionView.contentOffset.y
+        log.debug("keyboardWillHide: duration=\(duration) offsetBefore=\(offsetBefore)")
+        UIView.animate(
+            withDuration: duration,
+            delay: 0,
+            options: UIView.AnimationOptions(rawValue: curveRaw << 16),
+            animations: {
+                self.collectionView.contentInset.bottom = 0
+                self.collectionView.verticalScrollIndicatorInsets.bottom = 0
+            }
+        )
     }
 
     // MARK: - Theme
@@ -196,6 +221,17 @@ final class DocumentEditorViewController: UIViewController {
         return document?.item(withID: itemID)
     }
 
+    private func isCellFullyVisible(at indexPath: IndexPath) -> Bool {
+        guard let layoutAttr = collectionView.layoutAttributesForItem(at: indexPath) else { return false }
+        let visibleRect = CGRect(
+            x: collectionView.contentOffset.x,
+            y: collectionView.contentOffset.y,
+            width: collectionView.bounds.width,
+            height: collectionView.bounds.height - collectionView.contentInset.bottom
+        )
+        return visibleRect.contains(layoutAttr.frame)
+    }
+
     // MARK: - Begin editing
 
     func beginEditing(item: TaskItem) {
@@ -213,8 +249,20 @@ final class DocumentEditorViewController: UIViewController {
         }
         let indexPath = IndexPath(item: index, section: 0)
 
-        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+        // Only scroll if the target cell isn't already fully visible — avoids a
+        // jarring jump when the user taps a cell that's already on screen.
+        let offsetBefore = collectionView.contentOffset.y
+        if !isCellFullyVisible(at: indexPath) {
+            log.debug("beginEditing: scrolling to \(indexPath), offsetBefore=\(offsetBefore)")
+            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+        } else {
+            log.debug("beginEditing: cell \(indexPath) already fully visible, skipping scroll")
+        }
         collectionView.layoutIfNeeded()
+        let offsetAfter = collectionView.contentOffset.y
+        if offsetBefore != offsetAfter {
+            log.debug("beginEditing: contentOffset changed \(offsetBefore) → \(offsetAfter)")
+        }
 
         guard let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else {
             log.warning("beginEditing: no cell at indexPath \(indexPath)")
@@ -302,6 +350,20 @@ final class DocumentEditorViewController: UIViewController {
         docUndoManager.registerIndentChange(item: item, oldLevel: oldLevel, newLevel: item.indentLevel, document: document)
         applySnapshot(animated: false)
         onDocumentChanged?()
+    }
+}
+
+// MARK: - UIScrollViewDelegate (jump detection)
+
+extension DocumentEditorViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Only log large unexpected jumps (>100pt) to avoid flooding
+        // We track the last offset via a stored property set after intentional scrolls.
+        let offset = scrollView.contentOffset.y
+        if abs(offset - lastKnownContentOffset) > 100 && !scrollView.isDragging && !scrollView.isDecelerating {
+            log.warning("scrollViewDidScroll: unexpected jump \(self.lastKnownContentOffset) → \(offset)")
+        }
+        lastKnownContentOffset = offset
     }
 }
 

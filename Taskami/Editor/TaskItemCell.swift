@@ -208,7 +208,12 @@ final class TaskItemCell: UICollectionViewCell {
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         )
-        attributes.frame.size.height = max(size.height, 32)
+        let oldHeight = layoutAttributes.frame.size.height
+        let newHeight = max(size.height, 32)
+        attributes.frame.size.height = newHeight
+        if abs(oldHeight - newHeight) > 1 {
+            log.debug("preferredLayoutAttributesFitting: '\((item?.content ?? "").prefix(20))' height \(oldHeight) → \(newHeight) editMode=\(self.isInEditMode)")
+        }
         return attributes
     }
 }
