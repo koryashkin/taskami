@@ -28,6 +28,10 @@ final class DocumentEditorViewController: UIViewController {
     /// The cell currently in edit mode (at most one at a time).
     private weak var editingCell: TaskItemCell?
 
+    /// Prevents nested dataSource.apply calls (e.g. when a UITextView delegate callback
+    /// fires during an existing apply). Nested calls are deferred one run loop tick.
+    private var isApplyingSnapshot = false
+
     private var highlighter: TaskPaperTextHighlighter {
         TaskPaperTextHighlighter(theme: theme)
     }
@@ -149,6 +153,13 @@ final class DocumentEditorViewController: UIViewController {
     func applySnapshot(animated: Bool) {
         guard let document else { return }
 
+        // Guard against nested applies (e.g. a UITextView delegate callback fires
+        // mid-apply and tries to apply again). Defer one run loop tick instead.
+        guard !isApplyingSnapshot else {
+            DispatchQueue.main.async { [weak self] in self?.applySnapshot(animated: animated) }
+            return
+        }
+
         let allItems = document.allItems
         let filteredItems: [TaskItem]
         if searchText.isEmpty {
@@ -161,7 +172,10 @@ final class DocumentEditorViewController: UIViewController {
         var snapshot = NSDiffableDataSourceSnapshot<Int, UUID>()
         snapshot.appendSections([0])
         snapshot.appendItems(filteredItems.map(\.id))
+
+        isApplyingSnapshot = true
         dataSource.apply(snapshot, animatingDifferences: animated)
+        isApplyingSnapshot = false
     }
 
     // MARK: - Item Access
@@ -175,15 +189,18 @@ final class DocumentEditorViewController: UIViewController {
 
     func beginEditing(item: TaskItem) {
         guard let document else { return }
-        let allItems = document.allItems
-        guard let index = allItems.firstIndex(where: { $0.id == item.id }) else { return }
+
+        // Commit the current edit first; this may trigger applySnapshot which can
+        // shift index paths, so resolve the target cell AFTER committing.
+        commitCurrentEdit()
+
+        guard let index = document.allItems.firstIndex(where: { $0.id == item.id }) else { return }
         let indexPath = IndexPath(item: index, section: 0)
 
         collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
         collectionView.layoutIfNeeded()
 
         guard let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else { return }
-        commitCurrentEdit()
         editingCell = cell
         cell.beginEditing(inputAccessoryView: keyboardAccessory)
     }
