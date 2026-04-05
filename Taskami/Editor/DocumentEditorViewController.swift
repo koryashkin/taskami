@@ -302,15 +302,17 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
 
     func cellDidRequestNewItem(after cell: TaskItemCell) {
         guard let item = cell.item else { return }
-        // Cell already updated item.content in shouldChangeTextIn before calling this
+        // Cell already saved item.content in shouldChangeTextIn before calling this.
+        // Defer out of UIKit's text-change pipeline to avoid a nested dataSource.apply call.
         if cell === editingCell { editingCell = nil }
-        addNewItem(after: item)
+        DispatchQueue.main.async { [weak self] in self?.addNewItem(after: item) }
     }
 
     func cellDidRequestDelete(_ cell: TaskItemCell) {
         guard let item = cell.item else { return }
+        // Same reason — defer out of the text-change pipeline.
         if cell === editingCell { editingCell = nil }
-        deleteItem(item)
+        DispatchQueue.main.async { [weak self] in self?.deleteItem(item) }
     }
 
     func cellDidRequestIndent(_ cell: TaskItemCell) {
