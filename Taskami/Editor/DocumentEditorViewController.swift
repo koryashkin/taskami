@@ -38,6 +38,10 @@ final class DocumentEditorViewController: UIViewController {
     /// Tracks scroll position for unexpected-jump detection in scrollViewDidScroll.
     private var lastKnownContentOffset: CGFloat = 0
 
+    /// Location (in collectionView coordinates) of the most recent tap that initiated
+    /// an edit. Used to place the cursor where the user tapped rather than at the end.
+    private var pendingTapLocation: (itemID: UUID, point: CGPoint)?
+
     private var highlighter: TaskPaperTextHighlighter {
         TaskPaperTextHighlighter(theme: theme)
     }
@@ -51,6 +55,7 @@ final class DocumentEditorViewController: UIViewController {
         setupDragDrop()
         setupKeyboardAccessory()
         setupKeyboardObservers()
+        setupTapToCursor()
         applyTheme()
         applySnapshot(animated: false)
     }
@@ -129,6 +134,26 @@ final class DocumentEditorViewController: UIViewController {
             self, selector: #selector(keyboardWillHide(_:)),
             name: UIResponder.keyboardWillHideNotification, object: nil
         )
+    }
+
+    private func setupTapToCursor() {
+        // A secondary tap recognizer that runs simultaneously with the collection view's
+        // own selection recognizer. It captures the tap point so beginEditing can place
+        // the cursor where the finger landed rather than always at end-of-text.
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTapForCursor(_:)))
+        tap.delegate = self
+        collectionView.addGestureRecognizer(tap)
+    }
+
+    @objc private func handleTapForCursor(_ gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended else { return }
+        let point = gesture.location(in: collectionView)
+        guard let indexPath = collectionView.indexPathForItem(at: point),
+              let item = item(at: indexPath) else { return }
+        // Already editing this item — UITextView handles the tap natively; don't override.
+        if editingCell?.item?.id == item.id { return }
+        log.debug("handleTapForCursor: storing tap at \(point) for item '\(item.content.prefix(20))'")
+        pendingTapLocation = (itemID: item.id, point: point)
     }
 
     @objc private func keyboardWillShow(_ notification: Notification) {
@@ -271,6 +296,19 @@ final class DocumentEditorViewController: UIViewController {
         log.debug("beginEditing: activating cell at \(indexPath)")
         editingCell = cell
         cell.beginEditing(inputAccessoryView: keyboardAccessory)
+
+        // If a tap location was captured for this exact item, place the cursor there.
+        // beginEditing sets cursor to end-of-text by default; we override it here.
+        if let pending = pendingTapLocation, pending.itemID == item.id {
+            pendingTapLocation = nil
+            // Convert the tap point from collectionView space → cell space → textView space.
+            let pointInCell = collectionView.convert(pending.point, to: cell)
+            let pointInTextView = CGPoint(
+                x: pointInCell.x - cell.textViewFrame.minX,
+                y: pointInCell.y - cell.textViewFrame.minY
+            )
+            cell.placeCursor(at: pointInTextView)
+        }
     }
 
     private func commitCurrentEdit() {
@@ -393,6 +431,19 @@ extension DocumentEditorViewController: UICollectionViewDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.beginEditing(item: item)
         }
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+
+extension DocumentEditorViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer
+    ) -> Bool {
+        // Allow our tap-to-cursor recognizer to fire at the same time as the
+        // collection view's built-in selection recognizer.
+        return true
     }
 }
 

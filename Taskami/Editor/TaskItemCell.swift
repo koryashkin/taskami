@@ -35,6 +35,9 @@ final class TaskItemCell: UICollectionViewCell {
     /// Exposes the textView to the VC for cursor movement accessory buttons.
     var editingTextView: UITextView? { isInEditMode ? textView : nil }
 
+    /// The textView's frame in the cell's coordinate space (for tap-to-cursor conversion).
+    var textViewFrame: CGRect { textView.frame }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -146,6 +149,15 @@ final class TaskItemCell: UICollectionViewCell {
         textView.becomeFirstResponder()
         // Place cursor at end
         textView.selectedRange = NSRange(location: textView.text.utf16.count, length: 0)
+    }
+
+    /// Place the cursor at the closest text position to `pointInTextView`.
+    /// Call after `beginEditing` so the text view is in edit mode.
+    func placeCursor(at pointInTextView: CGPoint) {
+        guard isInEditMode,
+              let position = textView.closestPosition(to: pointInTextView) else { return }
+        log.debug("placeCursor at \(pointInTextView)")
+        textView.selectedTextRange = textView.textRange(from: position, to: position)
     }
 
     func commitEditing() {
