@@ -129,7 +129,7 @@ final class DocumentEditorViewController: UIViewController {
     // MARK: - Theme
 
     private func applyTheme() {
-        view.backgroundColor = theme.backgroundColor
+        view.backgroundColor = theme.backgroundColor.uiColor
         collectionView?.backgroundColor = .clear
         collectionView?.reloadData()
     }

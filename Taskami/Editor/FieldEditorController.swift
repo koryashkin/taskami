@@ -35,9 +35,9 @@ final class FieldEditorController: NSObject, UITextViewDelegate {
 
         textView.text = item.content
         textView.font = highlighter.theme.font
-        textView.textColor = highlighter.theme.textColor
-        textView.backgroundColor = highlighter.theme.backgroundColor
-        textView.tintColor = highlighter.theme.cursorColor
+        textView.textColor = highlighter.theme.textColor.uiColor
+        textView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+        textView.tintColor = highlighter.theme.cursorColor.uiColor
 
         // Position the text view over the cell's content area
         textView.frame = cell.contentView.bounds

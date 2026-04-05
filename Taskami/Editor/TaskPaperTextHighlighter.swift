@@ -14,7 +14,7 @@ struct TaskPaperTextHighlighter {
             let projectFont = UIFont(descriptor: baseFont.fontDescriptor.withSymbolicTraits(.traitBold) ?? baseFont.fontDescriptor, size: baseFont.pointSize)
             let attrs: [NSAttributedString.Key: Any] = [
                 .font: projectFont,
-                .foregroundColor: theme.projectColor
+                .foregroundColor: theme.projectColor.uiColor
             ]
             result.append(NSAttributedString(string: content, attributes: attrs))
 
@@ -22,13 +22,13 @@ struct TaskPaperTextHighlighter {
             // Build the full display string and highlight tags within it
             let baseAttrs: [NSAttributedString.Key: Any] = [
                 .font: baseFont,
-                .foregroundColor: item.isDone ? theme.doneColor : theme.taskColor
+                .foregroundColor: item.isDone ? theme.doneColor.uiColor : theme.taskColor.uiColor
             ]
 
             if item.isDone {
                 var doneAttrs = baseAttrs
                 doneAttrs[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
-                doneAttrs[.strikethroughColor] = theme.doneColor
+                doneAttrs[.strikethroughColor] = theme.doneColor.uiColor
                 result.append(NSAttributedString(string: content, attributes: doneAttrs))
             } else {
                 result.append(NSAttributedString(string: content, attributes: baseAttrs))
@@ -40,7 +40,7 @@ struct TaskPaperTextHighlighter {
         case .note:
             let attrs: [NSAttributedString.Key: Any] = [
                 .font: baseFont,
-                .foregroundColor: theme.noteColor
+                .foregroundColor: theme.noteColor.uiColor
             ]
             result.append(NSAttributedString(string: content, attributes: attrs))
         }
@@ -62,7 +62,7 @@ struct TaskPaperTextHighlighter {
         let tagsWithRanges = TagParser.parseTagsWithRanges(in: content)
         for (_, range) in tagsWithRanges {
             guard let nsRange = content.nsRange(from: range) else { continue }
-            attrString.addAttribute(.foregroundColor, value: theme.tagColor, range: nsRange)
+            attrString.addAttribute(.foregroundColor, value: theme.tagColor.uiColor, range: nsRange)
         }
     }
 }

@@ -52,7 +52,7 @@ final class TaskItemCell: UICollectionViewCell {
         // Show/hide dash for tasks
         dashLabel.isHidden = item.type != .task
         dashLabel.font = highlighter.theme.font
-        dashLabel.textColor = item.isDone ? highlighter.theme.doneColor : highlighter.theme.taskColor
+        dashLabel.textColor = item.isDone ? highlighter.theme.doneColor.uiColor : highlighter.theme.taskColor.uiColor
 
         // Update leading constraint for indent
         for constraint in contentView.constraints {
@@ -65,7 +65,7 @@ final class TaskItemCell: UICollectionViewCell {
         contentLabel.attributedText = highlighter.highlight(item)
 
         // Background
-        contentView.backgroundColor = highlighter.theme.backgroundColor
+        contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
     }
 
     override func preferredLayoutAttributesFitting(
