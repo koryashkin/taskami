@@ -32,11 +32,18 @@ final class DocumentEditorViewController: UIViewController {
         setupKeyboardAccessory()
         setupKeyboardObservers()
         applyTheme()
+        // Apply snapshot now that dataSource is ready (document may have been set
+        // before viewDidLoad via setDocument called from makeUIViewController)
+        applySnapshot(animated: false)
     }
 
     func setDocument(_ document: TaskDocument) {
         self.document = document
-        applySnapshot(animated: false)
+        // Only apply snapshot if viewDidLoad has run and dataSource is set up.
+        // If not yet loaded, viewDidLoad will call applySnapshot after setup.
+        if isViewLoaded {
+            applySnapshot(animated: false)
+        }
     }
 
     // MARK: - Setup

@@ -14,7 +14,7 @@ final class FieldEditorController: NSObject, UITextViewDelegate {
     weak var delegate: FieldEditorDelegate?
 
     private(set) var editingItem: TaskItem?
-    private var highlighter: TaskPaperTextHighlighter?
+    private var activeConstraints: [NSLayoutConstraint] = []
 
     override init() {
         textView = UITextView()
@@ -24,14 +24,20 @@ final class FieldEditorController: NSObject, UITextViewDelegate {
         textView.autocorrectionType = .default
         textView.autocapitalizationType = .sentences
         textView.returnKeyType = .default
+        // Must be false so we can use AutoLayout constraints on the overlay
+        textView.translatesAutoresizingMaskIntoConstraints = false
         super.init()
         textView.delegate = self
     }
 
-    /// Show the field editor overlaid on a cell.
+    /// Show the field editor overlaid on a cell using constraints (not autoresizingMask).
     func beginEditing(item: TaskItem, in cell: TaskItemCell, highlighter: TaskPaperTextHighlighter) {
-        self.editingItem = item
-        self.highlighter = highlighter
+        // Dismiss any existing editor first
+        if textView.superview != nil {
+            dismiss()
+        }
+
+        editingItem = item
 
         textView.text = item.content
         textView.font = highlighter.theme.font
@@ -39,11 +45,17 @@ final class FieldEditorController: NSObject, UITextViewDelegate {
         textView.backgroundColor = highlighter.theme.backgroundColor.uiColor
         textView.tintColor = highlighter.theme.cursorColor.uiColor
 
-        // Position the text view over the cell's content area
-        textView.frame = cell.contentView.bounds
-        textView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
         cell.contentView.addSubview(textView)
+
+        // Pin the field editor to cover the cell's content area exactly
+        activeConstraints = [
+            textView.leadingAnchor.constraint(equalTo: cell.contentView.leadingAnchor),
+            textView.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor),
+            textView.topAnchor.constraint(equalTo: cell.contentView.topAnchor),
+            textView.bottomAnchor.constraint(equalTo: cell.contentView.bottomAnchor),
+        ]
+        NSLayoutConstraint.activate(activeConstraints)
+
         textView.becomeFirstResponder()
     }
 
@@ -59,8 +71,10 @@ final class FieldEditorController: NSObject, UITextViewDelegate {
         dismiss()
     }
 
-    /// Dismiss without committing.
+    /// Dismiss without saving changes.
     func dismiss() {
+        NSLayoutConstraint.deactivate(activeConstraints)
+        activeConstraints = []
         textView.resignFirstResponder()
         textView.removeFromSuperview()
         editingItem = nil
@@ -71,7 +85,7 @@ final class FieldEditorController: NSObject, UITextViewDelegate {
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         guard let item = editingItem else { return true }
 
-        // Return key: commit current item and create new one
+        // Return key: commit current line and request a new item below it
         if text == "\n" {
             let currentContent = textView.text ?? ""
             item.content = currentContent

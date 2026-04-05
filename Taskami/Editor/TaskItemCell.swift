@@ -5,7 +5,9 @@ final class TaskItemCell: UICollectionViewCell {
 
     private let contentLabel = UITextView()
     private let dashLabel = UILabel()
-    private var currentItem: TaskItem?
+    // Stored reference so configure() can update it directly — no constraint search loop
+    private var indentLeadingConstraint: NSLayoutConstraint!
+    private var dashWidthConstraint: NSLayoutConstraint!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,8 +35,11 @@ final class TaskItemCell: UICollectionViewCell {
         contentView.addSubview(dashLabel)
         contentView.addSubview(contentLabel)
 
+        indentLeadingConstraint = dashLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16)
+        dashWidthConstraint = dashLabel.widthAnchor.constraint(equalToConstant: 0)
+
         NSLayoutConstraint.activate([
-            dashLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            indentLeadingConstraint,
             dashLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
 
             contentLabel.leadingAnchor.constraint(equalTo: dashLabel.trailingAnchor),
@@ -45,27 +50,32 @@ final class TaskItemCell: UICollectionViewCell {
     }
 
     func configure(with item: TaskItem, highlighter: TaskPaperTextHighlighter) {
-        currentItem = item
-
         let indentOffset = CGFloat(item.indentLevel) * highlighter.theme.indentWidth + 16
 
-        // Show/hide dash for tasks
-        dashLabel.isHidden = item.type != .task
-        dashLabel.font = highlighter.theme.font
-        dashLabel.textColor = item.isDone ? highlighter.theme.doneColor.uiColor : highlighter.theme.taskColor.uiColor
+        // Update indent
+        indentLeadingConstraint.constant = indentOffset
 
-        // Update leading constraint for indent
-        for constraint in contentView.constraints {
-            if constraint.firstAnchor == dashLabel.leadingAnchor {
-                constraint.constant = indentOffset
-            }
+        // Show/hide dash for tasks — zero-width when hidden avoids layout gaps
+        let isTask = item.type == .task
+        dashLabel.isHidden = !isTask
+        if isTask {
+            dashLabel.text = "- "
+            dashLabel.font = highlighter.theme.font
+            dashLabel.textColor = item.isDone ? highlighter.theme.doneColor.uiColor : highlighter.theme.taskColor.uiColor
+            dashWidthConstraint.isActive = false
+        } else {
+            dashWidthConstraint.isActive = true
         }
 
-        // Apply highlighted attributed text
         contentLabel.attributedText = highlighter.highlight(item)
-
-        // Background
         contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        contentLabel.attributedText = nil
+        dashWidthConstraint.isActive = false
+        dashLabel.isHidden = false
     }
 
     override func preferredLayoutAttributesFitting(
