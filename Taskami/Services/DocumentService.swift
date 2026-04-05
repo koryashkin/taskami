@@ -1,5 +1,8 @@
 import Foundation
 import Observation
+import OSLog
+
+private let log = Logger(subsystem: "com.taskami", category: "DocumentService")
 
 @Observable
 final class DocumentService {
@@ -37,7 +40,11 @@ final class DocumentService {
         let presenter = DocumentFilePresenter(url: url)
         presenter.onFileChanged = { [weak self] in
             Task { @MainActor in
-                try? await self?.reloadFromDisk()
+                do {
+                    try await self?.reloadFromDisk()
+                } catch {
+                    log.error("Failed to reload from disk: \(error)")
+                }
             }
         }
         presenter.onConflictDetected = { _ in
@@ -77,7 +84,11 @@ final class DocumentService {
         autosaveTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(1))
             guard !Task.isCancelled else { return }
-            try? await self?.save()
+            do {
+                try await self?.save()
+            } catch {
+                log.error("Autosave failed: \(error)")
+            }
         }
     }
 
@@ -91,5 +102,6 @@ final class DocumentService {
         document.items = items
         document.encoding = encoding
         document.hasUnsavedChanges = false
+        log.debug("reloadFromDisk: \(document.fileURL.lastPathComponent)")
     }
 }

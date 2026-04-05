@@ -1,4 +1,7 @@
 import SwiftUI
+import OSLog
+
+private let log = Logger(subsystem: "com.taskami", category: "DocumentView")
 
 struct DocumentView: View {
     let fileURL: URL
@@ -62,6 +65,7 @@ struct DocumentView: View {
             let doc = try await appState.documentService.open(url: fileURL)
             document = doc
         } catch {
+            log.error("Failed to open \(fileURL.lastPathComponent): \(error)")
             self.error = error
         }
     }

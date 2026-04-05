@@ -5,6 +5,7 @@ final class DocumentUndoManager {
 
     init(undoManager: UndoManager = UndoManager()) {
         self.undoManager = undoManager
+        self.undoManager.levelsOfUndo = 100
     }
 
     func registerContentChange(item: TaskItem, oldContent: String, newContent: String, document: TaskDocument) {
