@@ -152,7 +152,7 @@ final class DocumentEditorViewController: UIViewController {
               let item = item(at: indexPath) else { return }
         // Already editing this item — UITextView handles the tap natively; don't override.
         if editingCell?.item?.id == item.id { return }
-        log.debug("handleTapForCursor: storing tap at \(point) for item '\(item.content.prefix(20))'")
+        log.debug("handleTapForCursor: storing tap at (\(point.x), \(point.y)) for item '\(item.content.prefix(20))'")
         pendingTapLocation = (itemID: item.id, point: point)
     }
 
