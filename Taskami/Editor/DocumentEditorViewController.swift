@@ -11,7 +11,10 @@ final class DocumentEditorViewController: UIViewController {
         }
     }
     var theme: EditorTheme = .light {
-        didSet { applyTheme() }
+        didSet {
+            guard oldValue != theme else { return }
+            applyTheme()
+        }
     }
     var onDocumentChanged: (() -> Void)?
 
@@ -144,7 +147,12 @@ final class DocumentEditorViewController: UIViewController {
     private func applyTheme() {
         view.backgroundColor = theme.backgroundColor.uiColor
         collectionView?.backgroundColor = .clear
-        collectionView?.reloadData()
+        // Skip reloadData while the field editor is active: the textView is the first
+        // responder inside a UIHostingController hierarchy and reloadData causes UIKit to
+        // create a _UIReparentingView, which is unsupported and triggers layout cycles.
+        if fieldEditor.editingItem == nil {
+            collectionView?.reloadData()
+        }
     }
 
     // MARK: - Snapshot
