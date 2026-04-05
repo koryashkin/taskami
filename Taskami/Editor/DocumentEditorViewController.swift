@@ -75,6 +75,9 @@ final class DocumentEditorViewController: UIViewController {
 
         config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
             guard let self, let item = self.item(at: indexPath) else { return nil }
+            // Disable swipe actions while editing — the interactive keyboard dismiss pan
+            // can look like a swipe, causing unintended Done/Delete triggers.
+            guard self.editingCell == nil else { return nil }
 
             let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
                 self.deleteItem(item)
@@ -225,8 +228,32 @@ final class DocumentEditorViewController: UIViewController {
     // MARK: - Item Access
 
     func item(at indexPath: IndexPath) -> TaskItem? {
-        guard let itemID = dataSource.itemIdentifier(for: indexPath) else { return nil }
-        return document?.item(withID: itemID)
+        guard let itemID = dataSource.itemIdentifier(for: indexPath) else {
+            log.warning("item(at: \(indexPath)): dataSource has no identifier (snapshot count=\(self.dataSource.snapshot().numberOfItems))")
+            return nil
+        }
+        guard let item = document?.item(withID: itemID) else {
+            log.warning("item(at: \(indexPath)): document can't find id \(itemID.uuidString.prefix(8)) (allItems count=\(self.document?.allItems.count ?? -1))")
+            return nil
+        }
+        return item
+    }
+
+    /// Reconfigures a single item in the current snapshot without rebuilding it from scratch.
+    /// Use this for content-only changes (toggleDone, cellDidCommit) where the item list
+    /// and order are unchanged — avoids the deferred layout pass that a full rebuild triggers.
+    private func reconfigureItem(_ itemID: UUID) {
+        var snapshot = dataSource.snapshot()
+        guard snapshot.itemIdentifiers.contains(itemID) else {
+            log.warning("reconfigureItem: \(itemID.uuidString.prefix(8)) not in snapshot, falling back to applySnapshot")
+            applySnapshot(animated: false)
+            return
+        }
+        log.debug("reconfigureItem: \(itemID.uuidString.prefix(8))")
+        snapshot.reconfigureItems([itemID])
+        isApplyingSnapshot = true
+        dataSource.apply(snapshot, animatingDifferences: false)
+        isApplyingSnapshot = false
     }
 
     private func isCellFullyVisible(at indexPath: IndexPath) -> Bool {
@@ -346,10 +373,11 @@ final class DocumentEditorViewController: UIViewController {
     // MARK: - Toggle done
 
     func toggleDone(_ item: TaskItem) {
+        log.debug("toggleDone: '\(item.content.prefix(30))'")
         let oldContent = item.content
         item.toggleDone()
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document!)
-        applySnapshot(animated: false)
+        reconfigureItem(item.id)
         onDocumentChanged?()
     }
 
@@ -401,7 +429,17 @@ extension DocumentEditorViewController: UICollectionViewDelegate {
         // scrollToItem + layoutIfNeeded first, so it works even if the keyboard
         // inset animation is in progress when this fires.
         guard let item = item(at: indexPath) else {
-            log.warning("didSelectItemAt: no item at \(indexPath)")
+            // Data source may still be settling after a reconfigureItems call.
+            // Retry on the next run loop tick — by then layout is fully committed.
+            log.warning("didSelectItemAt: no item at \(indexPath), scheduling retry")
+            DispatchQueue.main.async { [weak self] in
+                guard let self, let item = self.item(at: indexPath) else {
+                    self?.log.error("didSelectItemAt: retry also failed for \(indexPath)")
+                    return
+                }
+                if self.editingCell?.item?.id == item.id { return }
+                self.beginEditing(item: item)
+            }
             return
         }
 
@@ -440,7 +478,10 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         item.tags = TagParser.parseTags(in: newContent)
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: newContent, document: document!)
         if cell === editingCell { editingCell = nil }
-        applySnapshot(animated: false)
+        // Content-only change: reconfigure the single cell instead of rebuilding the full
+        // snapshot. A full rebuild triggers a deferred layout pass that leaves the data source
+        // temporarily unsettled, causing item(at:) to return nil on the very next tap.
+        reconfigureItem(item.id)
         onDocumentChanged?()
     }
 
