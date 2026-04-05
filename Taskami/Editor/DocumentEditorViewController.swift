@@ -153,14 +153,14 @@ final class DocumentEditorViewController: UIViewController {
 
     // MARK: - Snapshot
 
-    func applySnapshot(animated: Bool) {
+    func applySnapshot(animated: Bool, caller: String = #function) {
         guard let document else { return }
 
         // Guard against nested applies (e.g. a UITextView delegate callback fires
         // mid-apply and tries to apply again). Defer one run loop tick instead.
         guard !isApplyingSnapshot else {
-            log.debug("applySnapshot deferred (already applying)")
-            DispatchQueue.main.async { [weak self] in self?.applySnapshot(animated: animated) }
+            log.debug("applySnapshot deferred (already applying) from \(caller)")
+            DispatchQueue.main.async { [weak self] in self?.applySnapshot(animated: animated, caller: caller) }
             return
         }
 
@@ -173,7 +173,7 @@ final class DocumentEditorViewController: UIViewController {
             filteredItems = allItems.filter(filter)
         }
 
-        log.debug("applySnapshot: \(filteredItems.count) items (animated=\(animated))")
+        log.debug("applySnapshot: \(filteredItems.count) items (animated=\(animated)) from \(caller)")
 
         var snapshot = NSDiffableDataSourceSnapshot<Int, UUID>()
         snapshot.appendSections([0])
@@ -308,21 +308,24 @@ extension DocumentEditorViewController: UICollectionViewDelegate {
 
         log.debug("didSelectItemAt \(indexPath)")
 
-        guard let item = item(at: indexPath),
-              let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else {
-            log.warning("didSelectItemAt: no item or cell at \(indexPath)")
+        // Only look up the item from the data source (stable during layout flux).
+        // Resolving the actual cell is deferred to beginEditing(item:) which calls
+        // scrollToItem + layoutIfNeeded first, so it works even if the keyboard
+        // inset animation is in progress when this fires.
+        guard let item = item(at: indexPath) else {
+            log.warning("didSelectItemAt: no item at \(indexPath)")
             return
         }
 
-        // If tapping the already-editing cell, do nothing
-        if cell === editingCell {
-            log.debug("didSelectItemAt: already editing this cell")
+        // If tapping the already-editing item, do nothing
+        if editingCell?.item?.id == item.id {
+            log.debug("didSelectItemAt: already editing this item")
             return
         }
 
-        commitCurrentEdit()
-        editingCell = cell
-        cell.beginEditing(inputAccessoryView: keyboardAccessory)
+        DispatchQueue.main.async { [weak self] in
+            self?.beginEditing(item: item)
+        }
     }
 }
 
