@@ -11,9 +11,9 @@ final class EditorDragDropHandler: NSObject, UICollectionViewDragDelegate, UICol
         itemsForBeginning session: UIDragSession,
         at indexPath: IndexPath
     ) -> [UIDragItem] {
-        guard let item = editorVC?.item(at: indexPath) else { return [] }
+        guard let editorVC, let item = editorVC.item(at: indexPath) else { return [] }
 
-        // Commit any active editing before drag begins
+        editorVC.commitCurrentEdit()
 
         let provider = NSItemProvider(object: item.id.uuidString as NSString)
         let dragItem = UIDragItem(itemProvider: provider)

@@ -321,7 +321,7 @@ final class DocumentEditorViewController: UIViewController {
         }
     }
 
-    private func commitCurrentEdit() {
+    func commitCurrentEdit() {
         if editingCell != nil { log.debug("commitCurrentEdit") }
         editingCell?.commitEditing()
         editingCell = nil
@@ -373,10 +373,11 @@ final class DocumentEditorViewController: UIViewController {
     // MARK: - Toggle done
 
     func toggleDone(_ item: TaskItem) {
+        guard let document else { return }
         log.debug("toggleDone: '\(item.content.prefix(30))'")
         let oldContent = item.content
         item.toggleDone()
-        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document!)
+        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
         reconfigureItem(item.id)
         onDocumentChanged?()
     }
@@ -472,11 +473,11 @@ extension DocumentEditorViewController: UICollectionViewDelegate {
 extension DocumentEditorViewController: TaskItemCellDelegate {
 
     func cellDidCommit(_ cell: TaskItemCell, newContent: String) {
-        guard let item = cell.item else { return }
+        guard let item = cell.item, let document else { return }
         let oldContent = item.content
         item.content = newContent
         item.tags = TagParser.parseTags(in: newContent)
-        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: newContent, document: document!)
+        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: newContent, document: document)
         if cell === editingCell { editingCell = nil }
         // Content-only change: reconfigure the single cell instead of rebuilding the full
         // snapshot. A full rebuild triggers a deferred layout pass that leaves the data source
@@ -538,6 +539,10 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.beginEditing(item: targetItem)
         }
+    }
+
+    func cellDidDismissEditing(_ cell: TaskItemCell) {
+        if cell === editingCell { editingCell = nil }
     }
 }
 

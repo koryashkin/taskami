@@ -13,6 +13,8 @@ protocol TaskItemCellDelegate: AnyObject {
     func cellDidRequestOutdent(_ cell: TaskItemCell)
     func cellDidChange(_ cell: TaskItemCell, content: String)
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection)
+    /// Called when the cell exits edit mode without committing (e.g. scrolled off-screen and reused).
+    func cellDidDismissEditing(_ cell: TaskItemCell)
 }
 
 final class TaskItemCell: UICollectionViewCell {
@@ -171,6 +173,7 @@ final class TaskItemCell: UICollectionViewCell {
     func dismissEditing() {
         guard isInEditMode else { return }
         endEditMode()
+        delegate?.cellDidDismissEditing(self)
     }
 
     private func endEditMode() {
