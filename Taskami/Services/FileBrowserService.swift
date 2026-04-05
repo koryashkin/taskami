@@ -81,7 +81,9 @@ final class FileBrowserService {
             fileName += ".taskpaper"
         }
         let url = currentDirectory.appendingPathComponent(fileName)
-        try "".write(to: url, atomically: true, encoding: .utf8)
+        let defaultContent = Bundle.main.url(forResource: "DefaultTaskList", withExtension: "taskpaper")
+            .flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
+        try defaultContent.write(to: url, atomically: true, encoding: .utf8)
         refresh()
         return url
     }

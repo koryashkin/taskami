@@ -15,7 +15,9 @@ struct DocumentEditorView: UIViewControllerRepresentable {
         vc.searchFilter = searchFilter
         vc.setDocument(document)
         vc.onDocumentChanged = onDocumentChanged
-        onViewControllerCreated?(vc)
+        // Defer to avoid "modifying state during view update" warning —
+        // makeUIViewController is called during the SwiftUI update pass.
+        DispatchQueue.main.async { onViewControllerCreated?(vc) }
         return vc
     }
 
