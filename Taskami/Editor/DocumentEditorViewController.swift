@@ -75,8 +75,11 @@ final class DocumentEditorViewController: UIViewController {
 
         config.trailingSwipeActionsConfigurationProvider = { [weak self] indexPath in
             guard let self, let item = self.item(at: indexPath) else { return nil }
-            // Disable swipe actions while editing — the interactive keyboard dismiss pan
-            // can look like a swipe, causing unintended Done/Delete triggers.
+            // Disable swipe actions while a cell is actively in edit mode — the interactive
+            // keyboard dismiss pan can look like a swipe, causing unintended Done/Delete triggers.
+            // Clear any stale editingCell reference (e.g. the cell scrolled off-screen and was
+            // reused, so isInEditMode is now false even though the pointer is still set).
+            if self.editingCell?.isInEditMode == false { self.editingCell = nil }
             guard self.editingCell == nil else { return nil }
 
             let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
