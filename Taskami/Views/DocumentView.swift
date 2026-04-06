@@ -41,12 +41,14 @@ struct DocumentView: View {
         .navigationTitle(fileURL.deletingPathExtension().lastPathComponent)
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, isPresented: $isSearching, prompt: "Search tasks")
+        .accessibilityIdentifier("documentView")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Add Task", systemImage: "plus") {
                     editorVC?.addNewItem()
                 }
                 .disabled(editorVC == nil)
+                .accessibilityIdentifier("addTaskButton")
             }
         }
         .task {

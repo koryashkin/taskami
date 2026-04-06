@@ -24,14 +24,17 @@ struct FileBrowserView: View {
                     NavigationLink(value: item) {
                         FolderRowView(item: item)
                     }
+                    .accessibilityIdentifier("folder-\(item.name)")
                 } else {
                     NavigationLink(value: item) {
                         FileRowView(item: item, showExtension: appState.preferences.showFileExtensions)
                     }
+                    .accessibilityIdentifier("file-\(item.name)")
                 }
             }
             .onDelete(perform: deleteItems)
         }
+        .accessibilityIdentifier("fileList")
         .navigationTitle(appState.fileBrowser.currentDirectory.lastPathComponent)
         .searchable(text: $searchText, prompt: "Filter files")
         .navigationDestination(for: FileItem.self) { item in
@@ -49,13 +52,16 @@ struct FileBrowserView: View {
                         newItemName = ""
                         showingNewFileDialog = true
                     }
+                    .accessibilityIdentifier("newFileButton")
                     Button("New Folder", systemImage: "folder.badge.plus") {
                         newItemName = ""
                         showingNewFolderDialog = true
                     }
+                    .accessibilityIdentifier("newFolderButton")
                 } label: {
                     Image(systemName: "plus")
                 }
+                .accessibilityIdentifier("newItemMenu")
             }
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
@@ -63,6 +69,7 @@ struct FileBrowserView: View {
                 } label: {
                     Image(systemName: "gear")
                 }
+                .accessibilityIdentifier("settingsButton")
             }
             ToolbarItem(placement: .secondaryAction) {
                 Menu("Sort", systemImage: "arrow.up.arrow.down") {

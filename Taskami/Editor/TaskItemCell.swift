@@ -115,6 +115,12 @@ final class TaskItemCell: UICollectionViewCell {
         } else {
             log.debug("configure: skipping display update — cell is in edit mode")
         }
+
+        // Accessibility
+        isAccessibilityElement = true
+        accessibilityIdentifier = "taskCell"
+        accessibilityLabel = item.content.isEmpty ? "Empty task" : item.content
+        accessibilityTraits = .button
     }
 
     // MARK: - Edit mode

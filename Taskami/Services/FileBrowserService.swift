@@ -124,8 +124,17 @@ final class FileBrowserService {
 
     // MARK: - iCloud Container
 
-    /// Returns the iCloud container URL, or falls back to local Documents.
+    /// Returns the directory used for storing task files.
+    /// When the `--ui-testing` launch argument is present the app uses an
+    /// isolated temp folder so UI tests never touch real user data.
     static func defaultDirectory() -> URL {
+        if CommandLine.arguments.contains("--ui-testing") {
+            let testDir = FileManager.default.temporaryDirectory
+                .appendingPathComponent("TaskamiUITests", isDirectory: true)
+            try? FileManager.default.createDirectory(at: testDir, withIntermediateDirectories: true)
+            return testDir
+        }
+
         if let iCloudURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?
             .appendingPathComponent("Documents") {
             // Ensure directory exists
