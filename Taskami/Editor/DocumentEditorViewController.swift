@@ -303,8 +303,18 @@ final class DocumentEditorViewController: UIViewController {
             log.debug("beginEditing: contentOffset changed \(offsetBefore) → \(offsetAfter)")
         }
 
-        guard let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else {
-            log.warning("beginEditing: no cell at indexPath \(indexPath)")
+        // If cellForItem returns nil the cell may have shifted off-screen due to a
+        // height change from a recent configure call (e.g. @done text wrapping).
+        // Scroll it back into view and force another layout pass before giving up.
+        var cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell
+        if cell == nil {
+            log.warning("beginEditing: no cell at \(indexPath) — scrolling to reveal then retrying")
+            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+            collectionView.layoutIfNeeded()
+            cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell
+        }
+        guard let cell else {
+            log.error("beginEditing: cell still nil after scroll+layout for \(indexPath)")
             return
         }
         log.debug("beginEditing: activating cell at \(indexPath)")

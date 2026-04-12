@@ -97,6 +97,7 @@ final class TaskItemCell: UICollectionViewCell {
         log.debug("configure: '\(item.content.prefix(30))' editMode=\(self.isInEditMode)")
         self.item = item
         self.highlighter = highlighter
+        accessibilityIdentifier = "item-\(item.id.uuidString)"
 
         let indentOffset = CGFloat(item.indentLevel) * highlighter.theme.indentWidth + 16
         indentLeadingConstraint.constant = indentOffset
