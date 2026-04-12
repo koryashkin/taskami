@@ -254,6 +254,15 @@ final class DocumentEditorViewController: UIViewController {
         isApplyingSnapshot = true
         dataSource.apply(snapshot, animatingDifferences: false)
         isApplyingSnapshot = false
+
+        // UIKit bug: reconfigureItems+animatingDifferences:false silently skips the cell
+        // provider when the same item is reconfigured multiple times. Force-configure the
+        // visible cell directly so visual state is always correct.
+        if let index = snapshot.itemIdentifiers.firstIndex(of: itemID),
+           let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? TaskItemCell,
+           let item = document?.item(withID: itemID) {
+            cell.configure(with: item, highlighter: highlighter)
+        }
     }
 
     private func isCellFullyVisible(at indexPath: IndexPath) -> Bool {
@@ -270,7 +279,7 @@ final class DocumentEditorViewController: UIViewController {
     // MARK: - Begin editing
 
     func beginEditing(item: TaskItem) {
-        guard let document else { return }
+        guard document != nil else { return }
 
         log.debug("beginEditing: '\(item.content.prefix(40))'")
 
@@ -278,8 +287,11 @@ final class DocumentEditorViewController: UIViewController {
         // shift index paths, so resolve the target cell AFTER committing.
         commitCurrentEdit()
 
-        guard let index = document.allItems.firstIndex(where: { $0.id == item.id }) else {
-            log.warning("beginEditing: item not found in allItems")
+        // Use the snapshot's positions, not allItems — when search is active the snapshot
+        // contains only filteredItems, so allItems indices don't map to IndexPaths.
+        let snapshot = dataSource.snapshot()
+        guard let index = snapshot.itemIdentifiers.firstIndex(of: item.id) else {
+            log.warning("beginEditing: item \(item.id.uuidString.prefix(8)) not in current snapshot (filtered out?)")
             return
         }
         let indexPath = IndexPath(item: index, section: 0)
@@ -474,14 +486,31 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
     func cellDidCommit(_ cell: TaskItemCell, newContent: String) {
         guard let item = cell.item else { return }
         let oldContent = item.content
-        item.content = newContent
-        item.tags = TagParser.parseTags(in: newContent)
-        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: newContent, document: document!)
+        let oldType = item.type
+
+        // Re-detect item type from content (TaskPaper: line ending with ":" = project).
+        // Existing projects keep their type when renamed without ":" so renaming doesn't
+        // accidentally demote them. New tasks/notes ending with ":" are promoted to projects.
+        let trimmed = newContent.trimmingCharacters(in: .whitespaces)
+        if trimmed.hasSuffix(":") {
+            item.type = .project
+            item.content = String(trimmed.dropLast()).trimmingCharacters(in: .whitespaces)
+        } else {
+            item.content = newContent
+            // type unchanged — don't demote an existing project just because it was renamed
+        }
+        item.tags = TagParser.parseTags(in: item.content)
+
+        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document!)
         if cell === editingCell { editingCell = nil }
-        // Content-only change: reconfigure the single cell instead of rebuilding the full
-        // snapshot. A full rebuild triggers a deferred layout pass that leaves the data source
-        // temporarily unsettled, causing item(at:) to return nil on the very next tap.
-        reconfigureItem(item.id)
+
+        if item.type != oldType {
+            // Type changed (e.g. task → project): full snapshot needed to update the dash
+            // label visibility and cell layout, not just reconfigure the content.
+            applySnapshot(animated: false)
+        } else {
+            reconfigureItem(item.id)
+        }
         onDocumentChanged?()
     }
 
@@ -516,6 +545,13 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
     func cellDidChange(_ cell: TaskItemCell, content: String) {
         document?.hasUnsavedChanges = true
         onDocumentChanged?()
+    }
+
+    func cellDidRequestToggleDone(_ cell: TaskItemCell) {
+        guard let item = cell.item else { return }
+        // Commit any in-progress edit on this cell before toggling so content isn't lost.
+        if cell === editingCell { commitCurrentEdit() }
+        toggleDone(item)
     }
 
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection) {

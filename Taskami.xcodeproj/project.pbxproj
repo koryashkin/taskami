@@ -46,6 +46,7 @@
 		A43CFD3BEF607F3E9DE7155E /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE614D1C51846549C22D6F9 /* AppError.swift */; };
 		A7D3849EE509123C7EE0BAAE /* DefaultTaskList.taskpaper in Resources */ = {isa = PBXBuildFile; fileRef = 61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */; };
 		AB2E6FCF12562F3C89A0A259 /* QueryEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */; };
+		C9C5B4838ADA43E89A213578 /* TaskItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2BC231062A84F74A1BF321E /* TaskItemTests.swift */; };
 		B1422BD570434775C59AD92D /* TagParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75516F9295F89864CF20B6B /* TagParser.swift */; };
 		B2156FAE9F5136502596E605 /* DocumentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */; };
 		B958DEE88C7E66B23FF100E6 /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */; };
@@ -85,7 +86,7 @@
 		5E66BC38BCD21E41296D8E5E /* DocumentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentService.swift; sourceTree = "<group>"; };
 		5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentEditorView.swift; sourceTree = "<group>"; };
 		60C3B0D3ED32EDB931C39FE4 /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
-		61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */ = {isa = PBXFileReference; path = DefaultTaskList.taskpaper; sourceTree = "<group>"; };
+		61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */ = {isa = PBXFileReference; lastKnownFileType = text; path = DefaultTaskList.taskpaper; sourceTree = "<group>"; };
 		68458307BB09ECB2DC71111D /* TaskamiTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TaskamiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParserTests.swift; sourceTree = "<group>"; };
 		6EDBCE89D599D5B9C17138D7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -106,6 +107,7 @@
 		C92E8C899AB189973C25A4E0 /* DocumentEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentEditorViewController.swift; sourceTree = "<group>"; };
 		C94CF8EE92B1CA7A6AB5564A /* FileBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserView.swift; sourceTree = "<group>"; };
 		D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryEngineTests.swift; sourceTree = "<group>"; };
+		D2BC231062A84F74A1BF321E /* TaskItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTests.swift; sourceTree = "<group>"; };
 		D71C26E3E7491A44E499CEFD /* LegacyImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyImportService.swift; sourceTree = "<group>"; };
 		D75516F9295F89864CF20B6B /* TagParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagParser.swift; sourceTree = "<group>"; };
 		DA17080349AA4EF2B600E626 /* TaskPaperSerializerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperSerializerTests.swift; sourceTree = "<group>"; };
@@ -117,7 +119,7 @@
 		EC9E6554C8D166ED0A9FEE69 /* QueryASTParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryASTParser.swift; sourceTree = "<group>"; };
 		ED09CE4BB446155BA6786D5D /* TaskPaperSerializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperSerializer.swift; sourceTree = "<group>"; };
 		ED58DF2D92BC5FA1E28AD97C /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
-		ED8728E382737A0AF8223ADF /* Taskami.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Taskami.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED8728E382737A0AF8223ADF /* Taskami.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Taskami.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCoordinatorService.swift; sourceTree = "<group>"; };
 		FFD0A72C6ABD628A24FB2665 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -208,6 +210,7 @@
 				D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */,
 				7E550097544F2B153FB08057 /* TagParserTests.swift */,
 				6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */,
+				D2BC231062A84F74A1BF321E /* TaskItemTests.swift */,
 				DA17080349AA4EF2B600E626 /* TaskPaperSerializerTests.swift */,
 			);
 			path = TaskamiTests;
@@ -356,7 +359,6 @@
 						ProvisioningStyle = Automatic;
 					};
 					22E3F6942C2FB0097FACC772 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -400,6 +402,7 @@
 				AB2E6FCF12562F3C89A0A259 /* QueryEngineTests.swift in Sources */,
 				39406F8E29FE06EC8351115F /* TagParserTests.swift in Sources */,
 				F6D6A969B26D1F70E15AB4C3 /* TaskPaperParserTests.swift in Sources */,
+				C9C5B4838ADA43E89A213578 /* TaskItemTests.swift in Sources */,
 				01DFF6DCC6B1490208CDB9EB /* TaskPaperSerializerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -528,7 +531,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = THT3D327QD;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_GENERATION_MODE = GeneratedFile;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock Taskami with Face ID";
@@ -556,7 +559,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = THT3D327QD;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_GENERATION_MODE = GeneratedFile;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock Taskami with Face ID";

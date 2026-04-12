@@ -169,15 +169,16 @@ struct QueryASTParser {
             return s
         }
 
-        // Unquoted string: one or more non-reserved words
+        // Unquoted string: one or more non-reserved words.
+        // Attribute keywords (type, project, level…) are allowed here — they appear as values
+        // in predicates like "type = project" or "type = task". Only logic operators (and/or/not),
+        // relation keywords (contains/beginswith…), and @-tags must stop the scan.
         var words: [String] = []
         while pos < tokens.count {
             if case .word(let w) = tokens[pos] {
                 let lower = w.lowercased()
-                // Stop at reserved words
                 if Self.logicKeywords.contains(lower) ||
                    Self.relationKeywords.contains(lower) ||
-                   Self.attributeKeywords.contains(lower) ||
                    w.hasPrefix("@") {
                     break
                 }

@@ -13,6 +13,7 @@ protocol TaskItemCellDelegate: AnyObject {
     func cellDidRequestOutdent(_ cell: TaskItemCell)
     func cellDidChange(_ cell: TaskItemCell, content: String)
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection)
+    func cellDidRequestToggleDone(_ cell: TaskItemCell)
 }
 
 final class TaskItemCell: UICollectionViewCell {
@@ -21,7 +22,9 @@ final class TaskItemCell: UICollectionViewCell {
 
     // The single UITextView serves dual purpose: display (non-editable attributed) and edit (editable plain)
     private let textView = TaskItemTextView()
-    private let dashLabel = UILabel()
+    // UIButton absorbs its own tap so the collection view does NOT also fire didSelectItemAt,
+    // which would otherwise open edit mode immediately after toggling done.
+    private let dashButton = UIButton(type: .custom)
     private var indentLeadingConstraint: NSLayoutConstraint!
     private var dashWidthConstraint: NSLayoutConstraint!
 
@@ -61,22 +64,25 @@ final class TaskItemCell: UICollectionViewCell {
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.delegate = self
 
-        dashLabel.text = "- "
-        dashLabel.translatesAutoresizingMaskIntoConstraints = false
-        dashLabel.setContentHuggingPriority(.required, for: .horizontal)
-        dashLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        dashButton.translatesAutoresizingMaskIntoConstraints = false
+        dashButton.setContentHuggingPriority(.required, for: .horizontal)
+        dashButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        // UIButton(type: .custom) has zero content insets by default — no configuration
+        // needed. Using UIButton.Configuration alongside setAttributedTitle is unsupported
+        // on iOS 15+ and causes the button to stop responding after a few taps.
+        dashButton.addTarget(self, action: #selector(dashTapped), for: .touchUpInside)
 
-        contentView.addSubview(dashLabel)
+        contentView.addSubview(dashButton)
         contentView.addSubview(textView)
 
-        indentLeadingConstraint = dashLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16)
-        dashWidthConstraint = dashLabel.widthAnchor.constraint(equalToConstant: 0)
+        indentLeadingConstraint = dashButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16)
+        dashWidthConstraint = dashButton.widthAnchor.constraint(equalToConstant: 0)
 
         NSLayoutConstraint.activate([
             indentLeadingConstraint,
-            dashLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            dashButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
 
-            textView.leadingAnchor.constraint(equalTo: dashLabel.trailingAnchor),
+            textView.leadingAnchor.constraint(equalTo: dashButton.trailingAnchor),
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             textView.topAnchor.constraint(equalTo: contentView.topAnchor),
             textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -94,13 +100,11 @@ final class TaskItemCell: UICollectionViewCell {
         indentLeadingConstraint.constant = indentOffset
 
         let isTask = item.type == .task
-        dashLabel.isHidden = !isTask
+        dashButton.isHidden = !isTask
         if isTask {
-            dashLabel.text = "- "
-            dashLabel.font = highlighter.theme.font
-            dashLabel.textColor = item.isDone
-                ? highlighter.theme.doneColor.uiColor
-                : highlighter.theme.taskColor.uiColor
+            let color = item.isDone ? highlighter.theme.doneColor.uiColor : highlighter.theme.taskColor.uiColor
+            let attrs: [NSAttributedString.Key: Any] = [.font: highlighter.theme.font, .foregroundColor: color]
+            dashButton.setAttributedTitle(NSAttributedString(string: "- ", attributes: attrs), for: .normal)
             dashWidthConstraint.isActive = false
         } else {
             dashWidthConstraint.isActive = true
@@ -193,6 +197,10 @@ final class TaskItemCell: UICollectionViewCell {
         }
     }
 
+    @objc private func dashTapped() {
+        delegate?.cellDidRequestToggleDone(self)
+    }
+
     // MARK: - Reuse
 
     override func prepareForReuse() {
@@ -202,7 +210,7 @@ final class TaskItemCell: UICollectionViewCell {
         if isInEditMode { dismissEditing() }
         textView.attributedText = nil
         dashWidthConstraint.isActive = false
-        dashLabel.isHidden = false
+        dashButton.isHidden = false
         item = nil
         delegate = nil
         highlighter = nil
@@ -239,8 +247,16 @@ extension TaskItemCell: UITextViewDelegate {
         if text == "\n" {
             let current = textView.text ?? ""
             log.debug("shouldChangeText: Return key → new item after '\(current.prefix(30))'")
-            item?.content = current
-            item?.tags = TagParser.parseTags(in: current)
+            // Apply the same type detection used in cellDidCommit so that
+            // "Project Name:" pressed Return is saved as a project, not a task.
+            let trimmed = current.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasSuffix(":"), let item {
+                item.type = .project
+                item.content = String(trimmed.dropLast()).trimmingCharacters(in: .whitespaces)
+            } else {
+                item?.content = current
+            }
+            item?.tags = TagParser.parseTags(in: item?.content ?? "")
             delegate?.cellDidRequestNewItem(after: self)
             return false
         }
