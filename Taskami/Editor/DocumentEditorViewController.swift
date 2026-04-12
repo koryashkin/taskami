@@ -239,30 +239,22 @@ final class DocumentEditorViewController: UIViewController {
         return item
     }
 
-    /// Reconfigures a single item in the current snapshot without rebuilding it from scratch.
+    /// Reconfigures a single item without rebuilding the snapshot.
     /// Use this for content-only changes (toggleDone, cellDidCommit) where the item list
-    /// and order are unchanged — avoids the deferred layout pass that a full rebuild triggers.
+    /// and order are unchanged.
     private func reconfigureItem(_ itemID: UUID) {
-        var snapshot = dataSource.snapshot()
-        guard snapshot.itemIdentifiers.contains(itemID) else {
+        // Look up the index path directly from the committed snapshot — no apply() needed.
+        // cellForItem(at:) is safe here: textView.attributedText changes from the previous
+        // configure call only schedule a layout pass (setNeedsLayout), they do not run one,
+        // so the cell map is still valid in this run loop iteration.
+        guard let indexPath = dataSource.indexPath(for: itemID) else {
             log.warning("reconfigureItem: \(itemID.uuidString.prefix(8)) not in snapshot, falling back to applySnapshot")
             applySnapshot(animated: false)
             return
         }
-        log.debug("reconfigureItem: \(itemID.uuidString.prefix(8))")
-        snapshot.reconfigureItems([itemID])
-        isApplyingSnapshot = true
-        dataSource.apply(snapshot, animatingDifferences: false)
-        isApplyingSnapshot = false
-
-        // UIKit bug: reconfigureItems+animatingDifferences:false silently skips the cell
-        // provider when the same item is reconfigured multiple times. Force-configure the
-        // visible cell directly so visual state is always correct.
-        if let index = snapshot.itemIdentifiers.firstIndex(of: itemID),
-           let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? TaskItemCell,
-           let item = document?.item(withID: itemID) {
-            cell.configure(with: item, highlighter: highlighter)
-        }
+        guard let item = document?.item(withID: itemID),
+              let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else { return }
+        cell.configure(with: item, highlighter: highlighter)
     }
 
     private func isCellFullyVisible(at indexPath: IndexPath) -> Bool {
@@ -385,10 +377,11 @@ final class DocumentEditorViewController: UIViewController {
     // MARK: - Toggle done
 
     func toggleDone(_ item: TaskItem) {
+        guard let document else { return }
         log.debug("toggleDone: '\(item.content.prefix(30))'")
         let oldContent = item.content
         item.toggleDone()
-        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document!)
+        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
         reconfigureItem(item.id)
         onDocumentChanged?()
     }
@@ -484,7 +477,7 @@ extension DocumentEditorViewController: UICollectionViewDelegate {
 extension DocumentEditorViewController: TaskItemCellDelegate {
 
     func cellDidCommit(_ cell: TaskItemCell, newContent: String) {
-        guard let item = cell.item else { return }
+        guard let item = cell.item, let document else { return }
         let oldContent = item.content
         let oldType = item.type
 
@@ -501,7 +494,7 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         }
         item.tags = TagParser.parseTags(in: item.content)
 
-        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document!)
+        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
         if cell === editingCell { editingCell = nil }
 
         if item.type != oldType {
@@ -547,11 +540,12 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         onDocumentChanged?()
     }
 
-    func cellDidRequestToggleDone(_ cell: TaskItemCell) {
-        guard let item = cell.item else { return }
-        // Commit any in-progress edit on this cell before toggling so content isn't lost.
-        if cell === editingCell { commitCurrentEdit() }
-        toggleDone(item)
+    func cellDidToggleDone(_ cell: TaskItemCell, oldContent: String) {
+        guard let document, let item = cell.item else { return }
+        // The cell already toggled the model and updated its own display.
+        // Only register undo and schedule autosave here — do NOT call reconfigureItem.
+        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
+        onDocumentChanged?()
     }
 
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection) {

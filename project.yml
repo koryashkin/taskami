@@ -47,3 +47,18 @@ targets:
         BUNDLE_LOADER: "$(TEST_HOST)"
     dependencies:
       - target: Taskami
+
+  TaskamiUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: TaskamiUITests
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.koryashkin.taskami.uitests
+        CODE_SIGN_STYLE: Automatic
+        TEST_TARGET_NAME: Taskami
+    dependencies:
+      - target: Taskami

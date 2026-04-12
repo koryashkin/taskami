@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		00EA7F1D05F39E0ECEF52658 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED58DF2D92BC5FA1E28AD97C /* AppPreferences.swift */; };
 		01DFF6DCC6B1490208CDB9EB /* TaskPaperSerializerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA17080349AA4EF2B600E626 /* TaskPaperSerializerTests.swift */; };
+		113DC0B1695E82B021C5DC6B /* DoneToggleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5330B3428AEE2994656E8C /* DoneToggleUITests.swift */; };
 		15BB9F086DFEBA509F8A30D0 /* LegacyImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71C26E3E7491A44E499CEFD /* LegacyImportService.swift */; };
 		18F34C62BDB2C12F38A85025 /* QueryTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6318DB449694FAC9E70E5B /* QueryTokenizer.swift */; };
 		1D801BB4E64E06DBA6EB28EA /* EditorTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F56D201449226F878A614 /* EditorTheme.swift */; };
@@ -31,6 +32,7 @@
 		5EA560C6BDC3390F580EE26B /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C3B0D3ED32EDB931C39FE4 /* FileItem.swift */; };
 		65968549AA302F8A2EE44E02 /* TaskItemTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F499F67987EC0169DE19455 /* TaskItemTextView.swift */; };
 		66F887D34514A96EAE268B32 /* TaskPaperSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED09CE4BB446155BA6786D5D /* TaskPaperSerializer.swift */; };
+		68FD06E08262FA64EDC68E30 /* TaskItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7DCC361A381998DC2CB7A4 /* TaskItemTests.swift */; };
 		69DC92B0F85F223A1E6F5505 /* FileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CA9B3CA0C10EE6B5C0FA5D /* FileRowView.swift */; };
 		6E64DC629D7FAB60C87449D4 /* TaskItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138C1974381E6BAE06CEB5FD /* TaskItem.swift */; };
 		722BA6874CDF213ADAD61402 /* DocumentFilePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2F3CA30774103599F48696 /* DocumentFilePresenter.swift */; };
@@ -46,7 +48,6 @@
 		A43CFD3BEF607F3E9DE7155E /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE614D1C51846549C22D6F9 /* AppError.swift */; };
 		A7D3849EE509123C7EE0BAAE /* DefaultTaskList.taskpaper in Resources */ = {isa = PBXBuildFile; fileRef = 61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */; };
 		AB2E6FCF12562F3C89A0A259 /* QueryEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */; };
-		C9C5B4838ADA43E89A213578 /* TaskItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2BC231062A84F74A1BF321E /* TaskItemTests.swift */; };
 		B1422BD570434775C59AD92D /* TagParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75516F9295F89864CF20B6B /* TagParser.swift */; };
 		B2156FAE9F5136502596E605 /* DocumentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */; };
 		B958DEE88C7E66B23FF100E6 /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */; };
@@ -60,6 +61,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		CA83BCEA74DB99DF00EE1600 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F6BD6D5008A80F8B4AAFB1B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22E3F6942C2FB0097FACC772;
+			remoteInfo = Taskami;
+		};
 		FF07C36C1A68000C8A7D7A45 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F6BD6D5008A80F8B4AAFB1B8 /* Project object */;
@@ -70,6 +78,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0F5330B3428AEE2994656E8C /* DoneToggleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneToggleUITests.swift; sourceTree = "<group>"; };
 		0F5F56D201449226F878A614 /* EditorTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorTheme.swift; sourceTree = "<group>"; };
 		13050BBC5FC7267872BD22C5 /* LockScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreenView.swift; sourceTree = "<group>"; };
 		133FE08FF6DA32B1F779A6D2 /* SearchSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsView.swift; sourceTree = "<group>"; };
@@ -86,7 +95,7 @@
 		5E66BC38BCD21E41296D8E5E /* DocumentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentService.swift; sourceTree = "<group>"; };
 		5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentEditorView.swift; sourceTree = "<group>"; };
 		60C3B0D3ED32EDB931C39FE4 /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
-		61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */ = {isa = PBXFileReference; lastKnownFileType = text; path = DefaultTaskList.taskpaper; sourceTree = "<group>"; };
+		61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */ = {isa = PBXFileReference; path = DefaultTaskList.taskpaper; sourceTree = "<group>"; };
 		68458307BB09ECB2DC71111D /* TaskamiTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TaskamiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParserTests.swift; sourceTree = "<group>"; };
 		6EDBCE89D599D5B9C17138D7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -99,6 +108,7 @@
 		9F499F67987EC0169DE19455 /* TaskItemTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTextView.swift; sourceTree = "<group>"; };
 		A4E426425116A580458A046B /* ErrorBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBannerView.swift; sourceTree = "<group>"; };
 		A8CA9B3CA0C10EE6B5C0FA5D /* FileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRowView.swift; sourceTree = "<group>"; };
+		AA0B0BE1857B80070911023E /* TaskamiUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TaskamiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B560B7ECE8F5F51783AB3E7C /* EditorDragDropHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorDragDropHandler.swift; sourceTree = "<group>"; };
 		BD3FEC298289EABDAF86A010 /* FontAndColorSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAndColorSettingsView.swift; sourceTree = "<group>"; };
 		C146E8D173084B3118535A1C /* CodableColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableColor.swift; sourceTree = "<group>"; };
@@ -107,10 +117,10 @@
 		C92E8C899AB189973C25A4E0 /* DocumentEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentEditorViewController.swift; sourceTree = "<group>"; };
 		C94CF8EE92B1CA7A6AB5564A /* FileBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserView.swift; sourceTree = "<group>"; };
 		D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryEngineTests.swift; sourceTree = "<group>"; };
-		D2BC231062A84F74A1BF321E /* TaskItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTests.swift; sourceTree = "<group>"; };
 		D71C26E3E7491A44E499CEFD /* LegacyImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyImportService.swift; sourceTree = "<group>"; };
 		D75516F9295F89864CF20B6B /* TagParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagParser.swift; sourceTree = "<group>"; };
 		DA17080349AA4EF2B600E626 /* TaskPaperSerializerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperSerializerTests.swift; sourceTree = "<group>"; };
+		DA7DCC361A381998DC2CB7A4 /* TaskItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTests.swift; sourceTree = "<group>"; };
 		DB1AD41DA1C8EE8CCBCB2C45 /* QueryEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryEngine.swift; sourceTree = "<group>"; };
 		DE2DE47D5AD4A42A8D5227A3 /* TaskPaperTextHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperTextHighlighter.swift; sourceTree = "<group>"; };
 		E4EF8CC919F6A3AF078F31F2 /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
@@ -119,7 +129,7 @@
 		EC9E6554C8D166ED0A9FEE69 /* QueryASTParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryASTParser.swift; sourceTree = "<group>"; };
 		ED09CE4BB446155BA6786D5D /* TaskPaperSerializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperSerializer.swift; sourceTree = "<group>"; };
 		ED58DF2D92BC5FA1E28AD97C /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
-		ED8728E382737A0AF8223ADF /* Taskami.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Taskami.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED8728E382737A0AF8223ADF /* Taskami.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Taskami.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCoordinatorService.swift; sourceTree = "<group>"; };
 		FFD0A72C6ABD628A24FB2665 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -191,6 +201,7 @@
 			children = (
 				493E705108F63120B88DCC7D /* Taskami */,
 				77625EF0DE53F4F40DC2434E /* TaskamiTests */,
+				88BECA15BCB316F92858CF4B /* TaskamiUITests */,
 				6D58123B10751BD378CF5EA1 /* Frameworks */,
 				9A97C5F7535A1DCDF313300C /* Products */,
 			);
@@ -209,11 +220,19 @@
 			children = (
 				D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */,
 				7E550097544F2B153FB08057 /* TagParserTests.swift */,
+				DA7DCC361A381998DC2CB7A4 /* TaskItemTests.swift */,
 				6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */,
-				D2BC231062A84F74A1BF321E /* TaskItemTests.swift */,
 				DA17080349AA4EF2B600E626 /* TaskPaperSerializerTests.swift */,
 			);
 			path = TaskamiTests;
+			sourceTree = "<group>";
+		};
+		88BECA15BCB316F92858CF4B /* TaskamiUITests */ = {
+			isa = PBXGroup;
+			children = (
+				0F5330B3428AEE2994656E8C /* DoneToggleUITests.swift */,
+			);
+			path = TaskamiUITests;
 			sourceTree = "<group>";
 		};
 		8E6103645A85375346927725 /* Theme */ = {
@@ -230,6 +249,7 @@
 			children = (
 				ED8728E382737A0AF8223ADF /* Taskami.app */,
 				68458307BB09ECB2DC71111D /* TaskamiTests.xctest */,
+				AA0B0BE1857B80070911023E /* TaskamiUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -346,6 +366,24 @@
 			productReference = ED8728E382737A0AF8223ADF /* Taskami.app */;
 			productType = "com.apple.product-type.application";
 		};
+		94A6203E879B8A592CED53B0 /* TaskamiUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2C77DA4D4C46502454064FD9 /* Build configuration list for PBXNativeTarget "TaskamiUITests" */;
+			buildPhases = (
+				2B17D0BB3624BE504DAB7C85 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				062E8980D6A72A6DAE6F787D /* PBXTargetDependency */,
+			);
+			name = TaskamiUITests;
+			packageProductDependencies = (
+			);
+			productName = TaskamiUITests;
+			productReference = AA0B0BE1857B80070911023E /* TaskamiUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -359,7 +397,12 @@
 						ProvisioningStyle = Automatic;
 					};
 					22E3F6942C2FB0097FACC772 = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
+					};
+					94A6203E879B8A592CED53B0 = {
+						ProvisioningStyle = Automatic;
+						TestTargetID = 22E3F6942C2FB0097FACC772;
 					};
 				};
 			};
@@ -379,6 +422,7 @@
 			targets = (
 				22E3F6942C2FB0097FACC772 /* Taskami */,
 				1F32B32A78A17D351D3DDB64 /* TaskamiTests */,
+				94A6203E879B8A592CED53B0 /* TaskamiUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -395,14 +439,22 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2B17D0BB3624BE504DAB7C85 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				113DC0B1695E82B021C5DC6B /* DoneToggleUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		392BD40B835991F262FF9574 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				AB2E6FCF12562F3C89A0A259 /* QueryEngineTests.swift in Sources */,
 				39406F8E29FE06EC8351115F /* TagParserTests.swift in Sources */,
+				68FD06E08262FA64EDC68E30 /* TaskItemTests.swift in Sources */,
 				F6D6A969B26D1F70E15AB4C3 /* TaskPaperParserTests.swift in Sources */,
-				C9C5B4838ADA43E89A213578 /* TaskItemTests.swift in Sources */,
 				01DFF6DCC6B1490208CDB9EB /* TaskPaperSerializerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -460,6 +512,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		062E8980D6A72A6DAE6F787D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22E3F6942C2FB0097FACC772 /* Taskami */;
+			targetProxy = CA83BCEA74DB99DF00EE1600 /* PBXContainerItemProxy */;
+		};
 		6CC635C8E51E21EF2EDDA043 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 22E3F6942C2FB0097FACC772 /* Taskami */;
@@ -531,7 +588,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = THT3D327QD;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_GENERATION_MODE = GeneratedFile;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock Taskami with Face ID";
@@ -552,6 +609,44 @@
 			};
 			name = Release;
 		};
+		4D46D2342E8D7AB1747FCC39 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Taskami;
+			};
+			name = Release;
+		};
+		920819BFF86AF30F2A377D91 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.uitests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Taskami;
+			};
+			name = Debug;
+		};
 		A587184C09FA41A82C599231 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -559,7 +654,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = THT3D327QD;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_GENERATION_MODE = GeneratedFile;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock Taskami with Face ID";
@@ -689,6 +784,15 @@
 			buildConfigurations = (
 				ECF6357DBF95CF3B02E52B70 /* Debug */,
 				F21010C4A4E7D2CAC54BBBE8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		2C77DA4D4C46502454064FD9 /* Build configuration list for PBXNativeTarget "TaskamiUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				920819BFF86AF30F2A377D91 /* Debug */,
+				4D46D2342E8D7AB1747FCC39 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

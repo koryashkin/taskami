@@ -13,7 +13,9 @@ protocol TaskItemCellDelegate: AnyObject {
     func cellDidRequestOutdent(_ cell: TaskItemCell)
     func cellDidChange(_ cell: TaskItemCell, content: String)
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection)
-    func cellDidRequestToggleDone(_ cell: TaskItemCell)
+    /// Called after the cell has already toggled the item and updated its own display.
+    /// The delegate should only handle undo registration and autosave — NOT call reconfigureItem.
+    func cellDidToggleDone(_ cell: TaskItemCell, oldContent: String)
 }
 
 final class TaskItemCell: UICollectionViewCell {
@@ -106,6 +108,9 @@ final class TaskItemCell: UICollectionViewCell {
             let attrs: [NSAttributedString.Key: Any] = [.font: highlighter.theme.font, .foregroundColor: color]
             dashButton.setAttributedTitle(NSAttributedString(string: "- ", attributes: attrs), for: .normal)
             dashWidthConstraint.isActive = false
+            // Accessibility: stable ID + value so UI tests can find and verify the button
+            dashButton.accessibilityIdentifier = "dash-\(item.id.uuidString)"
+            dashButton.accessibilityValue = item.isDone ? "done" : "undone"
         } else {
             dashWidthConstraint.isActive = true
         }
@@ -198,7 +203,13 @@ final class TaskItemCell: UICollectionViewCell {
     }
 
     @objc private func dashTapped() {
-        delegate?.cellDidRequestToggleDone(self)
+        guard let item, let highlighter else { return }
+        // Toggle the model and update our own display immediately — no round-trip
+        // through cellForItem(at:) which can race with UICollectionView layout passes.
+        let oldContent = item.content
+        item.toggleDone()
+        configure(with: item, highlighter: highlighter)
+        delegate?.cellDidToggleDone(self, oldContent: oldContent)
     }
 
     // MARK: - Reuse
