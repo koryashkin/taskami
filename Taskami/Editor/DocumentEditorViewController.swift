@@ -19,6 +19,9 @@ final class DocumentEditorViewController: UIViewController {
             applyTheme()
         }
     }
+    /// Whether to append today's date to @done when toggling an item done.
+    /// Mirrors AppPreferences.addDateToDone — updated by DocumentEditorView.updateUIViewController.
+    var addDateToDone: Bool = true
     var onDocumentChanged: (() -> Void)?
 
     private var collectionView: UICollectionView!
@@ -107,7 +110,7 @@ final class DocumentEditorViewController: UIViewController {
     private func setupDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<TaskItemCell, UUID> { [weak self] cell, _, itemID in
             guard let self, let item = self.document?.item(withID: itemID) else { return }
-            cell.configure(with: item, highlighter: self.highlighter)
+            cell.configure(with: item, highlighter: self.highlighter, addDateToDone: self.addDateToDone)
             cell.delegate = self
         }
 
@@ -155,6 +158,19 @@ final class DocumentEditorViewController: UIViewController {
             animations: {
                 self.collectionView.contentInset.bottom = inset
                 self.collectionView.verticalScrollIndicatorInsets.bottom = inset
+                // Scroll the editing cell above the keyboard if it would be covered.
+                // This runs inside the same animation block as the inset change so
+                // the scroll tracks the keyboard slide-up — no separate jump.
+                if let cell = self.editingCell,
+                   let indexPath = self.collectionView.indexPath(for: cell) {
+                    let cellFrame = cell.frame  // in collectionView content coordinates
+                    let visibleBottom = self.collectionView.contentOffset.y
+                        + self.collectionView.bounds.height
+                        - inset
+                    if cellFrame.maxY > visibleBottom {
+                        self.collectionView.scrollToItem(at: indexPath, at: .bottom, animated: false)
+                    }
+                }
             }
         )
     }
@@ -243,18 +259,18 @@ final class DocumentEditorViewController: UIViewController {
     /// Use this for content-only changes (toggleDone, cellDidCommit) where the item list
     /// and order are unchanged.
     private func reconfigureItem(_ itemID: UUID) {
-        // Look up the index path directly from the committed snapshot — no apply() needed.
-        // cellForItem(at:) is safe here: textView.attributedText changes from the previous
-        // configure call only schedule a layout pass (setNeedsLayout), they do not run one,
-        // so the cell map is still valid in this run loop iteration.
         guard let indexPath = dataSource.indexPath(for: itemID) else {
             log.warning("reconfigureItem: \(itemID.uuidString.prefix(8)) not in snapshot, falling back to applySnapshot")
             applySnapshot(animated: false)
             return
         }
+        // Flush any pending layout before cellForItem. Setting textView.attributedText in
+        // endEditMode (commit path) or configure schedules a height-change layout pass via
+        // preferredLayoutAttributesFitting; cellForItem returns nil until that pass runs.
+        collectionView.layoutIfNeeded()
         guard let item = document?.item(withID: itemID),
               let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else { return }
-        cell.configure(with: item, highlighter: highlighter)
+        cell.configure(with: item, highlighter: highlighter, addDateToDone: addDateToDone)
     }
 
     private func isCellFullyVisible(at indexPath: IndexPath) -> Bool {
@@ -270,14 +286,14 @@ final class DocumentEditorViewController: UIViewController {
 
     // MARK: - Begin editing
 
-    func beginEditing(item: TaskItem) {
+    func beginEditing(item: TaskItem, isRetry: Bool = false) {
         guard document != nil else { return }
 
-        log.debug("beginEditing: '\(item.content.prefix(40))'")
+        log.debug("beginEditing\(isRetry ? "(retry)" : ""): '\(item.content.prefix(40))'")
 
         // Commit the current edit first; this may trigger applySnapshot which can
         // shift index paths, so resolve the target cell AFTER committing.
-        commitCurrentEdit()
+        if !isRetry { commitCurrentEdit() }
 
         // Use the snapshot's positions, not allItems — when search is active the snapshot
         // contains only filteredItems, so allItems indices don't map to IndexPaths.
@@ -288,33 +304,31 @@ final class DocumentEditorViewController: UIViewController {
         }
         let indexPath = IndexPath(item: index, section: 0)
 
+        // Flush any pending layout (e.g. height changes from a recent configure call
+        // after keyboard dismiss) BEFORE checking visibility. If we check visibility
+        // with stale layout attributes the cell can appear "in bounds" but then shift
+        // off-screen once the deferred layout pass runs, making cellForItem return nil.
+        collectionView.layoutIfNeeded()
+
         // Only scroll if the target cell isn't already fully visible — avoids a
         // jarring jump when the user taps a cell that's already on screen.
-        let offsetBefore = collectionView.contentOffset.y
+        // Use .bottom so off-screen cells scroll into view with minimal movement
+        // (the keyboard will take care of the final positioning in keyboardWillShow).
         if !isCellFullyVisible(at: indexPath) {
-            log.debug("beginEditing: scrolling to \(indexPath), offsetBefore=\(offsetBefore)")
-            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-        } else {
-            log.debug("beginEditing: cell \(indexPath) already fully visible, skipping scroll")
-        }
-        collectionView.layoutIfNeeded()
-        let offsetAfter = collectionView.contentOffset.y
-        if offsetBefore != offsetAfter {
-            log.debug("beginEditing: contentOffset changed \(offsetBefore) → \(offsetAfter)")
+            collectionView.scrollToItem(at: indexPath, at: .bottom, animated: false)
+            collectionView.layoutIfNeeded()
         }
 
-        // If cellForItem returns nil the cell may have shifted off-screen due to a
-        // height change from a recent configure call (e.g. @done text wrapping).
-        // Scroll it back into view and force another layout pass before giving up.
-        var cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell
-        if cell == nil {
-            log.warning("beginEditing: no cell at \(indexPath) — scrolling to reveal then retrying")
-            collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-            collectionView.layoutIfNeeded()
-            cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell
+        let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell
+        // If cellForItem still returns nil (e.g. contentInset animation still in flight),
+        // defer one run-loop tick and retry once.
+        if cell == nil, !isRetry {
+            log.warning("beginEditing: no cell at \(indexPath) — deferring one run-loop tick")
+            DispatchQueue.main.async { [weak self] in self?.beginEditing(item: item, isRetry: true) }
+            return
         }
         guard let cell else {
-            log.error("beginEditing: cell still nil after scroll+layout for \(indexPath)")
+            log.error("beginEditing: cell not found for \(indexPath) after all retries")
             return
         }
         log.debug("beginEditing: activating cell at \(indexPath)")
@@ -325,7 +339,6 @@ final class DocumentEditorViewController: UIViewController {
         // beginEditing sets cursor to end-of-text by default; we override it here.
         if let pending = pendingTapLocation, pending.itemID == item.id {
             pendingTapLocation = nil
-            // Convert the tap point from collectionView space → cell space → textView space.
             let pointInCell = collectionView.convert(pending.point, to: cell)
             let pointInTextView = CGPoint(
                 x: pointInCell.x - cell.textViewFrame.minX,
@@ -390,7 +403,7 @@ final class DocumentEditorViewController: UIViewController {
         guard let document else { return }
         log.debug("toggleDone: '\(item.content.prefix(30))'")
         let oldContent = item.content
-        item.toggleDone()
+        item.toggleDone(addDate: addDateToDone)
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
         reconfigureItem(item.id)
         onDocumentChanged?()
