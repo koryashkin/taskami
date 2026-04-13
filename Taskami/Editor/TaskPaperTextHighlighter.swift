@@ -45,15 +45,6 @@ struct TaskPaperTextHighlighter {
             result.append(NSAttributedString(string: content, attributes: attrs))
         }
 
-        // Apply indent via paragraph style
-        if item.indentLevel > 0 || item.type == .task {
-            let paragraph = NSMutableParagraphStyle()
-            let indentPoints = CGFloat(item.indentLevel) * theme.indentWidth
-            paragraph.headIndent = indentPoints
-            paragraph.firstLineHeadIndent = indentPoints
-            result.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: result.length))
-        }
-
         return result
     }
 

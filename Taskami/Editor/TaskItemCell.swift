@@ -16,6 +16,8 @@ protocol TaskItemCellDelegate: AnyObject {
     /// Called after the cell has already toggled the item and updated its own display.
     /// The delegate should only handle undo registration and autosave — NOT call reconfigureItem.
     func cellDidToggleDone(_ cell: TaskItemCell, oldContent: String)
+    /// Called when the cell exits edit mode without committing (e.g. scrolled off-screen and reused).
+    func cellDidDismissEditing(_ cell: TaskItemCell)
 }
 
 final class TaskItemCell: UICollectionViewCell {
@@ -33,6 +35,8 @@ final class TaskItemCell: UICollectionViewCell {
     private(set) var item: TaskItem?
     private var highlighter: TaskPaperTextHighlighter?
     private(set) var isInEditMode = false
+    /// Mirrors DocumentEditorViewController.addDateToDone — set via configure(with:highlighter:addDateToDone:).
+    private var addDateToDone: Bool = true
 
     /// The live text content while editing (for accessory actions that need it mid-edit).
     var textViewCurrentContent: String { textView.text ?? "" }
@@ -93,11 +97,13 @@ final class TaskItemCell: UICollectionViewCell {
 
     // MARK: - Configure (display mode)
 
-    func configure(with item: TaskItem, highlighter: TaskPaperTextHighlighter) {
+    func configure(with item: TaskItem, highlighter: TaskPaperTextHighlighter, addDateToDone: Bool = true) {
+        self.addDateToDone = addDateToDone
         log.debug("configure: '\(item.content.prefix(30))' editMode=\(self.isInEditMode)")
         self.item = item
         self.highlighter = highlighter
         accessibilityIdentifier = "item-\(item.id.uuidString)"
+        accessibilityValue = item.content
 
         let indentOffset = CGFloat(item.indentLevel) * highlighter.theme.indentWidth + 16
         indentLeadingConstraint.constant = indentOffset
@@ -181,6 +187,7 @@ final class TaskItemCell: UICollectionViewCell {
     func dismissEditing() {
         guard isInEditMode else { return }
         endEditMode()
+        delegate?.cellDidDismissEditing(self)
     }
 
     private func endEditMode() {
@@ -208,8 +215,8 @@ final class TaskItemCell: UICollectionViewCell {
         // Toggle the model and update our own display immediately — no round-trip
         // through cellForItem(at:) which can race with UICollectionView layout passes.
         let oldContent = item.content
-        item.toggleDone()
-        configure(with: item, highlighter: highlighter)
+        item.toggleDone(addDate: addDateToDone)
+        configure(with: item, highlighter: highlighter, addDateToDone: addDateToDone)
         delegate?.cellDidToggleDone(self, oldContent: oldContent)
     }
 

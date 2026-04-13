@@ -18,12 +18,7 @@ struct TaskPaperParser {
     /// Parse a single line into a TaskItem (without tree relationships).
     /// Ported from TaskPaperSection.m setSelfString:
     static func parseLine(_ line: String) -> TaskItem {
-        var s = line
-
-        // Strip trailing newline/carriage return
-        while s.hasSuffix("\n") || s.hasSuffix("\r") {
-            s.removeLast()
-        }
+        let s = line.trimmingCharacters(in: .newlines)
 
         let fullLength = s.count
 

@@ -348,7 +348,7 @@ final class DocumentEditorViewController: UIViewController {
         }
     }
 
-    private func commitCurrentEdit() {
+    func commitCurrentEdit() {
         if editingCell != nil { log.debug("commitCurrentEdit") }
         editingCell?.commitEditing()
         editingCell = nil
@@ -571,6 +571,11 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         onDocumentChanged?()
     }
 
+    func cellDidDismissEditing(_ cell: TaskItemCell) {
+        // Cell was reused or scrolled off-screen mid-edit — clear the stale reference.
+        if cell === editingCell { editingCell = nil }
+    }
+
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection) {
         guard let item = cell.item, let document else { return }
         let allItems = document.allItems
@@ -592,6 +597,7 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
             self?.beginEditing(item: targetItem)
         }
     }
+
 }
 
 // MARK: - EditorKeyboardAccessoryDelegate

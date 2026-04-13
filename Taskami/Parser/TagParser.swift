@@ -4,17 +4,21 @@ struct TagParser {
 
     // Matches: (optional leading whitespace)@name or @name(value)
     // Ported from Tag.m: TagRegex = @"(?:^|\\s)@([^\\(\\s]*)(?:\\(([^\\)]+)\\))?"
-    private static let tagPattern = try! NSRegularExpression(
-        pattern: #"(?:^|\s)@([^\(\s]*)(?:\(([^\)]+)\))?"#,
-        options: []
-    )
+    private static let tagPattern: NSRegularExpression = {
+        guard let re = try? NSRegularExpression(pattern: #"(?:^|\s)@([^\(\s]*)(?:\(([^\)]+)\))?"#) else {
+            fatalError("tagPattern regex is invalid")
+        }
+        return re
+    }()
 
     // Matches trailing tags at end of string
     // Ported from Tag.m: TrailingTagsRegex = @"(?:(?:^|\\s)@([^\\(\\s]*)(\\([^\\)]*\\))?)+$"
-    private static let trailingTagsPattern = try! NSRegularExpression(
-        pattern: #"(?:(?:^|\s)@([^\(\s]*)(\([^\)]*\))?)+$"#,
-        options: []
-    )
+    private static let trailingTagsPattern: NSRegularExpression = {
+        guard let re = try? NSRegularExpression(pattern: #"(?:(?:^|\s)@([^\(\s]*)(\([^\)]*\))?)+$"#) else {
+            fatalError("trailingTagsPattern regex is invalid")
+        }
+        return re
+    }()
 
     /// Parse all @tags from a content string.
     static func parseTags(in string: String) -> [Tag] {
@@ -67,7 +71,7 @@ struct TagParser {
 
             // Trim leading whitespace from the full match range for the tag range
             var tagStart = fullRange.lowerBound
-            if tagStart != string.startIndex && string[tagStart] == " " || string[tagStart] == "\t" {
+            if tagStart != string.startIndex && (string[tagStart] == " " || string[tagStart] == "\t") {
                 tagStart = string.index(after: tagStart)
             }
 

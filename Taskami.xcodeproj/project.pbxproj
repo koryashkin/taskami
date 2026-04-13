@@ -44,6 +44,7 @@
 		8EE3129A2472AA4B1B6F978D /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58ADDE31FF2E9866BE18C5FB /* AuthenticationService.swift */; };
 		954E1CD51C917897F63E14A3 /* QueryASTParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC9E6554C8D166ED0A9FEE69 /* QueryASTParser.swift */; };
 		9734359D646656D5B72B8539 /* TaskDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6460ECAEC6BEFBF6B477E9 /* TaskDocument.swift */; };
+		9F959FCC04A6492FD4488F99 /* DoneTagUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BCCEA50B1FD152D079FA68 /* DoneTagUITests.swift */; };
 		A120A9DC97997C29F0689E0B /* LockScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13050BBC5FC7267872BD22C5 /* LockScreenView.swift */; };
 		A43CFD3BEF607F3E9DE7155E /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE614D1C51846549C22D6F9 /* AppError.swift */; };
 		A7D3849EE509123C7EE0BAAE /* DefaultTaskList.taskpaper in Resources */ = {isa = PBXBuildFile; fileRef = 61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */; };
@@ -108,6 +109,7 @@
 		96C05BF5A6FF3FC63E950EA1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		9F499F67987EC0169DE19455 /* TaskItemTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTextView.swift; sourceTree = "<group>"; };
 		A0B4427E33FFC917508DBE57 /* EditModeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModeUITests.swift; sourceTree = "<group>"; };
+		A1BCCEA50B1FD152D079FA68 /* DoneTagUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneTagUITests.swift; sourceTree = "<group>"; };
 		A4E426425116A580458A046B /* ErrorBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBannerView.swift; sourceTree = "<group>"; };
 		A8CA9B3CA0C10EE6B5C0FA5D /* FileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRowView.swift; sourceTree = "<group>"; };
 		AA0B0BE1857B80070911023E /* TaskamiUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TaskamiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -232,6 +234,7 @@
 		88BECA15BCB316F92858CF4B /* TaskamiUITests */ = {
 			isa = PBXGroup;
 			children = (
+				A1BCCEA50B1FD152D079FA68 /* DoneTagUITests.swift */,
 				0F5330B3428AEE2994656E8C /* DoneToggleUITests.swift */,
 				A0B4427E33FFC917508DBE57 /* EditModeUITests.swift */,
 			);
@@ -446,6 +449,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F959FCC04A6492FD4488F99 /* DoneTagUITests.swift in Sources */,
 				113DC0B1695E82B021C5DC6B /* DoneToggleUITests.swift in Sources */,
 				B78A5CB3B0BC75D8B8C46834 /* EditModeUITests.swift in Sources */,
 			);

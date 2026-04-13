@@ -47,39 +47,42 @@ final class EditorKeyboardAccessoryView: UIInputView {
         ])
 
         // Indent (Tab)
-        addButton(systemName: "increase.indent", action: #selector(indentTapped))
+        addButton(systemName: "increase.indent", id: "accessory-indent", action: #selector(indentTapped))
 
         // Outdent (Shift-Tab)
-        addButton(systemName: "decrease.indent", action: #selector(outdentTapped))
+        addButton(systemName: "decrease.indent", id: "accessory-outdent", action: #selector(outdentTapped))
 
         addSeparator()
 
         // Toggle @done
-        addButton(systemName: "checkmark.circle", action: #selector(doneTapped))
+        addButton(systemName: "checkmark.circle", id: "accessory-done", action: #selector(doneTapped))
 
         addSeparator()
 
         // Cursor left
-        addButton(systemName: "chevron.left", action: #selector(cursorLeftTapped))
+        addButton(systemName: "chevron.left", id: "accessory-cursor-left", action: #selector(cursorLeftTapped))
 
         // Cursor right
-        addButton(systemName: "chevron.right", action: #selector(cursorRightTapped))
+        addButton(systemName: "chevron.right", id: "accessory-cursor-right", action: #selector(cursorRightTapped))
 
         addSeparator()
 
         // Dismiss keyboard
-        addButton(systemName: "keyboard.chevron.compact.down", action: #selector(dismissTapped))
+        addButton(systemName: "keyboard.chevron.compact.down", id: "accessory-dismiss", action: #selector(dismissTapped))
     }
 
-    private func addButton(systemName: String, action: Selector) {
+    @discardableResult
+    private func addButton(systemName: String, id: String, action: Selector) -> UIButton {
         let button = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
         button.setImage(UIImage(systemName: systemName, withConfiguration: config), for: .normal)
         button.tintColor = .label
+        button.accessibilityIdentifier = id
         button.addTarget(self, action: action, for: .touchUpInside)
         button.widthAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
         button.heightAnchor.constraint(equalToConstant: 36).isActive = true
         stackView.addArrangedSubview(button)
+        return button
     }
 
     private func addSeparator() {
