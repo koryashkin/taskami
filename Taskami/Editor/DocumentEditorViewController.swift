@@ -259,18 +259,23 @@ final class DocumentEditorViewController: UIViewController {
     /// Use this for content-only changes (toggleDone, cellDidCommit) where the item list
     /// and order are unchanged.
     private func reconfigureItem(_ itemID: UUID) {
-        guard let indexPath = dataSource.indexPath(for: itemID) else {
+        guard dataSource.indexPath(for: itemID) != nil else {
             log.warning("reconfigureItem: \(itemID.uuidString.prefix(8)) not in snapshot, falling back to applySnapshot")
             applySnapshot(animated: false)
             return
         }
-        // Flush any pending layout before cellForItem. Setting textView.attributedText in
-        // endEditMode (commit path) or configure schedules a height-change layout pass via
-        // preferredLayoutAttributesFitting; cellForItem returns nil until that pass runs.
-        collectionView.layoutIfNeeded()
-        guard let item = document?.item(withID: itemID),
-              let cell = collectionView.cellForItem(at: indexPath) as? TaskItemCell else { return }
-        cell.configure(with: item, highlighter: highlighter, addDateToDone: addDateToDone)
+        guard let item = document?.item(withID: itemID) else { return }
+        // Search visibleCells by item ID instead of using cellForItem(at:).
+        // cellForItem(at:) returns nil when the collection view is in the middle of a
+        // keyboard-dismiss animation (contentInset.bottom is transitioning), even though
+        // the cell is visually on screen. Iterating visibleCells is immune to this.
+        if let cell = collectionView.visibleCells
+            .compactMap({ $0 as? TaskItemCell })
+            .first(where: { $0.item?.id == itemID }) {
+            cell.configure(with: item, highlighter: highlighter, addDateToDone: addDateToDone)
+        }
+        // If the cell is off-screen, the registration handler will configure it correctly
+        // when it comes into view, because item is a reference type updated in-place.
     }
 
     private func isCellFullyVisible(at indexPath: IndexPath) -> Bool {
