@@ -29,6 +29,12 @@ struct DocumentView: View {
                     },
                     onViewControllerCreated: { vc in
                         editorVC = vc
+                        // Restore cursor once the VC is ready. pendingCursorRestore was
+                        // populated during open() before the VC existed.
+                        if let restore = appState.documentService.pendingCursorRestore {
+                            appState.documentService.pendingCursorRestore = nil
+                            vc.restoreCursor(itemPath: restore.itemPath, offset: restore.offset)
+                        }
                     }
                 )
             } else if appState.documentService.isLoading {
@@ -58,6 +64,15 @@ struct DocumentView: View {
             await loadDocument()
         }
         .onDisappear {
+            // Save cursor position alongside fold state before closing.
+            if let doc = appState.documentService.currentDocument {
+                let cursor = editorVC?.cursorPosition
+                appState.documentService.saveEditorState(
+                    for: doc,
+                    cursorItemPath: cursor?.itemPath,
+                    cursorOffset: cursor?.offset
+                )
+            }
             Task {
                 try? await appState.documentService.save()
                 appState.documentService.close()

@@ -76,15 +76,39 @@ final class TaskDocument: Identifiable {
     /// Silently ignores any path that no longer resolves (item moved/deleted).
     func applyCollapsedPaths(_ paths: [[Int]]) {
         for path in paths {
-            guard let first = path.first, first < items.count else { continue }
-            var current = items[first]
-            var valid = true
-            for index in path.dropFirst() {
-                guard index < current.children.count else { valid = false; break }
-                current = current.children[index]
-            }
-            if valid { current.isCollapsed = true }
+            item(atPath: path)?.isCollapsed = true
         }
+    }
+
+    /// Resolve an item from a root-to-leaf index path. Returns nil if any index is out of range.
+    func item(atPath path: [Int]) -> TaskItem? {
+        guard let first = path.first, first < items.count else { return nil }
+        var current = items[first]
+        for index in path.dropFirst() {
+            guard index < current.children.count else { return nil }
+            current = current.children[index]
+        }
+        return current
+    }
+
+    /// Compute the index path of an item in the tree. Returns nil if not found.
+    func path(of target: TaskItem) -> [Int]? {
+        for (i, item) in items.enumerated() {
+            if let found = findPath(of: target, in: item, currentPath: [i]) {
+                return found
+            }
+        }
+        return nil
+    }
+
+    private func findPath(of target: TaskItem, in item: TaskItem, currentPath: [Int]) -> [Int]? {
+        if item.id == target.id { return currentPath }
+        for (i, child) in item.children.enumerated() {
+            if let found = findPath(of: target, in: child, currentPath: currentPath + [i]) {
+                return found
+            }
+        }
+        return nil
     }
 
     func item(withID id: UUID) -> TaskItem? {

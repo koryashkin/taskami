@@ -4,9 +4,12 @@ import OSLog
 
 private let log = Logger(subsystem: "com.taskami", category: "DocumentService")
 
-private struct FoldStateFile: Codable {
+private struct EditorStateFile: Codable {
     var version: Int = 1
     var collapsedPaths: [[Int]]
+    /// Index path to the item holding the cursor, plus the character offset within it.
+    var cursorItemPath: [Int]?
+    var cursorOffset: Int?
 }
 
 @Observable
@@ -14,6 +17,8 @@ final class DocumentService {
     var currentDocument: TaskDocument?
     var isLoading: Bool = false
     var error: Error?
+    /// Set after open(); the DocumentView should consume this once to scroll to the saved position.
+    var pendingCursorRestore: (itemPath: [Int], offset: Int)?
 
     private let fileCoordinator = FileCoordinatorService()
     private var filePresenter: DocumentFilePresenter?
@@ -58,8 +63,9 @@ final class DocumentService {
         presenter.startMonitoring()
         self.filePresenter = presenter
 
-        loadAndApplyFoldState(for: document)
+        let savedCursor = loadAndApplyEditorState(for: document)
         currentDocument = document
+        pendingCursorRestore = savedCursor
         return document
     }
 
@@ -108,31 +114,46 @@ final class DocumentService {
         document.items = items
         document.encoding = encoding
         document.hasUnsavedChanges = false
-        loadAndApplyFoldState(for: document)
+        loadAndApplyEditorState(for: document)
         log.debug("reloadFromDisk: \(document.fileURL.lastPathComponent)")
     }
 
-    // MARK: - Fold state persistence
+    // MARK: - Editor state persistence (fold + cursor)
 
-    /// Write the current fold state to a tiny JSON sidecar alongside the document file.
-    func saveFoldState(for document: TaskDocument) {
-        let paths = document.collapsedPaths
-        let file = FoldStateFile(version: 1, collapsedPaths: paths)
+    /// Write fold state and cursor position to the sidecar file.
+    func saveEditorState(for document: TaskDocument, cursorItemPath: [Int]? = nil, cursorOffset: Int? = nil) {
+        let file = EditorStateFile(
+            version: 1,
+            collapsedPaths: document.collapsedPaths,
+            cursorItemPath: cursorItemPath,
+            cursorOffset: cursorOffset
+        )
         guard let data = try? JSONEncoder().encode(file) else { return }
-        let url = foldStateURL(for: document.fileURL)
+        let url = editorStateURL(for: document.fileURL)
         try? data.write(to: url, options: .atomic)
-        log.debug("saveFoldState: \(paths.count) collapsed paths → \(url.lastPathComponent)")
+        log.debug("saveEditorState: \(file.collapsedPaths.count) folds, cursor=\(String(describing: cursorItemPath)):\(String(describing: cursorOffset))")
     }
 
-    private func loadAndApplyFoldState(for document: TaskDocument) {
-        let url = foldStateURL(for: document.fileURL)
+    /// Load and apply fold state; return the saved cursor position if present.
+    @discardableResult
+    func loadAndApplyEditorState(for document: TaskDocument) -> (itemPath: [Int], offset: Int)? {
+        let url = editorStateURL(for: document.fileURL)
         guard let data = try? Data(contentsOf: url),
-              let file = try? JSONDecoder().decode(FoldStateFile.self, from: data) else { return }
+              let file = try? JSONDecoder().decode(EditorStateFile.self, from: data) else { return nil }
         document.applyCollapsedPaths(file.collapsedPaths)
-        log.debug("loadFoldState: applied \(file.collapsedPaths.count) paths from \(url.lastPathComponent)")
+        log.debug("loadEditorState: \(file.collapsedPaths.count) folds from \(url.lastPathComponent)")
+        if let path = file.cursorItemPath, let offset = file.cursorOffset {
+            return (path, offset)
+        }
+        return nil
     }
 
-    private func foldStateURL(for documentURL: URL) -> URL {
+    private func editorStateURL(for documentURL: URL) -> URL {
         documentURL.appendingPathExtension("foldstate")
+    }
+
+    // Keep old name as a passthrough so existing callers compile without change.
+    func saveFoldState(for document: TaskDocument) {
+        saveEditorState(for: document)
     }
 }

@@ -26,6 +26,22 @@ final class DocumentEditorViewController: UIViewController {
     /// Called whenever fold state changes (toggle or undo/redo) so the host can persist it.
     var onFoldStateChanged: (() -> Void)?
 
+    /// Returns the index path + character offset of the item currently being edited (or last edited).
+    /// The host calls this on disappear to persist cursor position.
+    var cursorPosition: (itemPath: [Int], offset: Int)? {
+        guard let document,
+              let item = editingCell?.item ?? lastEditedItem,
+              let path = document.path(of: item) else { return nil }
+        let offset = editingCell?.editingTextView.map {
+            $0.selectedRange.location
+        } ?? lastEditedOffset
+        return (path, offset)
+    }
+
+    /// Retained after commitCurrentEdit so cursorPosition remains readable after editing ends.
+    private weak var lastEditedItem: TaskItem?
+    private var lastEditedOffset: Int = 0
+
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<Int, UUID>!
 
@@ -79,6 +95,23 @@ final class DocumentEditorViewController: UIViewController {
         self.document = document
         if isViewLoaded {
             applySnapshot(animated: false)
+        }
+    }
+
+    /// Scroll to the item at `itemPath` and place the cursor at `offset`.
+    /// Called by the host after open() to restore the last session's cursor position.
+    func restoreCursor(itemPath: [Int], offset: Int) {
+        guard let document, let item = document.item(atPath: itemPath) else { return }
+        // Slight delay so the collection view has fully laid out before we scroll.
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.beginEditing(item: item)
+            DispatchQueue.main.async {
+                if let cell = self.editingCell, let tv = cell.editingTextView {
+                    let clampedOffset = min(offset, tv.text.utf16.count)
+                    tv.selectedRange = NSRange(location: clampedOffset, length: 0)
+                }
+            }
         }
     }
 
@@ -458,6 +491,10 @@ final class DocumentEditorViewController: UIViewController {
 
     func commitCurrentEdit() {
         if editingCell != nil { log.debug("commitCurrentEdit") }
+        if let cell = editingCell {
+            lastEditedItem = cell.item
+            lastEditedOffset = cell.editingTextView?.selectedRange.location ?? 0
+        }
         editingCell?.commitEditing()
         editingCell = nil
     }
