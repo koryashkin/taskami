@@ -110,6 +110,11 @@ struct QueryEngine {
                 return compareNumeric(tagNum, relation: relation, to: numValue)
             }
 
+            // Try date comparison (e.g. @due < today, @start > 2024-01-01)
+            if let tagDate = tag.dateValue, let queryDate = DateTagParser.parseDate(from: value) {
+                return compareDate(tagDate, relation: relation, to: queryDate)
+            }
+
             return compareString(tagValue, relation: relation, to: value)
         }
     }
@@ -163,6 +168,18 @@ struct QueryEngine {
             return matchesRegex(lhs, pattern: rhs)
         default:
             return lhs.localizedCaseInsensitiveContains(rhs)
+        }
+    }
+
+    private static func compareDate(_ lhs: Date, relation: String, to rhs: Date) -> Bool {
+        switch relation {
+        case "=":  return lhs == rhs
+        case "!=": return lhs != rhs
+        case ">":  return lhs > rhs
+        case ">=": return lhs >= rhs
+        case "<":  return lhs < rhs
+        case "<=": return lhs <= rhs
+        default:   return lhs == rhs
         }
     }
 

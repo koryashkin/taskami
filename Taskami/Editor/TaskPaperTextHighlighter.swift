@@ -17,6 +17,7 @@ struct TaskPaperTextHighlighter {
                 .foregroundColor: theme.projectColor.uiColor
             ]
             result.append(NSAttributedString(string: content, attributes: attrs))
+            appendProjectStats(for: item, projectFont: projectFont, to: result)
 
         case .task:
             // Build the full display string and highlight tags within it
@@ -51,10 +52,54 @@ struct TaskPaperTextHighlighter {
     /// Apply tag-specific coloring to an attributed string.
     private func highlightTags(in attrString: NSMutableAttributedString, content: String) {
         let tagsWithRanges = TagParser.parseTagsWithRanges(in: content)
-        for (_, range) in tagsWithRanges {
+        for (tag, range) in tagsWithRanges {
             guard let nsRange = content.nsRange(from: range) else { continue }
-            attrString.addAttribute(.foregroundColor, value: theme.tagColor.uiColor, range: nsRange)
+            attrString.addAttribute(.foregroundColor, value: tagDisplayColor(for: tag), range: nsRange)
         }
+    }
+
+    /// Return the display color for a tag — date-aware for @due and @start.
+    private func tagDisplayColor(for tag: Tag) -> UIColor {
+        let name = tag.name.lowercased()
+        guard (name == "due" || name == "start"), let date = tag.dateValue else {
+            return theme.tagColor.uiColor
+        }
+        switch DateTagParser.proximity(of: date) {
+        case .overdue:  return .systemRed
+        case .today:    return .systemOrange
+        case .upcoming: return .systemYellow
+        case .future:   return theme.tagColor.uiColor
+        }
+    }
+
+    /// Append a compact progress + cost summary line for project items that have task descendants.
+    private func appendProjectStats(for item: TaskItem, projectFont: UIFont, to result: NSMutableAttributedString) {
+        let progress = item.completionProgress
+        let cost = item.aggregateCost
+        guard progress != nil || cost != nil else { return }
+
+        var parts: [String] = []
+
+        if let progress {
+            let total = item.allDescendants.filter { $0.type == .task }.count
+            let done = Int(round(progress * Double(total)))
+            let filled = Int(round(progress * 8))
+            let bar = String(repeating: "▓", count: filled) + String(repeating: "░", count: 8 - filled)
+            parts.append("\(bar) \(done)/\(total)")
+        }
+
+        if let cost {
+            let formatted = cost.truncatingRemainder(dividingBy: 1) == 0 ? String(Int(cost)) : String(cost)
+            parts.append("@cost(\(formatted))")
+        }
+
+        let statsText = "\n" + parts.joined(separator: "  ")
+        let smallFont = UIFont(descriptor: projectFont.fontDescriptor, size: projectFont.pointSize * 0.78)
+        let statsAttrs: [NSAttributedString.Key: Any] = [
+            .font: smallFont,
+            .foregroundColor: theme.noteColor.uiColor
+        ]
+        result.append(NSAttributedString(string: statsText, attributes: statsAttrs))
     }
 }
 

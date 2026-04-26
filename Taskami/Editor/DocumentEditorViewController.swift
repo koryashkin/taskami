@@ -660,6 +660,8 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
             item.content = newContent
             // type unchanged — don't demote an existing project just because it was renamed
         }
+        // Normalize natural-language @due/@start values to ISO dates on commit
+        item.content = DateTagParser.normalizeContent(item.content)
         item.tags = TagParser.parseTags(in: item.content)
 
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
@@ -813,5 +815,53 @@ extension DocumentEditorViewController: EditorKeyboardAccessoryDelegate {
         collectionView.keyboardDismissMode = isFreeScrollActive ? .none : .interactive
         keyboardAccessory.isFreeScrollActive = isFreeScrollActive
         log.debug("freeScroll: \(self.isFreeScrollActive)")
+    }
+
+    func accessoryDidTapDatePicker() {
+        guard let cell = editingCell, let item = cell.item else { return }
+
+        // Snapshot current text so tag lookup is up-to-date
+        item.content = cell.textViewCurrentContent
+        item.tags = TagParser.parseTags(in: item.content)
+
+        // Prefer @due, fall back to @start, default tag name to "due"
+        let tagName: String
+        let initialDate: Date
+        if let dueTag = item.tag(named: "due") {
+            tagName = "due"
+            initialDate = dueTag.dateValue ?? Date()
+        } else if let startTag = item.tag(named: "start") {
+            tagName = "start"
+            initialDate = startTag.dateValue ?? Date()
+        } else {
+            tagName = "due"
+            initialDate = Date()
+        }
+
+        let picker = DatePickerSheetViewController()
+        picker.initialDate = initialDate
+        picker.onConfirm = { [weak self, weak item] date in
+            guard let self, let item, let document = self.document else { return }
+            let oldContent = item.content
+            DateTagParser.insertOrUpdateDateTag(named: tagName, date: date, in: item)
+            self.docUndoManager.registerContentChange(
+                item: item, oldContent: oldContent, newContent: item.content, document: document
+            )
+            self.reconfigureItem(item.id)
+            self.onDocumentChanged?()
+            // Sync the live text view if this item is still being edited
+            if let editingCell = self.editingCell, editingCell.item?.id == item.id,
+               let tv = editingCell.editingTextView {
+                tv.text = item.content
+            }
+        }
+
+        picker.modalPresentationStyle = .pageSheet
+        if let sheet = picker.sheetPresentationController {
+            sheet.detents = [.medium()]
+            sheet.prefersGrabberVisible = true
+        }
+        present(picker, animated: true)
+        log.debug("accessoryDidTapDatePicker: tag=@\(tagName) initial=\(DateTagParser.formatDate(initialDate))")
     }
 }

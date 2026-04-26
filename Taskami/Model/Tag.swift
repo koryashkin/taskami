@@ -23,6 +23,11 @@ struct Tag: Identifiable, Equatable, Sendable, Hashable {
         return Double(value)
     }
 
+    var dateValue: Date? {
+        guard let value else { return nil }
+        return DateTagParser.parseDate(from: value)
+    }
+
     static func == (lhs: Tag, rhs: Tag) -> Bool {
         lhs.name == rhs.name && lhs.value == rhs.value
     }

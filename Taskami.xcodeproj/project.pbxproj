@@ -60,6 +60,9 @@
 		DC8CB0227CC2A58EBB289A10 /* DocumentEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92E8C899AB189973C25A4E0 /* DocumentEditorViewController.swift */; };
 		F38D97A5FC6FB93B1EABAA7C /* FontAndColorSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3FEC298289EABDAF86A010 /* FontAndColorSettingsView.swift */; };
 		F6D6A969B26D1F70E15AB4C3 /* TaskPaperParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */; };
+		7F2D0B6581834ED8AA73ED7F /* DateTagParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D27FDDD82445079926F2C5 /* DateTagParser.swift */; };
+		4767FB31EAB04B62B66572D7 /* DatePickerSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */; };
+		CC1DE388C37645E4A88D1583 /* FocusBreadcrumbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -136,6 +139,9 @@
 		ED8728E382737A0AF8223ADF /* Taskami.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Taskami.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCoordinatorService.swift; sourceTree = "<group>"; };
 		FFD0A72C6ABD628A24FB2665 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
+		18D27FDDD82445079926F2C5 /* DateTagParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTagParser.swift; sourceTree = "<group>"; };
+		43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheetViewController.swift; sourceTree = "<group>"; };
+		FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBreadcrumbView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,6 +199,7 @@
 		4A3597A34C2F5753337B66BA /* Parser */ = {
 			isa = PBXGroup;
 			children = (
+				18D27FDDD82445079926F2C5 /* DateTagParser.swift */,
 				D75516F9295F89864CF20B6B /* TagParser.swift */,
 				E5825BD329F2C0289CDFBE3A /* TaskPaperParser.swift */,
 				ED09CE4BB446155BA6786D5D /* TaskPaperSerializer.swift */,
@@ -281,11 +288,13 @@
 		B3A0B36619BD913C1E57B1A0 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */,
 				5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */,
 				C92E8C899AB189973C25A4E0 /* DocumentEditorViewController.swift */,
 				909E0A91A8311C1D396039E8 /* DocumentUndoManager.swift */,
 				B560B7ECE8F5F51783AB3E7C /* EditorDragDropHandler.swift */,
 				86863540DA0FEE4D05FC2268 /* EditorKeyboardAccessoryView.swift */,
+				FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */,
 				C7D80466DA9339A66D949CD1 /* TaskItemCell.swift */,
 				9F499F67987EC0169DE19455 /* TaskItemTextView.swift */,
 				DE2DE47D5AD4A42A8D5227A3 /* TaskPaperTextHighlighter.swift */,
@@ -478,6 +487,8 @@
 				47DD8622EC47AB11D74AB960 /* CodableColor.swift in Sources */,
 				2C5B1FD6C29209F126FBB36C /* ConflictResolver.swift in Sources */,
 				59228B9229C7C0B1DAD8DD3A /* ContentView.swift in Sources */,
+				7F2D0B6581834ED8AA73ED7F /* DateTagParser.swift in Sources */,
+				4767FB31EAB04B62B66572D7 /* DatePickerSheetViewController.swift in Sources */,
 				B2156FAE9F5136502596E605 /* DocumentEditorView.swift in Sources */,
 				DC8CB0227CC2A58EBB289A10 /* DocumentEditorViewController.swift in Sources */,
 				722BA6874CDF213ADAD61402 /* DocumentFilePresenter.swift in Sources */,
@@ -486,6 +497,7 @@
 				323C2CCD1665CF2FCA00E47B /* DocumentView.swift in Sources */,
 				505CF3EC8065E930576017EB /* EditorDragDropHandler.swift in Sources */,
 				3A9A0F29D6C5CBFEE2E6806A /* EditorKeyboardAccessoryView.swift in Sources */,
+				CC1DE388C37645E4A88D1583 /* FocusBreadcrumbView.swift in Sources */,
 				1D801BB4E64E06DBA6EB28EA /* EditorTheme.swift in Sources */,
 				2E548A5B71DC1DAEDDBFB024 /* EmptyStateView.swift in Sources */,
 				8560A404235AEA3241B10702 /* ErrorBannerView.swift in Sources */,

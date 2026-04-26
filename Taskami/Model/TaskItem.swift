@@ -68,6 +68,21 @@ final class TaskItem: Identifiable {
         }
     }
 
+    /// Fraction of descendant tasks that are @done. Returns nil if there are no task descendants.
+    var completionProgress: Double? {
+        let tasks = allDescendants.filter { $0.type == .task }
+        guard !tasks.isEmpty else { return nil }
+        let done = tasks.filter { $0.isDone }.count
+        return Double(done) / Double(tasks.count)
+    }
+
+    /// Sum of @cost(N) tag numeric values across direct children. Returns nil if none have @cost.
+    var aggregateCost: Double? {
+        let costs = children.compactMap { $0.tag(named: "cost")?.numberValue }
+        guard !costs.isEmpty else { return nil }
+        return costs.reduce(0, +)
+    }
+
     /// All descendants in depth-first order (not including self).
     var allDescendants: [TaskItem] {
         var result: [TaskItem] = []

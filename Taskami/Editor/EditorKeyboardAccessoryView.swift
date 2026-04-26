@@ -8,6 +8,7 @@ protocol EditorKeyboardAccessoryDelegate: AnyObject {
     func accessoryDidTapCursorRight()
     func accessoryDidTapDismiss()
     func accessoryDidTapFreeScroll()
+    func accessoryDidTapDatePicker()
 }
 
 final class EditorKeyboardAccessoryView: UIInputView {
@@ -80,6 +81,11 @@ final class EditorKeyboardAccessoryView: UIInputView {
 
         addSeparator()
 
+        // Date picker
+        addButton(systemName: "calendar", id: "accessory-date-picker", action: #selector(datePickerTapped))
+
+        addSeparator()
+
         // Dismiss keyboard
         addButton(systemName: "keyboard.chevron.compact.down", id: "accessory-dismiss", action: #selector(dismissTapped))
     }
@@ -123,4 +129,5 @@ final class EditorKeyboardAccessoryView: UIInputView {
     @objc private func cursorRightTapped() { delegate?.accessoryDidTapCursorRight() }
     @objc private func dismissTapped() { delegate?.accessoryDidTapDismiss() }
     @objc private func freeScrollTapped() { delegate?.accessoryDidTapFreeScroll() }
+    @objc private func datePickerTapped() { delegate?.accessoryDidTapDatePicker() }
 }
