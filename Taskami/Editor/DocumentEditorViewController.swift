@@ -30,6 +30,12 @@ final class DocumentEditorViewController: UIViewController {
     private let dragDropHandler = EditorDragDropHandler()
     private let keyboardAccessory = EditorKeyboardAccessoryView()
     private let docUndoManager = DocumentUndoManager()
+    private let focusBreadcrumb = FocusBreadcrumbView()
+
+    /// The item whose subtree is currently shown exclusively (Focus In).
+    private(set) var focusedItem: TaskItem?
+    /// Stack of previously focused items, used to step back out through multiple levels.
+    private var focusStack: [TaskItem] = []
 
     /// The cell currently in edit mode (at most one at a time).
     private weak var editingCell: TaskItemCell?
@@ -59,6 +65,7 @@ final class DocumentEditorViewController: UIViewController {
         setupKeyboardAccessory()
         setupKeyboardObservers()
         setupUndoRedoObservers()
+        setupFocusBreadcrumb()
         applyTheme()
         applySnapshot(animated: false)
     }
@@ -97,6 +104,18 @@ final class DocumentEditorViewController: UIViewController {
             doneAction.image = UIImage(systemName: item.isDone ? "arrow.uturn.backward" : "checkmark")
 
             return UISwipeActionsConfiguration(actions: [deleteAction, doneAction])
+        }
+
+        config.leadingSwipeActionsConfigurationProvider = { [weak self] indexPath in
+            guard let self, let item = self.item(at: indexPath) else { return nil }
+            guard self.editingCell == nil, !item.children.isEmpty else { return nil }
+            let focusAction = UIContextualAction(style: .normal, title: "Focus") { _, _, completion in
+                self.focusIn(item: item)
+                completion(true)
+            }
+            focusAction.backgroundColor = .systemIndigo
+            focusAction.image = UIImage(systemName: "scope")
+            return UISwipeActionsConfiguration(actions: [focusAction])
         }
 
         let layout = UICollectionViewCompositionalLayout.list(using: config)
@@ -140,6 +159,57 @@ final class DocumentEditorViewController: UIViewController {
             self, selector: #selector(keyboardWillHide(_:)),
             name: UIResponder.keyboardWillHideNotification, object: nil
         )
+    }
+
+    private func setupFocusBreadcrumb() {
+        focusBreadcrumb.translatesAutoresizingMaskIntoConstraints = false
+        focusBreadcrumb.isHidden = true
+        focusBreadcrumb.onFocusOut = { [weak self] in self?.focusOut() }
+        view.addSubview(focusBreadcrumb)
+        NSLayoutConstraint.activate([
+            focusBreadcrumb.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            focusBreadcrumb.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            focusBreadcrumb.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
+    }
+
+    // MARK: - Focus In / Out
+
+    func focusIn(item: TaskItem) {
+        guard !item.children.isEmpty else { return }
+        commitCurrentEdit()
+        if let current = focusedItem {
+            focusStack.append(current)
+        }
+        focusedItem = item
+        updateFocusBreadcrumb(animated: true)
+        applySnapshot(animated: true)
+    }
+
+    func focusOut() {
+        commitCurrentEdit()
+        focusedItem = focusStack.popLast()
+        updateFocusBreadcrumb(animated: true)
+        applySnapshot(animated: true)
+    }
+
+    private func updateFocusBreadcrumb(animated: Bool) {
+        let isFocused = focusedItem != nil
+        if let item = focusedItem {
+            let parts = item.ancestors.reversed().map(\.content) + [item.content]
+            focusBreadcrumb.setPath(parts)
+        }
+        let inset: CGFloat = isFocused ? 44 : 0
+        let update = {
+            self.focusBreadcrumb.isHidden = !isFocused
+            self.collectionView.contentInset.top = inset
+            self.collectionView.verticalScrollIndicatorInsets.top = inset
+        }
+        if animated {
+            UIView.animate(withDuration: 0.25, animations: update)
+        } else {
+            update()
+        }
     }
 
     private func setupUndoRedoObservers() {
@@ -225,6 +295,12 @@ final class DocumentEditorViewController: UIViewController {
     func applySnapshot(animated: Bool, caller: String = #function) {
         guard let document else { return }
 
+        // If the focused item was removed from the document, pop the focus stack.
+        if let focused = focusedItem, document.item(withID: focused.id) == nil {
+            focusedItem = focusStack.popLast()
+            updateFocusBreadcrumb(animated: false)
+        }
+
         // Guard against nested applies (e.g. a UITextView delegate callback fires
         // mid-apply and tries to apply again). Defer one run loop tick instead.
         guard !isApplyingSnapshot else {
@@ -235,7 +311,7 @@ final class DocumentEditorViewController: UIViewController {
 
         let filteredItems: [TaskItem]
         if searchText.isEmpty {
-            filteredItems = document.visibleItems
+            filteredItems = document.visibleItems(focusedOn: focusedItem)
         } else {
             let filter = QueryEngine.compile(searchText)
             filteredItems = document.allItems.filter(filter)
@@ -615,7 +691,9 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
 
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection) {
         guard let item = cell.item, let document else { return }
-        let allItems = searchText.isEmpty ? document.visibleItems : document.allItems.filter(QueryEngine.compile(searchText))
+        let allItems = searchText.isEmpty
+            ? document.visibleItems(focusedOn: focusedItem)
+            : document.allItems.filter(QueryEngine.compile(searchText))
         guard let currentIndex = allItems.firstIndex(where: { $0.id == item.id }) else { return }
 
         let targetIndex: Int

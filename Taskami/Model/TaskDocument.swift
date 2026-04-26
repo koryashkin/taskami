@@ -35,10 +35,11 @@ final class TaskDocument: Identifiable {
     }
 
     /// Items flattened in depth-first order, respecting fold state.
+    /// Pass a `root` to restrict the result to that subtree (Focus In).
     /// Collapsed items are included but their descendants are omitted.
-    var visibleItems: [TaskItem] {
+    func visibleItems(focusedOn root: TaskItem? = nil) -> [TaskItem] {
         var result: [TaskItem] = []
-        for item in items {
+        for item in root.map({ [$0] }) ?? items {
             appendVisible(item, to: &result)
         }
         return result
