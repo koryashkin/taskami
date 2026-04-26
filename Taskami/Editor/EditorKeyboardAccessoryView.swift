@@ -7,6 +7,7 @@ protocol EditorKeyboardAccessoryDelegate: AnyObject {
     func accessoryDidTapCursorLeft()
     func accessoryDidTapCursorRight()
     func accessoryDidTapDismiss()
+    func accessoryDidTapFreeScroll()
 }
 
 final class EditorKeyboardAccessoryView: UIInputView {
@@ -14,6 +15,12 @@ final class EditorKeyboardAccessoryView: UIInputView {
     weak var delegate: EditorKeyboardAccessoryDelegate?
 
     private let stackView = UIStackView()
+    private var freeScrollButton: UIButton?
+
+    /// Reflects the current free-scroll state so the button can show an active tint.
+    var isFreeScrollActive: Bool = false {
+        didSet { updateFreeScrollButton() }
+    }
 
     override init(frame: CGRect, inputViewStyle: UIInputView.Style) {
         super.init(frame: frame, inputViewStyle: inputViewStyle)
@@ -67,8 +74,18 @@ final class EditorKeyboardAccessoryView: UIInputView {
 
         addSeparator()
 
+        // Free-scroll toggle (keep keyboard visible while scrolling)
+        let fsButton = addButton(systemName: "scroll", id: "accessory-free-scroll", action: #selector(freeScrollTapped))
+        freeScrollButton = fsButton
+
+        addSeparator()
+
         // Dismiss keyboard
         addButton(systemName: "keyboard.chevron.compact.down", id: "accessory-dismiss", action: #selector(dismissTapped))
+    }
+
+    private func updateFreeScrollButton() {
+        freeScrollButton?.tintColor = isFreeScrollActive ? .systemBlue : .label
     }
 
     @discardableResult
@@ -105,4 +122,5 @@ final class EditorKeyboardAccessoryView: UIInputView {
     @objc private func cursorLeftTapped() { delegate?.accessoryDidTapCursorLeft() }
     @objc private func cursorRightTapped() { delegate?.accessoryDidTapCursorRight() }
     @objc private func dismissTapped() { delegate?.accessoryDidTapDismiss() }
+    @objc private func freeScrollTapped() { delegate?.accessoryDidTapFreeScroll() }
 }

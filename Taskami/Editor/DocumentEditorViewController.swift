@@ -46,6 +46,9 @@ final class DocumentEditorViewController: UIViewController {
     /// fires during an existing apply). Nested calls are deferred one run loop tick.
     private var isApplyingSnapshot = false
 
+    /// When true the keyboard stays visible while the user scrolls (keyboardDismissMode = .none).
+    private var isFreeScrollActive = false
+
     /// Tracks scroll position for unexpected-jump detection in scrollViewDidScroll.
     private var lastKnownContentOffset: CGFloat = 0
 
@@ -269,6 +272,12 @@ final class DocumentEditorViewController: UIViewController {
         let curveRaw = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt ?? 0
         let offsetBefore = collectionView.contentOffset.y
         log.debug("keyboardWillHide: duration=\(duration) offsetBefore=\(offsetBefore)")
+        // Reset free-scroll so the next editing session starts in default dismiss mode.
+        if isFreeScrollActive {
+            isFreeScrollActive = false
+            collectionView.keyboardDismissMode = .interactive
+            keyboardAccessory.isFreeScrollActive = false
+        }
         collectionView.dragInteractionEnabled = true
         UIView.animate(
             withDuration: duration,
@@ -760,5 +769,12 @@ extension DocumentEditorViewController: EditorKeyboardAccessoryDelegate {
 
     func accessoryDidTapDismiss() {
         commitCurrentEdit()
+    }
+
+    func accessoryDidTapFreeScroll() {
+        isFreeScrollActive.toggle()
+        collectionView.keyboardDismissMode = isFreeScrollActive ? .none : .interactive
+        keyboardAccessory.isFreeScrollActive = isFreeScrollActive
+        log.debug("freeScroll: \(self.isFreeScrollActive)")
     }
 }
