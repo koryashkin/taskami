@@ -69,4 +69,14 @@ final class DocumentUndoManager {
             self?.registerIndentChange(item: targetItem, oldLevel: newLevel, newLevel: oldLevel, document: doc)
         }
     }
+
+    func registerCollapseChange(item: TaskItem, wasCollapsed: Bool, document: TaskDocument) {
+        let itemID = item.id
+        undoManager.registerUndo(withTarget: document) { [weak self] doc in
+            guard let targetItem = doc.item(withID: itemID) else { return }
+            let currentCollapsed = targetItem.isCollapsed
+            targetItem.isCollapsed = wasCollapsed
+            self?.registerCollapseChange(item: targetItem, wasCollapsed: currentCollapsed, document: doc)
+        }
+    }
 }

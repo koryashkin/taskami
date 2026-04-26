@@ -32,6 +32,8 @@ final class TaskItem: Identifiable {
         }
     }
 
+    var isCollapsed: Bool = false
+
     var isBlank: Bool {
         content.trimmingCharacters(in: .whitespaces).isEmpty && tags.isEmpty
     }

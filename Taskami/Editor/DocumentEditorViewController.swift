@@ -58,6 +58,7 @@ final class DocumentEditorViewController: UIViewController {
         setupDragDrop()
         setupKeyboardAccessory()
         setupKeyboardObservers()
+        setupUndoRedoObservers()
         applyTheme()
         applySnapshot(animated: false)
     }
@@ -141,6 +142,21 @@ final class DocumentEditorViewController: UIViewController {
         )
     }
 
+    private func setupUndoRedoObservers() {
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(undoRedoDidHappen),
+            name: .NSUndoManagerDidUndoChange, object: docUndoManager.undoManager
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(undoRedoDidHappen),
+            name: .NSUndoManagerDidRedoChange, object: docUndoManager.undoManager
+        )
+    }
+
+    @objc private func undoRedoDidHappen() {
+        applySnapshot(animated: false)
+    }
+
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
@@ -217,13 +233,12 @@ final class DocumentEditorViewController: UIViewController {
             return
         }
 
-        let allItems = document.allItems
         let filteredItems: [TaskItem]
         if searchText.isEmpty {
-            filteredItems = allItems
+            filteredItems = document.visibleItems
         } else {
             let filter = QueryEngine.compile(searchText)
-            filteredItems = allItems.filter(filter)
+            filteredItems = document.allItems.filter(filter)
         }
 
         let visibleBefore = collectionView.indexPathsForVisibleItems.sorted()
@@ -581,9 +596,26 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         if cell === editingCell { editingCell = nil }
     }
 
+    func cellDidToggleFold(_ cell: TaskItemCell) {
+        guard let item = cell.item, let document else { return }
+        // If collapsing and a descendant is currently being edited, commit it first
+        // so no invisible cell is left holding first responder.
+        if !item.isCollapsed,
+           let editing = editingCell,
+           let editedItem = editing.item,
+           item.allDescendants.contains(editedItem) {
+            commitCurrentEdit()
+        }
+        let wasCollapsed = item.isCollapsed
+        item.isCollapsed.toggle()
+        docUndoManager.registerCollapseChange(item: item, wasCollapsed: wasCollapsed, document: document)
+        reconfigureItem(item.id)
+        applySnapshot(animated: true)
+    }
+
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection) {
         guard let item = cell.item, let document else { return }
-        let allItems = document.allItems
+        let allItems = searchText.isEmpty ? document.visibleItems : document.allItems.filter(QueryEngine.compile(searchText))
         guard let currentIndex = allItems.firstIndex(where: { $0.id == item.id }) else { return }
 
         let targetIndex: Int

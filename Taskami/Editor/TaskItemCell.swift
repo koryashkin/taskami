@@ -18,6 +18,8 @@ protocol TaskItemCellDelegate: AnyObject {
     func cellDidToggleDone(_ cell: TaskItemCell, oldContent: String)
     /// Called when the cell exits edit mode without committing (e.g. scrolled off-screen and reused).
     func cellDidDismissEditing(_ cell: TaskItemCell)
+    /// Called when the user taps the disclosure triangle to fold/unfold children.
+    func cellDidToggleFold(_ cell: TaskItemCell)
 }
 
 final class TaskItemCell: UICollectionViewCell {
@@ -29,8 +31,11 @@ final class TaskItemCell: UICollectionViewCell {
     // UIButton absorbs its own tap so the collection view does NOT also fire didSelectItemAt,
     // which would otherwise open edit mode immediately after toggling done.
     private let dashButton = UIButton(type: .custom)
+    // Same absorption pattern as dashButton — prevents didSelectItemAt from firing on fold tap.
+    private let disclosureButton = UIButton(type: .custom)
     private var indentLeadingConstraint: NSLayoutConstraint!
     private var dashWidthConstraint: NSLayoutConstraint!
+    private var disclosureWidthConstraint: NSLayoutConstraint!
 
     private(set) var item: TaskItem?
     private var highlighter: TaskPaperTextHighlighter?
@@ -78,14 +83,26 @@ final class TaskItemCell: UICollectionViewCell {
         // on iOS 15+ and causes the button to stop responding after a few taps.
         dashButton.addTarget(self, action: #selector(dashTapped), for: .touchUpInside)
 
+        disclosureButton.translatesAutoresizingMaskIntoConstraints = false
+        disclosureButton.setContentHuggingPriority(.required, for: .horizontal)
+        disclosureButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        disclosureButton.addTarget(self, action: #selector(disclosureTapped), for: .touchUpInside)
+
+        contentView.addSubview(disclosureButton)
         contentView.addSubview(dashButton)
         contentView.addSubview(textView)
 
-        indentLeadingConstraint = dashButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16)
+        // disclosureButton anchors at the indent position; dashButton and textView follow it.
+        indentLeadingConstraint = disclosureButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16)
+        disclosureWidthConstraint = disclosureButton.widthAnchor.constraint(equalToConstant: 0)
         dashWidthConstraint = dashButton.widthAnchor.constraint(equalToConstant: 0)
 
         NSLayoutConstraint.activate([
             indentLeadingConstraint,
+            disclosureWidthConstraint,
+            disclosureButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+
+            dashButton.leadingAnchor.constraint(equalTo: disclosureButton.trailingAnchor),
             dashButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
 
             textView.leadingAnchor.constraint(equalTo: dashButton.trailingAnchor),
@@ -120,6 +137,20 @@ final class TaskItemCell: UICollectionViewCell {
             dashButton.accessibilityValue = item.isDone ? "done" : "undone"
         } else {
             dashWidthConstraint.isActive = true
+        }
+
+        let hasChildren = !item.children.isEmpty
+        disclosureButton.isHidden = !hasChildren
+        if hasChildren {
+            disclosureWidthConstraint.constant = 20
+            let symbolName = item.isCollapsed ? "chevron.right" : "chevron.down"
+            let config = UIImage.SymbolConfiguration(pointSize: highlighter.theme.font.pointSize * 0.65, weight: .medium)
+            disclosureButton.setImage(UIImage(systemName: symbolName, withConfiguration: config), for: .normal)
+            disclosureButton.tintColor = highlighter.theme.textColor.uiColor.withAlphaComponent(0.45)
+            disclosureButton.accessibilityIdentifier = "disclosure-\(item.id.uuidString)"
+            disclosureButton.accessibilityValue = item.isCollapsed ? "collapsed" : "expanded"
+        } else {
+            disclosureWidthConstraint.constant = 0
         }
 
         // Only update display if not currently editing
@@ -210,6 +241,10 @@ final class TaskItemCell: UICollectionViewCell {
         }
     }
 
+    @objc private func disclosureTapped() {
+        delegate?.cellDidToggleFold(self)
+    }
+
     @objc private func dashTapped() {
         guard let item, let highlighter else { return }
         // Toggle the model and update our own display immediately — no round-trip
@@ -230,6 +265,9 @@ final class TaskItemCell: UICollectionViewCell {
         textView.attributedText = nil
         dashWidthConstraint.isActive = false
         dashButton.isHidden = false
+        disclosureWidthConstraint.constant = 0
+        disclosureButton.isHidden = false
+        disclosureButton.setImage(nil, for: .normal)
         item = nil
         delegate = nil
         highlighter = nil

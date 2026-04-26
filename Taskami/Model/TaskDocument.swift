@@ -24,13 +24,32 @@ final class TaskDocument: Identifiable {
         self.hasUnsavedChanges = false
     }
 
-    /// All items flattened in depth-first order.
+    /// All items flattened in depth-first order, ignoring fold state.
+    /// Used for search (folded items are still searchable) and undo navigation.
     var allItems: [TaskItem] {
         var result: [TaskItem] = []
         for item in items {
             result.append(contentsOf: item.selfAndDescendants)
         }
         return result
+    }
+
+    /// Items flattened in depth-first order, respecting fold state.
+    /// Collapsed items are included but their descendants are omitted.
+    var visibleItems: [TaskItem] {
+        var result: [TaskItem] = []
+        for item in items {
+            appendVisible(item, to: &result)
+        }
+        return result
+    }
+
+    private func appendVisible(_ item: TaskItem, to result: inout [TaskItem]) {
+        result.append(item)
+        guard !item.isCollapsed else { return }
+        for child in item.children {
+            appendVisible(child, to: &result)
+        }
     }
 
     func item(withID id: UUID) -> TaskItem? {
