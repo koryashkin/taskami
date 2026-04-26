@@ -23,6 +23,8 @@ final class DocumentEditorViewController: UIViewController {
     /// Mirrors AppPreferences.addDateToDone — updated by DocumentEditorView.updateUIViewController.
     var addDateToDone: Bool = true
     var onDocumentChanged: (() -> Void)?
+    /// Called whenever fold state changes (toggle or undo/redo) so the host can persist it.
+    var onFoldStateChanged: (() -> Void)?
 
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<Int, UUID>!
@@ -225,6 +227,7 @@ final class DocumentEditorViewController: UIViewController {
 
     @objc private func undoRedoDidHappen() {
         applySnapshot(animated: false)
+        onFoldStateChanged?()
     }
 
     @objc private func keyboardWillShow(_ notification: Notification) {
@@ -687,6 +690,7 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         docUndoManager.registerCollapseChange(item: item, wasCollapsed: wasCollapsed, document: document)
         reconfigureItem(item.id)
         applySnapshot(animated: true)
+        onFoldStateChanged?()
     }
 
     func cellDidRequestNavigate(_ cell: TaskItemCell, direction: NavigationDirection) {

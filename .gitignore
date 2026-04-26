@@ -35,6 +35,9 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# Fold state sidecar (per-user UI state, not source)
+*.foldstate
+
 # Credentials / secrets
 *.p12
 *.mobileprovision

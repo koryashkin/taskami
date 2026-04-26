@@ -4,6 +4,11 @@ import OSLog
 
 private let log = Logger(subsystem: "com.taskami", category: "DocumentService")
 
+private struct FoldStateFile: Codable {
+    var version: Int = 1
+    var collapsedPaths: [[Int]]
+}
+
 @Observable
 final class DocumentService {
     var currentDocument: TaskDocument?
@@ -53,6 +58,7 @@ final class DocumentService {
         presenter.startMonitoring()
         self.filePresenter = presenter
 
+        loadAndApplyFoldState(for: document)
         currentDocument = document
         return document
     }
@@ -102,6 +108,31 @@ final class DocumentService {
         document.items = items
         document.encoding = encoding
         document.hasUnsavedChanges = false
+        loadAndApplyFoldState(for: document)
         log.debug("reloadFromDisk: \(document.fileURL.lastPathComponent)")
+    }
+
+    // MARK: - Fold state persistence
+
+    /// Write the current fold state to a tiny JSON sidecar alongside the document file.
+    func saveFoldState(for document: TaskDocument) {
+        let paths = document.collapsedPaths
+        let file = FoldStateFile(version: 1, collapsedPaths: paths)
+        guard let data = try? JSONEncoder().encode(file) else { return }
+        let url = foldStateURL(for: document.fileURL)
+        try? data.write(to: url, options: .atomic)
+        log.debug("saveFoldState: \(paths.count) collapsed paths → \(url.lastPathComponent)")
+    }
+
+    private func loadAndApplyFoldState(for document: TaskDocument) {
+        let url = foldStateURL(for: document.fileURL)
+        guard let data = try? Data(contentsOf: url),
+              let file = try? JSONDecoder().decode(FoldStateFile.self, from: data) else { return }
+        document.applyCollapsedPaths(file.collapsedPaths)
+        log.debug("loadFoldState: applied \(file.collapsedPaths.count) paths from \(url.lastPathComponent)")
+    }
+
+    private func foldStateURL(for documentURL: URL) -> URL {
+        documentURL.appendingPathExtension("foldstate")
     }
 }

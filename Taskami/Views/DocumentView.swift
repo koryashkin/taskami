@@ -22,6 +22,11 @@ struct DocumentView: View {
                     onDocumentChanged: {
                         appState.documentService.scheduleAutosave()
                     },
+                    onFoldStateChanged: {
+                        if let doc = appState.documentService.currentDocument {
+                            appState.documentService.saveFoldState(for: doc)
+                        }
+                    },
                     onViewControllerCreated: { vc in
                         editorVC = vc
                     }

@@ -7,6 +7,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
     var searchText: String
     var theme: EditorTheme
     var onDocumentChanged: (() -> Void)?
+    var onFoldStateChanged: (() -> Void)?
     /// Called once after the view controller is created, providing a reference for calling actions.
     var onViewControllerCreated: ((DocumentEditorViewController) -> Void)?
 
@@ -16,6 +17,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
         vc.searchText = searchText
         vc.setDocument(document)
         vc.onDocumentChanged = onDocumentChanged
+        vc.onFoldStateChanged = onFoldStateChanged
         // Defer to avoid "modifying state during view update" warning —
         // makeUIViewController is called during the SwiftUI update pass.
         DispatchQueue.main.async { onViewControllerCreated?(vc) }

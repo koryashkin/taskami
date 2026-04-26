@@ -53,6 +53,40 @@ final class TaskDocument: Identifiable {
         }
     }
 
+    // MARK: - Fold state persistence helpers
+
+    /// Index paths (from root) of every currently-collapsed item.
+    /// Used to round-trip fold state to/from the sidecar file.
+    var collapsedPaths: [[Int]] {
+        var result: [[Int]] = []
+        for (i, item) in items.enumerated() {
+            collectCollapsed(item, path: [i], into: &result)
+        }
+        return result
+    }
+
+    private func collectCollapsed(_ item: TaskItem, path: [Int], into result: inout [[Int]]) {
+        if item.isCollapsed { result.append(path) }
+        for (i, child) in item.children.enumerated() {
+            collectCollapsed(child, path: path + [i], into: &result)
+        }
+    }
+
+    /// Apply a set of persisted index paths, collapsing the matched items.
+    /// Silently ignores any path that no longer resolves (item moved/deleted).
+    func applyCollapsedPaths(_ paths: [[Int]]) {
+        for path in paths {
+            guard let first = path.first, first < items.count else { continue }
+            var current = items[first]
+            var valid = true
+            for index in path.dropFirst() {
+                guard index < current.children.count else { valid = false; break }
+                current = current.children[index]
+            }
+            if valid { current.isCollapsed = true }
+        }
+    }
+
     func item(withID id: UUID) -> TaskItem? {
         allItems.first { $0.id == id }
     }
