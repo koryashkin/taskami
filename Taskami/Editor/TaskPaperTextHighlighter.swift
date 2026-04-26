@@ -2,6 +2,19 @@ import UIKit
 
 struct TaskPaperTextHighlighter {
     var theme: EditorTheme
+    var dueTintingEnabled: Bool = false
+
+    /// Returns the cell background color for an item, applying a subtle tint for overdue/today @due tags.
+    func cellBackgroundColor(for item: TaskItem) -> UIColor {
+        guard dueTintingEnabled, let dueTag = item.tag(named: "due"), let dueDate = dueTag.dateValue else {
+            return theme.backgroundColor.uiColor
+        }
+        switch DateTagParser.proximity(of: dueDate) {
+        case .overdue:  return UIColor.systemRed.withAlphaComponent(0.10)
+        case .today:    return UIColor.systemOrange.withAlphaComponent(0.10)
+        default:        return theme.backgroundColor.uiColor
+        }
+    }
 
     /// Create an NSAttributedString for a TaskItem's display text.
     func highlight(_ item: TaskItem) -> NSAttributedString {

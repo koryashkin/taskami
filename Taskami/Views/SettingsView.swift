@@ -23,6 +23,9 @@ struct SettingsView: View {
                             Button("Sepia") { appState.preferences.editorTheme = .sepia }
                         }
                     }
+
+                    Toggle("Dynamic Type", isOn: $prefs.dynamicTypeEnabled)
+                    Toggle("Highlight Overdue Tasks", isOn: $prefs.dueTintingEnabled)
                 }
 
                 Section("Editor") {

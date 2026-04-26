@@ -24,6 +24,12 @@ final class AppPreferences {
     var biometricLockEnabled: Bool {
         didSet { UserDefaults.standard.set(biometricLockEnabled, forKey: "biometricLock") }
     }
+    var dynamicTypeEnabled: Bool {
+        didSet { UserDefaults.standard.set(dynamicTypeEnabled, forKey: "dynamicType") }
+    }
+    var dueTintingEnabled: Bool {
+        didSet { UserDefaults.standard.set(dueTintingEnabled, forKey: "dueTinting") }
+    }
 
     init() {
         let defaults = UserDefaults.standard
@@ -42,6 +48,8 @@ final class AppPreferences {
         self.liveSearchEnabled = defaults.object(forKey: "liveSearch") as? Bool ?? true
         self.showFileExtensions = defaults.object(forKey: "showExtensions") as? Bool ?? false
         self.biometricLockEnabled = defaults.object(forKey: "biometricLock") as? Bool ?? false
+        self.dynamicTypeEnabled = defaults.object(forKey: "dynamicType") as? Bool ?? false
+        self.dueTintingEnabled = defaults.object(forKey: "dueTinting") as? Bool ?? false
     }
 
     private func saveTheme() {

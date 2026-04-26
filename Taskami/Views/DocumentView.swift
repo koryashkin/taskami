@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import OSLog
 
 private let log = Logger(subsystem: "com.taskami", category: "DocumentView")
@@ -11,6 +12,17 @@ struct DocumentView: View {
     @State private var isSearching = false
     @State private var error: Error?
     @State private var editorVC: DocumentEditorViewController?
+    @State private var showExportDialog = false
+
+    /// EditorTheme with font scaled to the system Dynamic Type body size when enabled.
+    private var effectiveTheme: EditorTheme {
+        var theme = appState.preferences.editorTheme
+        if appState.preferences.dynamicTypeEnabled {
+            let scaled = UIFontMetrics(forTextStyle: .body).scaledValue(for: theme.fontSize)
+            theme.fontSize = scaled
+        }
+        return theme
+    }
 
     var body: some View {
         Group {
@@ -18,7 +30,9 @@ struct DocumentView: View {
                 DocumentEditorView(
                     document: document,
                     searchText: searchText,
-                    theme: appState.preferences.editorTheme,
+                    theme: effectiveTheme,
+                    addDateToDone: appState.preferences.addDateToDone,
+                    dueTintingEnabled: appState.preferences.dueTintingEnabled,
                     onDocumentChanged: {
                         appState.documentService.scheduleAutosave()
                     },
@@ -29,8 +43,6 @@ struct DocumentView: View {
                     },
                     onViewControllerCreated: { vc in
                         editorVC = vc
-                        // Restore cursor once the VC is ready. pendingCursorRestore was
-                        // populated during open() before the VC existed.
                         if let restore = appState.documentService.pendingCursorRestore {
                             appState.documentService.pendingCursorRestore = nil
                             vc.restoreCursor(itemPath: restore.itemPath, offset: restore.offset)
@@ -59,12 +71,27 @@ struct DocumentView: View {
                 }
                 .disabled(editorVC == nil)
             }
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Export HTML", systemImage: "square.and.arrow.up") {
+                    showExportDialog = true
+                }
+                .disabled(editorVC == nil)
+            }
+        }
+        .confirmationDialog("Export as HTML", isPresented: $showExportDialog) {
+            ForEach(HTMLExporter.Theme.allCases) { theme in
+                Button(theme.rawValue) {
+                    editorVC?.presentHTMLExport(theme: theme)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Choose a color theme for the exported HTML file.")
         }
         .task {
             await loadDocument()
         }
         .onDisappear {
-            // Save cursor position alongside fold state before closing.
             if let doc = appState.documentService.currentDocument {
                 let cursor = editorVC?.cursorPosition
                 appState.documentService.saveEditorState(

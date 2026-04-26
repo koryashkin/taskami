@@ -6,6 +6,8 @@ struct DocumentEditorView: UIViewControllerRepresentable {
     /// Plain search text — equatable, so updateUIViewController only calls applySnapshot when it actually changes.
     var searchText: String
     var theme: EditorTheme
+    var addDateToDone: Bool = true
+    var dueTintingEnabled: Bool = false
     var onDocumentChanged: (() -> Void)?
     var onFoldStateChanged: (() -> Void)?
     /// Called once after the view controller is created, providing a reference for calling actions.
@@ -15,6 +17,8 @@ struct DocumentEditorView: UIViewControllerRepresentable {
         let vc = DocumentEditorViewController()
         vc.theme = theme
         vc.searchText = searchText
+        vc.addDateToDone = addDateToDone
+        vc.dueTintingEnabled = dueTintingEnabled
         vc.setDocument(document)
         vc.onDocumentChanged = onDocumentChanged
         vc.onFoldStateChanged = onFoldStateChanged
@@ -26,9 +30,9 @@ struct DocumentEditorView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ vc: DocumentEditorViewController, context: Context) {
         vc.theme = theme
-        // searchText has a didSet on the VC that calls applySnapshot only when the value
-        // actually changes — no closure allocation, no spurious snapshot on every render.
         vc.searchText = searchText
+        vc.addDateToDone = addDateToDone
+        vc.dueTintingEnabled = dueTintingEnabled
 
         if vc.document?.id != document.id {
             vc.setDocument(document)

@@ -22,6 +22,12 @@ final class DocumentEditorViewController: UIViewController {
     /// Whether to append today's date to @done when toggling an item done.
     /// Mirrors AppPreferences.addDateToDone — updated by DocumentEditorView.updateUIViewController.
     var addDateToDone: Bool = true
+    var dueTintingEnabled: Bool = false {
+        didSet {
+            guard oldValue != dueTintingEnabled, isViewLoaded else { return }
+            applyTheme()
+        }
+    }
     var onDocumentChanged: (() -> Void)?
     /// Called whenever fold state changes (toggle or undo/redo) so the host can persist it.
     var onFoldStateChanged: (() -> Void)?
@@ -73,7 +79,7 @@ final class DocumentEditorViewController: UIViewController {
     private var pendingTapLocation: (itemID: UUID, point: CGPoint)?
 
     private var highlighter: TaskPaperTextHighlighter {
-        TaskPaperTextHighlighter(theme: theme)
+        TaskPaperTextHighlighter(theme: theme, dueTintingEnabled: dueTintingEnabled)
     }
 
     // MARK: - Lifecycle
@@ -808,6 +814,32 @@ extension DocumentEditorViewController: EditorKeyboardAccessoryDelegate {
 
     func accessoryDidTapDismiss() {
         commitCurrentEdit()
+    }
+
+    // MARK: - HTML Export
+
+    func presentHTMLExport(theme: HTMLExporter.Theme) {
+        guard let document else { return }
+        commitCurrentEdit()
+
+        let html = HTMLExporter.export(document, theme: theme)
+        let filename = document.fileURL.deletingPathExtension().lastPathComponent + ".html"
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+
+        do {
+            try html.write(to: tempURL, atomically: true, encoding: .utf8)
+        } catch {
+            log.error("presentHTMLExport: failed to write temp file: \(error)")
+            return
+        }
+
+        let activityVC = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        present(activityVC, animated: true)
     }
 
     func accessoryDidTapFreeScroll() {

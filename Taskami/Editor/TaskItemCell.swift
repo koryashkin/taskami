@@ -156,7 +156,7 @@ final class TaskItemCell: UICollectionViewCell {
         // Only update display if not currently editing
         if !isInEditMode {
             textView.attributedText = highlighter.highlight(item)
-            contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+            contentView.backgroundColor = highlighter.cellBackgroundColor(for: item)
         } else {
             log.debug("configure: skipping display update — cell is in edit mode")
         }
@@ -235,7 +235,7 @@ final class TaskItemCell: UICollectionViewCell {
         // Restore attributed display
         if let item, let highlighter {
             textView.attributedText = highlighter.highlight(item)
-            contentView.backgroundColor = highlighter.theme.backgroundColor.uiColor
+            contentView.backgroundColor = highlighter.cellBackgroundColor(for: item)
         } else {
             log.warning("endEditMode: no item or highlighter — cell will show blank")
         }

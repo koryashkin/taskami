@@ -61,6 +61,7 @@
 		F38D97A5FC6FB93B1EABAA7C /* FontAndColorSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3FEC298289EABDAF86A010 /* FontAndColorSettingsView.swift */; };
 		F6D6A969B26D1F70E15AB4C3 /* TaskPaperParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */; };
 		7F2D0B6581834ED8AA73ED7F /* DateTagParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D27FDDD82445079926F2C5 /* DateTagParser.swift */; };
+		6C7E4934700C424192BD2771 /* HTMLExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */; };
 		4767FB31EAB04B62B66572D7 /* DatePickerSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */; };
 		CC1DE388C37645E4A88D1583 /* FocusBreadcrumbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */; };
 /* End PBXBuildFile section */
@@ -140,6 +141,7 @@
 		FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCoordinatorService.swift; sourceTree = "<group>"; };
 		FFD0A72C6ABD628A24FB2665 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 		18D27FDDD82445079926F2C5 /* DateTagParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTagParser.swift; sourceTree = "<group>"; };
+		ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLExporter.swift; sourceTree = "<group>"; };
 		43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheetViewController.swift; sourceTree = "<group>"; };
 		FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBreadcrumbView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -165,6 +167,7 @@
 				5E66BC38BCD21E41296D8E5E /* DocumentService.swift */,
 				3757791E708DF776C81B01CD /* FileBrowserService.swift */,
 				FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */,
+				ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */,
 				D71C26E3E7491A44E499CEFD /* LegacyImportService.swift */,
 			);
 			path = Services;
@@ -504,6 +507,7 @@
 				5287E627ACD2A5017493EC0A /* FileBrowserService.swift in Sources */,
 				7D5EB19D2006A78B0A89F7DD /* FileBrowserView.swift in Sources */,
 				5BC9E0F8C0266898279D54E5 /* FileCoordinatorService.swift in Sources */,
+				6C7E4934700C424192BD2771 /* HTMLExporter.swift in Sources */,
 				5EA560C6BDC3390F580EE26B /* FileItem.swift in Sources */,
 				69DC92B0F85F223A1E6F5505 /* FileRowView.swift in Sources */,
 				D99AB7ABE35764D78A660882 /* FolderRowView.swift in Sources */,
