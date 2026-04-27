@@ -30,6 +30,9 @@ final class AppPreferences {
     var dueTintingEnabled: Bool {
         didSet { UserDefaults.standard.set(dueTintingEnabled, forKey: "dueTinting") }
     }
+    var recentSearches: [String] {
+        didSet { UserDefaults.standard.set(recentSearches, forKey: "recentSearches") }
+    }
 
     init() {
         let defaults = UserDefaults.standard
@@ -50,6 +53,7 @@ final class AppPreferences {
         self.biometricLockEnabled = defaults.object(forKey: "biometricLock") as? Bool ?? false
         self.dynamicTypeEnabled = defaults.object(forKey: "dynamicType") as? Bool ?? false
         self.dueTintingEnabled = defaults.object(forKey: "dueTinting") as? Bool ?? false
+        self.recentSearches = defaults.stringArray(forKey: "recentSearches") ?? []
     }
 
     private func saveTheme() {

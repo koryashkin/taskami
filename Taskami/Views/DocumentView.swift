@@ -39,6 +39,7 @@ struct DocumentView: View {
                     onActivateSearch: { isSearching = true },
                     onDocumentChanged: {
                         appState.documentService.scheduleAutosave()
+                        WidgetDataStore.update(from: document)
                     },
                     onFoldStateChanged: {
                         if let doc = appState.documentService.currentDocument {
@@ -68,6 +69,21 @@ struct DocumentView: View {
         .navigationTitle(fileURL.deletingPathExtension().lastPathComponent)
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, isPresented: $isSearching, prompt: "Search tasks")
+        .searchSuggestions {
+            if let document {
+                SearchSuggestionsView(
+                    document: document,
+                    searchText: $searchText,
+                    recentSearches: appState.preferences.recentSearches,
+                    onClearRecent: { appState.preferences.recentSearches = [] }
+                )
+            }
+        }
+        .onChange(of: isSearching) { _, searching in
+            if !searching && !searchText.isEmpty {
+                appState.addRecentSearch(searchText)
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Add Task", systemImage: "plus") {
@@ -110,6 +126,9 @@ struct DocumentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: showRemindersBanner)
+        .onChange(of: appState.shortcutActivateSearch) { _, active in
+            if active { isSearching = true; appState.shortcutActivateSearch = false }
+        }
         .task {
             await loadDocument()
         }
