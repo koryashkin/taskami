@@ -36,7 +36,6 @@ struct DocumentView: View {
                     theme: effectiveTheme,
                     addDateToDone: appState.preferences.addDateToDone,
                     dueTintingEnabled: appState.preferences.dueTintingEnabled,
-                    onActivateSearch: { isSearching = true },
                     onDocumentChanged: {
                         appState.documentService.scheduleAutosave()
                         WidgetDataStore.update(from: document)
@@ -46,6 +45,7 @@ struct DocumentView: View {
                             appState.documentService.saveFoldState(for: doc)
                         }
                     },
+                    onActivateSearch: { isSearching = true },
                     onViewControllerCreated: { vc in
                         editorVC = vc
                         if let restore = appState.documentService.pendingCursorRestore {

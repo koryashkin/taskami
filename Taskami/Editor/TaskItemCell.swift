@@ -171,6 +171,9 @@ final class TaskItemCell: UICollectionViewCell {
         dashButton.isAccessibilityElement = false
         disclosureButton.isAccessibilityElement = false
 
+        // Raw content exposed as value so UI tests can check for tags like @done.
+        accessibilityValue = item.content
+
         switch item.type {
         case .project:
             accessibilityLabel = item.content

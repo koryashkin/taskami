@@ -29,9 +29,11 @@ actor FileCoordinatorService {
     }
 
     /// Write string content to a file with coordinated access.
-    func write(_ content: String, to url: URL, encoding: String.Encoding = .utf8) async throws {
+    /// Pass `presenter` as the initiator so it is excluded from receiving its own
+    /// `presentedItemDidChange` callback, preventing spurious reloadFromDisk calls.
+    func write(_ content: String, to url: URL, encoding: String.Encoding = .utf8, initiator: NSFilePresenter? = nil) async throws {
         try await Task.detached {
-            let coordinator = NSFileCoordinator()
+            let coordinator = NSFileCoordinator(filePresenter: initiator)
             var coordinatorError: NSError?
             var writeError: Error?
 

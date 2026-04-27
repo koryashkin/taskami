@@ -59,6 +59,7 @@
 		80D1223184984939B6043A87 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3149F66B559E493C90A1CB59 /* AppDelegate.swift */; };
 		B6162C11B6C74B3E98170DFF /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */; };
 		DEA9A160D73E4B91AF3B3CB4 /* TaskamiWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */; };
+		5C971B1DFB8D4378B1F50444 /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */; };
 		EB965770B4D249399D06CCDF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E94D107107C40ABB8128100 /* WidgetKit.framework */; };
 		E3CB88394A0C4009A4B88ED2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDF940D8FDD14D68B46080B5 /* SwiftUI.framework */; };
 		BBBAC85B20C3B67906963827 /* SearchSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133FE08FF6DA32B1F779A6D2 /* SearchSuggestionsView.swift */; };
@@ -136,6 +137,7 @@
 		3149F66B559E493C90A1CB59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataStore.swift; sourceTree = "<group>"; };
 		53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskamiWidget.swift; sourceTree = "<group>"; };
+		763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataStore.swift; sourceTree = "<group>"; };
 		226CAF732B18498DBE3738B4 /* TaskamiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TaskamiWidget.entitlements; sourceTree = "<group>"; };
 		C95B91E4FF774E558EB1A53F /* Taskami.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Taskami.entitlements; sourceTree = "<group>"; };
 		B3329EE9A59A4CAEB857E09B /* TaskamiWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TaskamiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -276,6 +278,7 @@
 			isa = PBXGroup;
 			children = (
 				53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */,
+				763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */,
 				226CAF732B18498DBE3738B4 /* TaskamiWidget.entitlements */,
 			);
 			path = TaskamiWidget;
@@ -647,6 +650,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DEA9A160D73E4B91AF3B3CB4 /* TaskamiWidget.swift in Sources */,
+				5C971B1DFB8D4378B1F50444 /* WidgetDataStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

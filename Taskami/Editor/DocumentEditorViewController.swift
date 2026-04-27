@@ -418,6 +418,8 @@ final class DocumentEditorViewController: UIViewController {
             .compactMap({ $0 as? TaskItemCell })
             .first(where: { $0.item?.id == itemID }) {
             cell.configure(with: item, highlighter: highlighter, addDateToDone: addDateToDone)
+            collectionView.layoutIfNeeded()
+            UIAccessibility.post(notification: .layoutChanged, argument: nil)
         }
         // If the cell is off-screen, the registration handler will configure it correctly
         // when it comes into view, because item is a reference type updated in-place.
@@ -724,6 +726,10 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         // The cell already toggled the model and updated its own display.
         // Only register undo and schedule autosave here — do NOT call reconfigureItem.
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
+        // Flush layout before notifying accessibility so XCTest gets accurate element
+        // frames after the cell height change shifts sibling cells.
+        collectionView.layoutIfNeeded()
+        UIAccessibility.post(notification: .layoutChanged, argument: nil)
         onDocumentChanged?()
     }
 

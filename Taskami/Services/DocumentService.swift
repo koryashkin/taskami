@@ -74,7 +74,7 @@ final class DocumentService {
         guard let document = currentDocument else { return }
 
         let content = TaskPaperSerializer.serialize(document.items, lineEnding: document.lineEnding)
-        try await fileCoordinator.write(content, to: document.fileURL, encoding: document.encoding)
+        try await fileCoordinator.write(content, to: document.fileURL, encoding: document.encoding, initiator: filePresenter)
         document.hasUnsavedChanges = false
     }
 
