@@ -120,7 +120,7 @@ final class TaskItemCell: UICollectionViewCell {
         self.item = item
         self.highlighter = highlighter
         accessibilityIdentifier = "item-\(item.id.uuidString)"
-        accessibilityValue = item.content
+        updateAccessibility(for: item)
 
         let indentOffset = CGFloat(item.indentLevel) * highlighter.theme.indentWidth + 16
         indentLeadingConstraint.constant = indentOffset
@@ -160,6 +160,50 @@ final class TaskItemCell: UICollectionViewCell {
         } else {
             log.debug("configure: skipping display update — cell is in edit mode")
         }
+    }
+
+    // MARK: - Accessibility
+
+    private func updateAccessibility(for item: TaskItem) {
+        isAccessibilityElement = true
+        // Keep subviews out of the VoiceOver focus order — their actions are
+        // exposed via UIAccessibilityCustomAction below.
+        dashButton.isAccessibilityElement = false
+        disclosureButton.isAccessibilityElement = false
+
+        switch item.type {
+        case .project:
+            accessibilityLabel = item.content
+            accessibilityTraits = [.header]
+            accessibilityHint = item.children.isEmpty ? nil
+                : (item.isCollapsed ? "Collapsed. Double-tap to expand." : "Expanded. Double-tap to collapse.")
+        case .task:
+            let status = item.isDone ? "Done" : "Task"
+            accessibilityLabel = "\(status): \(item.content)"
+            accessibilityTraits = item.isDone ? [.notEnabled] : []
+            accessibilityHint = "Double-tap to edit."
+        case .note:
+            accessibilityLabel = item.content
+            accessibilityTraits = [.staticText]
+            accessibilityHint = "Double-tap to edit."
+        }
+
+        var actions: [UIAccessibilityCustomAction] = []
+        if item.type == .task {
+            let title = item.isDone ? "Mark as not done" : "Mark as done"
+            actions.append(UIAccessibilityCustomAction(name: title) { [weak self] _ in
+                self?.dashTapped()
+                return true
+            })
+        }
+        if !item.children.isEmpty {
+            let title = item.isCollapsed ? "Expand" : "Collapse"
+            actions.append(UIAccessibilityCustomAction(name: title) { [weak self] _ in
+                self?.disclosureTapped()
+                return true
+            })
+        }
+        accessibilityCustomActions = actions.isEmpty ? nil : actions
     }
 
     // MARK: - Edit mode
@@ -241,11 +285,16 @@ final class TaskItemCell: UICollectionViewCell {
         }
     }
 
-    @objc private func disclosureTapped() {
+    @objc func disclosureTapped() {
         delegate?.cellDidToggleFold(self)
+        // Announce the new fold state to VoiceOver after the delegate has toggled it.
+        if UIAccessibility.isVoiceOverRunning, let item {
+            let announcement = item.isCollapsed ? "Collapsed" : "Expanded"
+            UIAccessibility.post(notification: .announcement, argument: announcement)
+        }
     }
 
-    @objc private func dashTapped() {
+    @objc func dashTapped() {
         guard let item, let highlighter else { return }
         // Toggle the model and update our own display immediately — no round-trip
         // through cellForItem(at:) which can race with UICollectionView layout passes.
@@ -253,6 +302,9 @@ final class TaskItemCell: UICollectionViewCell {
         item.toggleDone(addDate: addDateToDone)
         configure(with: item, highlighter: highlighter, addDateToDone: addDateToDone)
         delegate?.cellDidToggleDone(self, oldContent: oldContent)
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(notification: .announcement, argument: item.isDone ? "Done" : "Not done")
+        }
     }
 
     // MARK: - Reuse

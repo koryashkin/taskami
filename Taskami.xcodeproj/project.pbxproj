@@ -56,6 +56,11 @@
 		913BD405FF1B48DB8CF75723 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1199683654AE4D9D99D84B2E /* EventKit.framework */; };
 		E0E987D074C74695A318C87F /* OPMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */; };
 		A0F7DA971EA4418B917D2EF3 /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */; };
+		80D1223184984939B6043A87 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3149F66B559E493C90A1CB59 /* AppDelegate.swift */; };
+		B6162C11B6C74B3E98170DFF /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */; };
+		DEA9A160D73E4B91AF3B3CB4 /* TaskamiWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */; };
+		EB965770B4D249399D06CCDF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E94D107107C40ABB8128100 /* WidgetKit.framework */; };
+		E3CB88394A0C4009A4B88ED2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDF940D8FDD14D68B46080B5 /* SwiftUI.framework */; };
 		BBBAC85B20C3B67906963827 /* SearchSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133FE08FF6DA32B1F779A6D2 /* SearchSuggestionsView.swift */; };
 		C01B5690955F40A10BA96D43 /* ItemType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C82AEE3017F2A7807F3BD81 /* ItemType.swift */; };
 		D5102FDBD1C02567AE4C864D /* TaskamiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DAF76B827F2D372F554F19 /* TaskamiApp.swift */; };
@@ -87,6 +92,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 22E3F6942C2FB0097FACC772;
 			remoteInfo = Taskami;
+		};
+		71626F626942414E8BB40BDC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F6BD6D5008A80F8B4AAFB1B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B18786A0ACAF40809058BABC;
+			remoteInfo = TaskamiWidget;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -121,6 +133,14 @@
 		F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPMLImporter.swift; sourceTree = "<group>"; };
 		3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
 		D57E32E05D1A486391B7AEC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3149F66B559E493C90A1CB59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataStore.swift; sourceTree = "<group>"; };
+		53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskamiWidget.swift; sourceTree = "<group>"; };
+		226CAF732B18498DBE3738B4 /* TaskamiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TaskamiWidget.entitlements; sourceTree = "<group>"; };
+		C95B91E4FF774E558EB1A53F /* Taskami.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Taskami.entitlements; sourceTree = "<group>"; };
+		B3329EE9A59A4CAEB857E09B /* TaskamiWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TaskamiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E94D107107C40ABB8128100 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		FDF940D8FDD14D68B46080B5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		96C05BF5A6FF3FC63E950EA1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		9F499F67987EC0169DE19455 /* TaskItemTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTextView.swift; sourceTree = "<group>"; };
 		A0B4427E33FFC917508DBE57 /* EditModeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModeUITests.swift; sourceTree = "<group>"; };
@@ -171,6 +191,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		116D00AFD7154FF7A78447B1 /* Frameworks (Widget) */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB965770B4D249399D06CCDF /* WidgetKit.framework in Frameworks */,
+				E3CB88394A0C4009A4B88ED2 /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -194,6 +223,7 @@
 		42E95A1E7D3B5732AEDAE6B9 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				3149F66B559E493C90A1CB59 /* AppDelegate.swift */,
 				96C05BF5A6FF3FC63E950EA1 /* AppState.swift */,
 				56DAF76B827F2D372F554F19 /* TaskamiApp.swift */,
 			);
@@ -214,6 +244,7 @@
 				BACF304897A4305BE325318D /* Utilities */,
 				B298673C4255F02FEF3AD01D /* Views */,
 				D57E32E05D1A486391B7AEC5 /* Info.plist */,
+				C95B91E4FF774E558EB1A53F /* Taskami.entitlements */,
 			);
 			path = Taskami;
 			sourceTree = "<group>";
@@ -233,6 +264,7 @@
 			isa = PBXGroup;
 			children = (
 				493E705108F63120B88DCC7D /* Taskami */,
+				F3F2F391D6E24795A57914AE /* TaskamiWidget */,
 				77625EF0DE53F4F40DC2434E /* TaskamiTests */,
 				88BECA15BCB316F92858CF4B /* TaskamiUITests */,
 				6D58123B10751BD378CF5EA1 /* Frameworks */,
@@ -240,11 +272,22 @@
 			);
 			sourceTree = "<group>";
 		};
+		F3F2F391D6E24795A57914AE /* TaskamiWidget */ = {
+			isa = PBXGroup;
+			children = (
+				53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */,
+				226CAF732B18498DBE3738B4 /* TaskamiWidget.entitlements */,
+			);
+			path = TaskamiWidget;
+			sourceTree = "<group>";
+		};
 		6D58123B10751BD378CF5EA1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */,
 				1199683654AE4D9D99D84B2E /* EventKit.framework */,
+				6E94D107107C40ABB8128100 /* WidgetKit.framework */,
+				FDF940D8FDD14D68B46080B5 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -289,6 +332,7 @@
 				ED8728E382737A0AF8223ADF /* Taskami.app */,
 				68458307BB09ECB2DC71111D /* TaskamiTests.xctest */,
 				AA0B0BE1857B80070911023E /* TaskamiUITests.xctest */,
+				B3329EE9A59A4CAEB857E09B /* TaskamiWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -333,6 +377,7 @@
 			isa = PBXGroup;
 			children = (
 				1AE614D1C51846549C22D6F9 /* AppError.swift */,
+				E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -400,6 +445,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				3A6E9A605DDE4173B9EAB6B4 /* PBXTargetDependency */,
 			);
 			name = Taskami;
 			packageProductDependencies = (
@@ -407,6 +453,25 @@
 			productName = Taskami;
 			productReference = ED8728E382737A0AF8223ADF /* Taskami.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B18786A0ACAF40809058BABC /* TaskamiWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2E05253A039E414A9844846F /* Build configuration list for PBXNativeTarget "TaskamiWidget" */;
+			buildPhases = (
+				5EA6B2B52F814B439B9DD2B2 /* Sources */,
+				4BB376CB17B94E398F886833 /* Resources */,
+				116D00AFD7154FF7A78447B1 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TaskamiWidget;
+			packageProductDependencies = (
+			);
+			productName = TaskamiWidget;
+			productReference = B3329EE9A59A4CAEB857E09B /* TaskamiWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		94A6203E879B8A592CED53B0 /* TaskamiUITests */ = {
 			isa = PBXNativeTarget;
@@ -446,6 +511,10 @@
 						ProvisioningStyle = Automatic;
 						TestTargetID = 22E3F6942C2FB0097FACC772;
 					};
+					B18786A0ACAF40809058BABC = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = BB29BED8848153DF218DC5E4 /* Build configuration list for PBXProject "Taskami" */;
@@ -465,6 +534,7 @@
 				22E3F6942C2FB0097FACC772 /* Taskami */,
 				1F32B32A78A17D351D3DDB64 /* TaskamiTests */,
 				94A6203E879B8A592CED53B0 /* TaskamiUITests */,
+				B18786A0ACAF40809058BABC /* TaskamiWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -475,6 +545,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A7D3849EE509123C7EE0BAAE /* DefaultTaskList.taskpaper in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BB376CB17B94E398F886833 /* Resources (Widget) */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -512,7 +589,9 @@
 			files = (
 				A43CFD3BEF607F3E9DE7155E /* AppError.swift in Sources */,
 				00EA7F1D05F39E0ECEF52658 /* AppPreferences.swift in Sources */,
+				80D1223184984939B6043A87 /* AppDelegate.swift in Sources */,
 				86538001B19B3364AAB93FED /* AppState.swift in Sources */,
+				B6162C11B6C74B3E98170DFF /* WidgetDataStore.swift in Sources */,
 				8EE3129A2472AA4B1B6F978D /* AuthenticationService.swift in Sources */,
 				47DD8622EC47AB11D74AB960 /* CodableColor.swift in Sources */,
 				2C5B1FD6C29209F126FBB36C /* ConflictResolver.swift in Sources */,
@@ -563,6 +642,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5EA6B2B52F814B439B9DD2B2 /* Sources (Widget) */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DEA9A160D73E4B91AF3B3CB4 /* TaskamiWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -575,6 +662,11 @@
 			isa = PBXTargetDependency;
 			target = 22E3F6942C2FB0097FACC772 /* Taskami */;
 			targetProxy = FF07C36C1A68000C8A7D7A45 /* PBXContainerItemProxy */;
+		};
+		3A6E9A605DDE4173B9EAB6B4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B18786A0ACAF40809058BABC /* TaskamiWidget */;
+			targetProxy = 71626F626942414E8BB40BDC /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -639,6 +731,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Taskami/Taskami.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -698,6 +791,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Taskami/Taskami.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -816,6 +910,54 @@
 			};
 			name = Release;
 		};
+		5E736DE3D73345B88CC25895 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TaskamiWidget/TaskamiWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TaskamiWidget;
+				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EDA94EF644944383ADD5C746 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TaskamiWidget/TaskamiWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TaskamiWidget;
+				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -851,6 +993,15 @@
 			buildConfigurations = (
 				E51936DD08006C3AF870C3A2 /* Debug */,
 				01D53401F347F0C8BF0520A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		2E05253A039E414A9844846F /* Build configuration list for PBXNativeTarget "TaskamiWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E736DE3D73345B88CC25895 /* Debug */,
+				EDA94EF644944383ADD5C746 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

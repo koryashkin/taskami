@@ -2,6 +2,7 @@ import SwiftUI
 
 @main
 struct TaskamiApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var appState = AppState()
     @Environment(\.scenePhase) private var scenePhase
 
@@ -14,6 +15,17 @@ struct TaskamiApp: App {
                 }
                 .onOpenURL { url in
                     appState.handleOpenURL(url)
+                }
+                .onChange(of: appDelegate.pendingShortcutType) { _, type in
+                    guard let type else { return }
+                    appDelegate.pendingShortcutType = nil
+                    switch type {
+                    case "com.koryashkin.taskami.newTask":
+                        appState.shortcutNewTask = true
+                    case "com.koryashkin.taskami.search":
+                        appState.shortcutActivateSearch = true
+                    default: break
+                    }
                 }
         }
         .onChange(of: scenePhase) { _, newPhase in

@@ -126,6 +126,13 @@ struct FileBrowserView: View {
         } message: { msg in
             Text(msg)
         }
+        .onChange(of: appState.shortcutNewTask) { _, active in
+            if active {
+                appState.shortcutNewTask = false
+                newItemName = ""
+                showingNewFileDialog = true
+            }
+        }
         .onChange(of: appState.pendingImportURL) { _, url in
             guard let url else { return }
             appState.pendingImportURL = nil

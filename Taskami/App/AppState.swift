@@ -12,6 +12,10 @@ final class AppState {
     var pendingOpenURL: URL?
     /// Set by onOpenURL when the system routes an .opml file to the app.
     var pendingImportURL: URL?
+    /// Signals FileBrowserView to add a new task in the current document.
+    var shortcutNewTask: Bool = false
+    /// Signals DocumentView to activate the search bar.
+    var shortcutActivateSearch: Bool = false
 
     init() {
         self.preferences = AppPreferences()
@@ -31,6 +35,16 @@ final class AppState {
         if success {
             isLocked = false
         }
+    }
+
+    /// Records a search query in the recent-searches list (max 10, deduped, newest first).
+    func addRecentSearch(_ query: String) {
+        let q = query.trimmingCharacters(in: .whitespaces)
+        guard !q.isEmpty else { return }
+        var recent = preferences.recentSearches
+        recent.removeAll { $0 == q }
+        recent.insert(q, at: 0)
+        preferences.recentSearches = Array(recent.prefix(10))
     }
 
     /// Routes a file URL received from the system (Files app "Open In", share sheet, etc.)

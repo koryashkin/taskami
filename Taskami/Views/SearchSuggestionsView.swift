@@ -3,6 +3,8 @@ import SwiftUI
 struct SearchSuggestionsView: View {
     let document: TaskDocument
     @Binding var searchText: String
+    var recentSearches: [String] = []
+    var onClearRecent: (() -> Void)?
 
     private var uniqueTags: [String] {
         var seen = Set<String>()
@@ -22,6 +24,26 @@ struct SearchSuggestionsView: View {
     }
 
     var body: some View {
+        if !recentSearches.isEmpty {
+            Section {
+                ForEach(recentSearches, id: \.self) { query in
+                    Button {
+                        searchText = query
+                    } label: {
+                        Label(query, systemImage: "clock")
+                    }
+                }
+            } header: {
+                HStack {
+                    Text("Recent")
+                    Spacer()
+                    Button("Clear") { onClearRecent?() }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+
         if !uniqueTags.isEmpty {
             Section("Tags") {
                 ForEach(uniqueTags, id: \.self) { tag in
