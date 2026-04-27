@@ -987,6 +987,10 @@ extension DocumentEditorViewController {
     }
 
     @objc private func newItemCommand() {
+        addNewItemAfterCurrentEdit()
+    }
+
+    func addNewItemAfterCurrentEdit() {
         addNewItem(after: editingCell?.item ?? lastEditedItem)
     }
 

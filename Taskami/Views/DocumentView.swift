@@ -87,7 +87,7 @@ struct DocumentView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Add Task", systemImage: "plus") {
-                    editorVC?.addNewItem()
+                    editorVC?.addNewItemAfterCurrentEdit()
                 }
                 .disabled(editorVC == nil)
             }
