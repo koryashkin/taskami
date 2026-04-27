@@ -10,6 +10,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
     var dueTintingEnabled: Bool = false
     var onDocumentChanged: (() -> Void)?
     var onFoldStateChanged: (() -> Void)?
+    var onActivateSearch: (() -> Void)?
     /// Called once after the view controller is created, providing a reference for calling actions.
     var onViewControllerCreated: ((DocumentEditorViewController) -> Void)?
 
@@ -22,6 +23,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
         vc.setDocument(document)
         vc.onDocumentChanged = onDocumentChanged
         vc.onFoldStateChanged = onFoldStateChanged
+        vc.onActivateSearch = onActivateSearch
         // Defer to avoid "modifying state during view update" warning —
         // makeUIViewController is called during the SwiftUI update pass.
         DispatchQueue.main.async { onViewControllerCreated?(vc) }
@@ -33,6 +35,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
         vc.searchText = searchText
         vc.addDateToDone = addDateToDone
         vc.dueTintingEnabled = dueTintingEnabled
+        vc.onActivateSearch = onActivateSearch
 
         if vc.document?.id != document.id {
             vc.setDocument(document)

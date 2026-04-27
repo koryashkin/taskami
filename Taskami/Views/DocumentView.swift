@@ -33,6 +33,7 @@ struct DocumentView: View {
                     theme: effectiveTheme,
                     addDateToDone: appState.preferences.addDateToDone,
                     dueTintingEnabled: appState.preferences.dueTintingEnabled,
+                    onActivateSearch: { isSearching = true },
                     onDocumentChanged: {
                         appState.documentService.scheduleAutosave()
                     },

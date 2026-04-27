@@ -66,6 +66,7 @@
 		86848C1B4A1A4FC581B3954A /* TaskDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */; };
 		6C7E4934700C424192BD2771 /* HTMLExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */; };
 		4767FB31EAB04B62B66572D7 /* DatePickerSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */; };
+		D8856EF30748407EA139EC20 /* CommandPaletteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40884D6CD1D4411D99788022 /* CommandPaletteViewController.swift */; };
 		CC1DE388C37645E4A88D1583 /* FocusBreadcrumbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */; };
 /* End PBXBuildFile section */
 
@@ -149,6 +150,7 @@
 		7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDocumentTests.swift; sourceTree = "<group>"; };
 		ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLExporter.swift; sourceTree = "<group>"; };
 		43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheetViewController.swift; sourceTree = "<group>"; };
+		40884D6CD1D4411D99788022 /* CommandPaletteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteViewController.swift; sourceTree = "<group>"; };
 		FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBreadcrumbView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -300,6 +302,7 @@
 		B3A0B36619BD913C1E57B1A0 /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				40884D6CD1D4411D99788022 /* CommandPaletteViewController.swift */,
 				43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */,
 				5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */,
 				C92E8C899AB189973C25A4E0 /* DocumentEditorViewController.swift */,
@@ -503,6 +506,7 @@
 				2C5B1FD6C29209F126FBB36C /* ConflictResolver.swift in Sources */,
 				59228B9229C7C0B1DAD8DD3A /* ContentView.swift in Sources */,
 				7F2D0B6581834ED8AA73ED7F /* DateTagParser.swift in Sources */,
+				D8856EF30748407EA139EC20 /* CommandPaletteViewController.swift in Sources */,
 				4767FB31EAB04B62B66572D7 /* DatePickerSheetViewController.swift in Sources */,
 				B2156FAE9F5136502596E605 /* DocumentEditorView.swift in Sources */,
 				DC8CB0227CC2A58EBB289A10 /* DocumentEditorViewController.swift in Sources */,

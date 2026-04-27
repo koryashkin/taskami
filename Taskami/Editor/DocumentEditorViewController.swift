@@ -31,6 +31,8 @@ final class DocumentEditorViewController: UIViewController {
     var onDocumentChanged: (() -> Void)?
     /// Called whenever fold state changes (toggle or undo/redo) so the host can persist it.
     var onFoldStateChanged: (() -> Void)?
+    /// Called when the user triggers the Search keyboard shortcut or leading edge swipe.
+    var onActivateSearch: (() -> Void)?
 
     /// Returns the index path + character offset of the item currently being edited (or last edited).
     /// The host calls this on disappear to persist cursor position.
@@ -93,6 +95,7 @@ final class DocumentEditorViewController: UIViewController {
         setupKeyboardObservers()
         setupUndoRedoObservers()
         setupFocusBreadcrumb()
+        setupEdgeGestures()
         applyTheme()
         applySnapshot(animated: false)
     }
@@ -895,5 +898,147 @@ extension DocumentEditorViewController: EditorKeyboardAccessoryDelegate {
         }
         present(picker, animated: true)
         log.debug("accessoryDidTapDatePicker: tag=@\(tagName) initial=\(DateTagParser.formatDate(initialDate))")
+    }
+}
+
+// MARK: - Hardware Keyboard Shortcuts
+
+extension DocumentEditorViewController {
+
+    override var keyCommands: [UIKeyCommand]? {
+        var commands: [UIKeyCommand] = []
+
+        commands.append(UIKeyCommand(
+            title: "Quick Open",
+            action: #selector(showCommandPalette),
+            input: "p",
+            modifierFlags: .command
+        ))
+        commands.append(UIKeyCommand(
+            title: "New Item",
+            action: #selector(newItemCommand),
+            input: "n",
+            modifierFlags: .command
+        ))
+        commands.append(UIKeyCommand(
+            title: "Toggle Done",
+            action: #selector(toggleDoneCommand),
+            input: "\r",
+            modifierFlags: .command
+        ))
+        commands.append(UIKeyCommand(
+            title: "Delete Item",
+            action: #selector(deleteItemCommand),
+            input: "\u{8}",
+            modifierFlags: .command
+        ))
+        commands.append(UIKeyCommand(
+            title: "Focus Out",
+            action: #selector(focusOutCommand),
+            input: "[",
+            modifierFlags: [.command, .shift]
+        ))
+        commands.append(UIKeyCommand(
+            title: "Search",
+            action: #selector(activateSearchCommand),
+            input: "f",
+            modifierFlags: .command
+        ))
+
+        return commands
+    }
+
+    @objc private func showCommandPalette() {
+        guard let document else { return }
+        commitCurrentEdit()
+
+        let palette = CommandPaletteViewController()
+        palette.items = document.allItems
+        palette.onSelect = { [weak self] item in
+            guard let self else { return }
+            // If the selected item isn't visible under the current focus, clear focus first.
+            if let focused = self.focusedItem {
+                let inSubtree = focused.id == item.id
+                    || focused.allDescendants.contains(where: { $0.id == item.id })
+                if !inSubtree {
+                    self.focusedItem = nil
+                    self.focusStack = []
+                    self.updateFocusBreadcrumb(animated: false)
+                    self.applySnapshot(animated: false)
+                }
+            }
+            DispatchQueue.main.async { self.beginEditing(item: item) }
+        }
+
+        palette.modalPresentationStyle = .pageSheet
+        if let sheet = palette.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 12
+        }
+        present(palette, animated: true)
+        log.debug("showCommandPalette: \(document.allItems.count) items")
+    }
+
+    @objc private func newItemCommand() {
+        addNewItem(after: editingCell?.item ?? lastEditedItem)
+    }
+
+    @objc private func toggleDoneCommand() {
+        guard let item = editingCell?.item ?? lastEditedItem else { return }
+        if let cell = editingCell {
+            item.content = cell.textViewCurrentContent
+            cell.commitEditing()
+            editingCell = nil
+        }
+        toggleDone(item)
+    }
+
+    @objc private func deleteItemCommand() {
+        guard let item = editingCell?.item ?? lastEditedItem else { return }
+        editingCell = nil
+        deleteItem(item)
+    }
+
+    @objc private func focusOutCommand() {
+        guard focusedItem != nil else { return }
+        focusOut()
+    }
+
+    @objc private func activateSearchCommand() {
+        commitCurrentEdit()
+        onActivateSearch?()
+    }
+}
+
+// MARK: - Edge-Swipe Gestures
+
+extension DocumentEditorViewController {
+
+    private func setupEdgeGestures() {
+        // Two-finger swipes on the collection view so they don't conflict with
+        // the single-finger cell swipe actions (delete/done/focus).
+        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(handleRightSwipe))
+        rightSwipe.direction = .right
+        rightSwipe.numberOfTouchesRequired = 2
+        collectionView.addGestureRecognizer(rightSwipe)
+
+        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(handleLeftSwipe))
+        leftSwipe.direction = .left
+        leftSwipe.numberOfTouchesRequired = 2
+        collectionView.addGestureRecognizer(leftSwipe)
+    }
+
+    /// Two-finger right swipe → focus out (mirrors the iOS back-navigation metaphor).
+    @objc private func handleRightSwipe(_ gr: UISwipeGestureRecognizer) {
+        guard gr.state == .ended, focusedItem != nil else { return }
+        focusOut()
+    }
+
+    /// Two-finger left swipe → activate the search/filter bar.
+    @objc private func handleLeftSwipe(_ gr: UISwipeGestureRecognizer) {
+        guard gr.state == .ended else { return }
+        commitCurrentEdit()
+        onActivateSearch?()
     }
 }
