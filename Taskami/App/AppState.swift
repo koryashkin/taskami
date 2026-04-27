@@ -8,6 +8,10 @@ final class AppState {
     var preferences: AppPreferences
     var authService: AuthenticationService
     var isLocked: Bool = false
+    /// Set by onOpenURL when the system routes a .taskpaper file to the app.
+    var pendingOpenURL: URL?
+    /// Set by onOpenURL when the system routes an .opml file to the app.
+    var pendingImportURL: URL?
 
     init() {
         self.preferences = AppPreferences()
@@ -26,6 +30,19 @@ final class AppState {
         let success = await authService.authenticate()
         if success {
             isLocked = false
+        }
+    }
+
+    /// Routes a file URL received from the system (Files app "Open In", share sheet, etc.)
+    /// to the appropriate pending state consumed by the UI layer.
+    func handleOpenURL(_ url: URL) {
+        guard url.isFileURL else { return }
+        let ext = url.pathExtension.lowercased()
+        _ = url.startAccessingSecurityScopedResource()
+        if ext == "taskpaper" {
+            pendingOpenURL = url
+        } else if ext == "opml" || ext == "xml" {
+            pendingImportURL = url
         }
     }
 

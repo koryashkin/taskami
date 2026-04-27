@@ -12,6 +12,9 @@ struct TaskamiApp: App {
                 .onAppear {
                     appState.checkPasscode()
                 }
+                .onOpenURL { url in
+                    appState.handleOpenURL(url)
+                }
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {

@@ -53,6 +53,9 @@
 		B2156FAE9F5136502596E605 /* DocumentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */; };
 		B78A5CB3B0BC75D8B8C46834 /* EditModeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B4427E33FFC917508DBE57 /* EditModeUITests.swift */; };
 		B958DEE88C7E66B23FF100E6 /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */; };
+		913BD405FF1B48DB8CF75723 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1199683654AE4D9D99D84B2E /* EventKit.framework */; };
+		E0E987D074C74695A318C87F /* OPMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */; };
+		A0F7DA971EA4418B917D2EF3 /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */; };
 		BBBAC85B20C3B67906963827 /* SearchSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133FE08FF6DA32B1F779A6D2 /* SearchSuggestionsView.swift */; };
 		C01B5690955F40A10BA96D43 /* ItemType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C82AEE3017F2A7807F3BD81 /* ItemType.swift */; };
 		D5102FDBD1C02567AE4C864D /* TaskamiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DAF76B827F2D372F554F19 /* TaskamiApp.swift */; };
@@ -114,6 +117,10 @@
 		86863540DA0FEE4D05FC2268 /* EditorKeyboardAccessoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorKeyboardAccessoryView.swift; sourceTree = "<group>"; };
 		909E0A91A8311C1D396039E8 /* DocumentUndoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentUndoManager.swift; sourceTree = "<group>"; };
 		93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
+		1199683654AE4D9D99D84B2E /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
+		F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPMLImporter.swift; sourceTree = "<group>"; };
+		3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
+		D57E32E05D1A486391B7AEC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		96C05BF5A6FF3FC63E950EA1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		9F499F67987EC0169DE19455 /* TaskItemTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTextView.swift; sourceTree = "<group>"; };
 		A0B4427E33FFC917508DBE57 /* EditModeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModeUITests.swift; sourceTree = "<group>"; };
@@ -160,6 +167,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B958DEE88C7E66B23FF100E6 /* LocalAuthentication.framework in Frameworks */,
+				913BD405FF1B48DB8CF75723 /* EventKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,6 +185,8 @@
 				FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */,
 				ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */,
 				D71C26E3E7491A44E499CEFD /* LegacyImportService.swift */,
+				F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */,
+				3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -203,6 +213,7 @@
 				8E6103645A85375346927725 /* Theme */,
 				BACF304897A4305BE325318D /* Utilities */,
 				B298673C4255F02FEF3AD01D /* Views */,
+				D57E32E05D1A486391B7AEC5 /* Info.plist */,
 			);
 			path = Taskami;
 			sourceTree = "<group>";
@@ -233,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */,
+				1199683654AE4D9D99D84B2E /* EventKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -524,6 +536,8 @@
 				7D5EB19D2006A78B0A89F7DD /* FileBrowserView.swift in Sources */,
 				5BC9E0F8C0266898279D54E5 /* FileCoordinatorService.swift in Sources */,
 				6C7E4934700C424192BD2771 /* HTMLExporter.swift in Sources */,
+				E0E987D074C74695A318C87F /* OPMLImporter.swift in Sources */,
+				A0F7DA971EA4418B917D2EF3 /* RemindersService.swift in Sources */,
 				5EA560C6BDC3390F580EE26B /* FileItem.swift in Sources */,
 				69DC92B0F85F223A1E6F5505 /* FileRowView.swift in Sources */,
 				D99AB7ABE35764D78A660882 /* FolderRowView.swift in Sources */,
@@ -629,14 +643,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_GENERATION_MODE = GeneratedFile;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock Taskami with Face ID";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_FILE = Taskami/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -695,14 +702,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_GENERATION_MODE = GeneratedFile;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Unlock Taskami with Face ID";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_FILE = Taskami/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -13,6 +13,9 @@ struct DocumentView: View {
     @State private var error: Error?
     @State private var editorVC: DocumentEditorViewController?
     @State private var showExportDialog = false
+    @State private var showRemindersBanner = false
+    @State private var remindersBannerMessage = ""
+    private let remindersService = RemindersService()
 
     /// EditorTheme with font scaled to the system Dynamic Type body size when enabled.
     private var effectiveTheme: EditorTheme {
@@ -78,6 +81,12 @@ struct DocumentView: View {
                 }
                 .disabled(editorVC == nil)
             }
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Sync Reminders", systemImage: "bell.badge") {
+                    syncReminders()
+                }
+                .disabled(document == nil)
+            }
         }
         .confirmationDialog("Export as HTML", isPresented: $showExportDialog) {
             ForEach(HTMLExporter.Theme.allCases) { theme in
@@ -89,6 +98,18 @@ struct DocumentView: View {
         } message: {
             Text("Choose a color theme for the exported HTML file.")
         }
+        .overlay(alignment: .top) {
+            if showRemindersBanner {
+                Text(remindersBannerMessage)
+                    .font(.footnote)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: showRemindersBanner)
         .task {
             await loadDocument()
         }
@@ -115,6 +136,17 @@ struct DocumentView: View {
         } catch {
             log.error("Failed to open \(fileURL.lastPathComponent): \(error)")
             self.error = error
+        }
+    }
+
+    private func syncReminders() {
+        guard let document else { return }
+        Task {
+            let result = await remindersService.sync(document: document)
+            remindersBannerMessage = result.message
+            withAnimation { showRemindersBanner = true }
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation { showRemindersBanner = false }
         }
     }
 }

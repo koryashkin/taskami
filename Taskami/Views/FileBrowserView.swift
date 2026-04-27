@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct FileBrowserView: View {
     @Environment(AppState.self) var appState
@@ -7,6 +8,9 @@ struct FileBrowserView: View {
     @State private var showingNewFolderDialog = false
     @State private var newItemName = ""
     @State private var showingSettings = false
+    @State private var showingOPMLPicker = false
+    @State private var importError: String?
+    @State private var showingImportError = false
 
     private var filteredItems: [FileItem] {
         if searchText.isEmpty {
@@ -52,6 +56,9 @@ struct FileBrowserView: View {
                     Button("New Folder", systemImage: "folder.badge.plus") {
                         newItemName = ""
                         showingNewFolderDialog = true
+                    }
+                    Button("Import OPML…", systemImage: "arrow.down.doc") {
+                        showingOPMLPicker = true
                     }
                 } label: {
                     Image(systemName: "plus")
@@ -103,6 +110,46 @@ struct FileBrowserView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+        }
+        .fileImporter(
+            isPresented: $showingOPMLPicker,
+            allowedContentTypes: [.xml, UTType("org.opml.opml") ?? .xml],
+            onCompletion: { result in
+                switch result {
+                case .success(let url): importOPML(from: url)
+                case .failure: break
+                }
+            }
+        )
+        .alert("Import Error", isPresented: $showingImportError, presenting: importError) { _ in
+            Button("OK", role: .cancel) {}
+        } message: { msg in
+            Text(msg)
+        }
+        .onChange(of: appState.pendingImportURL) { _, url in
+            guard let url else { return }
+            appState.pendingImportURL = nil
+            importOPML(from: url)
+        }
+    }
+
+    private func importOPML(from url: URL) {
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+        do {
+            let result = try OPMLImporter.importFrom(url: url)
+            let dir = appState.fileBrowser.currentDirectory
+            var dest = dir.appendingPathComponent(result.suggestedTitle).appendingPathExtension("taskpaper")
+            var counter = 1
+            while FileManager.default.fileExists(atPath: dest.path) {
+                dest = dir.appendingPathComponent("\(result.suggestedTitle) \(counter)").appendingPathExtension("taskpaper")
+                counter += 1
+            }
+            try result.taskPaperContent.write(to: dest, atomically: true, encoding: .utf8)
+            appState.fileBrowser.refresh()
+        } catch {
+            importError = error.localizedDescription
+            showingImportError = true
         }
     }
 
