@@ -151,6 +151,75 @@ struct QueryEngineTests {
         #expect(matches.count == allItems().count)
     }
 
+    // MARK: - Date Comparison Queries
+
+    private func dateItems() -> [TaskItem] {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let yesterday = DateTagParser.formatDate(cal.date(byAdding: .day, value: -1, to: today)!)
+        let todayStr = DateTagParser.formatDate(today)
+        let nextWeek = DateTagParser.formatDate(cal.date(byAdding: .day, value: 7, to: today)!)
+        let text = """
+        - Overdue task @due(\(yesterday))
+        - Today task @due(\(todayStr))
+        - Future task @due(\(nextWeek))
+        - No due task
+        """
+        return TaskPaperParser.parse(text).flatMap { $0.selfAndDescendants }
+    }
+
+    @Test("@due < today matches only overdue items")
+    func dueLessThanToday() {
+        let filter = QueryEngine.compile("@due < today")
+        let matches = dateItems().filter(filter)
+        #expect(matches.count == 1)
+        #expect(matches[0].content.contains("Overdue"))
+    }
+
+    @Test("@due = today matches today's item")
+    func dueEqualsToday() {
+        let filter = QueryEngine.compile("@due = today")
+        let matches = dateItems().filter(filter)
+        #expect(matches.count == 1)
+        #expect(matches[0].content.contains("Today"))
+    }
+
+    @Test("@due > today matches only future items")
+    func dueGreaterThanToday() {
+        let filter = QueryEngine.compile("@due > today")
+        let matches = dateItems().filter(filter)
+        #expect(matches.count == 1)
+        #expect(matches[0].content.contains("Future"))
+    }
+
+    @Test("@due <= today matches overdue and today")
+    func dueLessOrEqualToday() {
+        let filter = QueryEngine.compile("@due <= today")
+        let matches = dateItems().filter(filter)
+        #expect(matches.count == 2)
+    }
+
+    @Test("@due < tomorrow matches overdue and today")
+    func dueLessThanTomorrow() {
+        let filter = QueryEngine.compile("@due < tomorrow")
+        let matches = dateItems().filter(filter)
+        #expect(matches.count == 2)
+    }
+
+    @Test("@due matches items that have any @due tag")
+    func dueTagExists() {
+        let filter = QueryEngine.compile("@due")
+        let matches = dateItems().filter(filter)
+        #expect(matches.count == 3) // all except "No due task"
+    }
+
+    @Test("Date query does not match items without @due tag")
+    func dueLessThanTodayNoMatch() {
+        let filter = QueryEngine.compile("@due < today")
+        let noDueTasks = [TaskItem(type: .task, content: "No due")]
+        #expect(noDueTasks.filter(filter).isEmpty)
+    }
+
     // MARK: - Tokenizer
 
     @Test("Tokenize simple query")

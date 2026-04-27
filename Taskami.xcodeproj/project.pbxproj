@@ -61,6 +61,9 @@
 		F38D97A5FC6FB93B1EABAA7C /* FontAndColorSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3FEC298289EABDAF86A010 /* FontAndColorSettingsView.swift */; };
 		F6D6A969B26D1F70E15AB4C3 /* TaskPaperParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */; };
 		7F2D0B6581834ED8AA73ED7F /* DateTagParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D27FDDD82445079926F2C5 /* DateTagParser.swift */; };
+		B16810241B3042D18A5A103F /* DateTagParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */; };
+		97B5F066962647CDA18BACF8 /* HTMLExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */; };
+		86848C1B4A1A4FC581B3954A /* TaskDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */; };
 		6C7E4934700C424192BD2771 /* HTMLExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */; };
 		4767FB31EAB04B62B66572D7 /* DatePickerSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */; };
 		CC1DE388C37645E4A88D1583 /* FocusBreadcrumbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */; };
@@ -141,6 +144,9 @@
 		FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCoordinatorService.swift; sourceTree = "<group>"; };
 		FFD0A72C6ABD628A24FB2665 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 		18D27FDDD82445079926F2C5 /* DateTagParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTagParser.swift; sourceTree = "<group>"; };
+		E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTagParserTests.swift; sourceTree = "<group>"; };
+		AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLExporterTests.swift; sourceTree = "<group>"; };
+		7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDocumentTests.swift; sourceTree = "<group>"; };
 		ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLExporter.swift; sourceTree = "<group>"; };
 		43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheetViewController.swift; sourceTree = "<group>"; };
 		FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBreadcrumbView.swift; sourceTree = "<group>"; };
@@ -232,9 +238,12 @@
 		77625EF0DE53F4F40DC2434E /* TaskamiTests */ = {
 			isa = PBXGroup;
 			children = (
+				E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */,
+				AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */,
 				D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */,
 				7E550097544F2B153FB08057 /* TagParserTests.swift */,
 				DA7DCC361A381998DC2CB7A4 /* TaskItemTests.swift */,
+				7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */,
 				6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */,
 				DA17080349AA4EF2B600E626 /* TaskPaperSerializerTests.swift */,
 			);
@@ -471,6 +480,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B16810241B3042D18A5A103F /* DateTagParserTests.swift in Sources */,
+				97B5F066962647CDA18BACF8 /* HTMLExporterTests.swift in Sources */,
+				86848C1B4A1A4FC581B3954A /* TaskDocumentTests.swift in Sources */,
 				AB2E6FCF12562F3C89A0A259 /* QueryEngineTests.swift in Sources */,
 				39406F8E29FE06EC8351115F /* TagParserTests.swift in Sources */,
 				68FD06E08262FA64EDC68E30 /* TaskItemTests.swift in Sources */,

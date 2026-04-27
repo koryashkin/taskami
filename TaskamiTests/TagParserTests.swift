@@ -98,4 +98,40 @@ struct TagParserTests {
         let range = TagParser.trailingTagsRange(in: "Just text")
         #expect(range == nil)
     }
+
+    // MARK: - Tag.dateValue
+
+    @Test("Tag.dateValue parses ISO date string")
+    func tagDateValueISO() throws {
+        let tag = Tag(name: "due", value: "2024-06-15")
+        let date = try #require(tag.dateValue)
+        let c = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        #expect(c.year == 2024)
+        #expect(c.month == 6)
+        #expect(c.day == 15)
+    }
+
+    @Test("Tag.dateValue parses natural language")
+    func tagDateValueNaturalLanguage() {
+        let tag = Tag(name: "due", value: "today")
+        #expect(tag.dateValue == Calendar.current.startOfDay(for: Date()))
+    }
+
+    @Test("Tag.dateValue returns nil for non-date value")
+    func tagDateValueNonDate() {
+        let tag = Tag(name: "priority", value: "high")
+        #expect(tag.dateValue == nil)
+    }
+
+    @Test("Tag.dateValue returns nil when value is nil")
+    func tagDateValueNilValue() {
+        let tag = Tag(name: "done")
+        #expect(tag.dateValue == nil)
+    }
+
+    @Test("Tag.numberValue returns nil for date strings")
+    func tagNumberValueForDateString() {
+        let tag = Tag(name: "due", value: "2024-06-15")
+        #expect(tag.numberValue == nil)
+    }
 }
