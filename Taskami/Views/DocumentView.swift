@@ -7,6 +7,7 @@ private let log = Logger(subsystem: "com.taskami", category: "DocumentView")
 struct DocumentView: View {
     let fileURL: URL
     @Environment(AppState.self) var appState
+    @State private var documentService = DocumentService()
     @State private var document: TaskDocument?
     @State private var searchText = ""
     @State private var isSearching = false
@@ -37,24 +38,23 @@ struct DocumentView: View {
                     addDateToDone: appState.preferences.addDateToDone,
                     dueTintingEnabled: appState.preferences.dueTintingEnabled,
                     onDocumentChanged: {
-                        appState.documentService.scheduleAutosave()
+                        documentService.scheduleAutosave()
                         WidgetDataStore.update(from: document)
                     },
                     onFoldStateChanged: {
-                        if let doc = appState.documentService.currentDocument {
-                            appState.documentService.saveFoldState(for: doc)
+                        if let doc = documentService.currentDocument {
+                            documentService.saveFoldState(for: doc)
                         }
                     },
                     onActivateSearch: { isSearching = true },
                     onViewControllerCreated: { vc in
                         editorVC = vc
-                        if let restore = appState.documentService.pendingCursorRestore {
-                            appState.documentService.pendingCursorRestore = nil
+                        if let restore = documentService.consumePendingCursorRestore() {
                             vc.restoreCursor(itemPath: restore.itemPath, offset: restore.offset)
                         }
                     }
                 )
-            } else if appState.documentService.isLoading {
+            } else if documentService.isLoading {
                 ProgressView("Loading...")
             } else if let error {
                 ContentUnavailableView(
@@ -129,28 +129,52 @@ struct DocumentView: View {
         .onChange(of: appState.shortcutActivateSearch) { _, active in
             if active { isSearching = true; appState.shortcutActivateSearch = false }
         }
+        .alert("Document Changed on Disk", isPresented: externalChangeAlertBinding) {
+            Button("Reload From Disk", role: .destructive) {
+                Task {
+                    do {
+                        try await documentService.reloadDiscardingLocalChanges()
+                    } catch {
+                        self.error = error
+                    }
+                }
+            }
+            Button("Keep My Changes") {
+                documentService.keepLocalChangesAfterExternalChange()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This file changed outside the editor while you had unsaved edits. Reload to take the disk version, or keep your local changes and overwrite on the next save.")
+        }
         .task {
             await loadDocument()
         }
         .onDisappear {
-            if let doc = appState.documentService.currentDocument {
+            if let doc = documentService.currentDocument {
                 let cursor = editorVC?.cursorPosition
-                appState.documentService.saveEditorState(
+                documentService.saveEditorState(
                     for: doc,
                     cursorItemPath: cursor?.itemPath,
                     cursorOffset: cursor?.offset
                 )
             }
             Task {
-                try? await appState.documentService.save()
-                appState.documentService.close()
+                try? await documentService.save()
+                documentService.close()
             }
         }
     }
 
+    private var externalChangeAlertBinding: Binding<Bool> {
+        Binding(
+            get: { documentService.externalChangeResolutionState == .pending },
+            set: { _ in }
+        )
+    }
+
     private func loadDocument() async {
         do {
-            let doc = try await appState.documentService.open(url: fileURL)
+            let doc = try await documentService.open(url: fileURL)
             document = doc
         } catch {
             log.error("Failed to open \(fileURL.lastPathComponent): \(error)")
