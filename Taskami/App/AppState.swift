@@ -4,7 +4,6 @@ import Observation
 @Observable
 final class AppState {
     var fileBrowser: FileBrowserService
-    var documentService: DocumentService
     var preferences: AppPreferences
     var authService: AuthenticationService
     var isLocked: Bool = false
@@ -20,7 +19,6 @@ final class AppState {
     init() {
         self.preferences = AppPreferences()
         self.fileBrowser = FileBrowserService(directory: FileBrowserService.defaultDirectory())
-        self.documentService = DocumentService()
         self.authService = AuthenticationService()
     }
 
@@ -52,7 +50,6 @@ final class AppState {
     func handleOpenURL(_ url: URL) {
         guard url.isFileURL else { return }
         let ext = url.pathExtension.lowercased()
-        _ = url.startAccessingSecurityScopedResource()
         if ext == "taskpaper" {
             pendingOpenURL = url
         } else if ext == "opml" || ext == "xml" {

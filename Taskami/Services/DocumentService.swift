@@ -12,6 +12,23 @@ private struct EditorStateFile: Codable {
     var cursorOffset: Int?
 }
 
+enum ExternalChangeResolutionState: Equatable {
+    case none
+    case pending
+}
+
+enum DocumentServiceError: LocalizedError {
+    case externalChangePending
+
+    var errorDescription: String? {
+        switch self {
+        case .externalChangePending:
+            return "This document changed on disk while you had unsaved edits. Choose whether to reload or keep your local changes first."
+        }
+    }
+}
+
+@MainActor
 @Observable
 final class DocumentService {
     var currentDocument: TaskDocument?
@@ -19,6 +36,7 @@ final class DocumentService {
     var error: Error?
     /// Set after open(); the DocumentView should consume this once to scroll to the saved position.
     var pendingCursorRestore: (itemPath: [Int], offset: Int)?
+    var externalChangeResolutionState: ExternalChangeResolutionState = .none
 
     private let fileCoordinator = FileCoordinatorService()
     private var filePresenter: DocumentFilePresenter?
@@ -50,11 +68,7 @@ final class DocumentService {
         let presenter = DocumentFilePresenter(url: url)
         presenter.onFileChanged = { [weak self] in
             Task { @MainActor in
-                do {
-                    try await self?.reloadFromDisk()
-                } catch {
-                    log.error("Failed to reload from disk: \(error)")
-                }
+                await self?.handlePresentedItemDidChange()
             }
         }
         presenter.onConflictDetected = { _ in
@@ -66,12 +80,16 @@ final class DocumentService {
         let savedCursor = loadAndApplyEditorState(for: document)
         currentDocument = document
         pendingCursorRestore = savedCursor
+        externalChangeResolutionState = .none
         return document
     }
 
     /// Save the current document to disk.
     func save() async throws {
         guard let document = currentDocument else { return }
+        guard externalChangeResolutionState == .none else {
+            throw DocumentServiceError.externalChangePending
+        }
 
         let content = TaskPaperSerializer.serialize(document.items, lineEnding: document.lineEnding)
         try await fileCoordinator.write(content, to: document.fileURL, encoding: document.encoding, initiator: filePresenter)
@@ -88,10 +106,13 @@ final class DocumentService {
 
         currentDocument = nil
         error = nil
+        pendingCursorRestore = nil
+        externalChangeResolutionState = .none
     }
 
     /// Schedule autosave with 1-second debounce.
     func scheduleAutosave() {
+        guard externalChangeResolutionState == .none else { return }
         autosaveTask?.cancel()
         autosaveTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(1))
@@ -116,6 +137,44 @@ final class DocumentService {
         document.hasUnsavedChanges = false
         loadAndApplyEditorState(for: document)
         log.debug("reloadFromDisk: \(document.fileURL.lastPathComponent)")
+    }
+
+    func keepLocalChangesAfterExternalChange() {
+        guard externalChangeResolutionState == .pending else { return }
+        externalChangeResolutionState = .none
+        if currentDocument?.hasUnsavedChanges == true {
+            scheduleAutosave()
+        }
+    }
+
+    func reloadDiscardingLocalChanges() async throws {
+        externalChangeResolutionState = .none
+        try await reloadFromDisk()
+    }
+
+    func consumePendingCursorRestore() -> (itemPath: [Int], offset: Int)? {
+        let restore = pendingCursorRestore
+        pendingCursorRestore = nil
+        return restore
+    }
+
+    func handlePresentedItemDidChange() async {
+        guard let document = currentDocument else { return }
+
+        if document.hasUnsavedChanges {
+            autosaveTask?.cancel()
+            autosaveTask = nil
+            externalChangeResolutionState = .pending
+            log.warning("Presented item changed while document has unsaved changes; deferring reload")
+            return
+        }
+
+        do {
+            try await reloadFromDisk()
+        } catch {
+            log.error("Failed to reload from disk: \(error)")
+            self.error = error
+        }
     }
 
     // MARK: - Editor state persistence (fold + cursor)
