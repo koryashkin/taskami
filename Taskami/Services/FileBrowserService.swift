@@ -3,6 +3,10 @@ import Observation
 
 @Observable
 final class FileBrowserService {
+    private enum UITestEnvironment {
+        static let directory = "TASKAMI_UI_TEST_DIRECTORY"
+        static let seedFileName = "Test"
+    }
 
     enum SortOrder: String, CaseIterable {
         case nameAscending = "Name (A-Z)"
@@ -126,6 +130,11 @@ final class FileBrowserService {
 
     /// Returns the iCloud container URL, or falls back to local Documents.
     static func defaultDirectory() -> URL {
+        if let uiTestDirectory = uiTestDirectoryOverride() {
+            ensureUITestSeedDocument(in: uiTestDirectory)
+            return uiTestDirectory
+        }
+
         if let iCloudURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?
             .appendingPathComponent("Documents") {
             // Ensure directory exists
@@ -135,5 +144,33 @@ final class FileBrowserService {
 
         // Fallback to local Documents
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    }
+
+    private static func uiTestDirectoryOverride() -> URL? {
+        let env = ProcessInfo.processInfo.environment
+        guard let rawPath = env[UITestEnvironment.directory], !rawPath.isEmpty else { return nil }
+
+        let url = URL(fileURLWithPath: rawPath, isDirectory: true)
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        return url
+    }
+
+    private static func ensureUITestSeedDocument(in directory: URL) {
+        let fileManager = FileManager.default
+        let visibleDocumentExtensions = Set(["taskpaper", "txt"])
+
+        if let existing = try? fileManager.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: nil,
+            options: [.skipsHiddenFiles]
+        ),
+           existing.contains(where: { visibleDocumentExtensions.contains($0.pathExtension.lowercased()) }) {
+            return
+        }
+
+        let defaultContent = Bundle.main.url(forResource: "DefaultTaskList", withExtension: "taskpaper")
+            .flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
+        let fileURL = directory.appendingPathComponent(UITestEnvironment.seedFileName).appendingPathExtension("taskpaper")
+        try? defaultContent.write(to: fileURL, atomically: true, encoding: .utf8)
     }
 }
