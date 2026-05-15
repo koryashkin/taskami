@@ -9,17 +9,22 @@ import XCTest
 /// The test drives that exact scenario automatically and fails on the first tap
 /// where the accessibilityValue of the dash button stops alternating.
 final class DoneToggleUITests: XCTestCase {
+    private enum LaunchEnvironment {
+        static let directory = "TASKAMI_UI_TEST_DIRECTORY"
+    }
 
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment[LaunchEnvironment.directory] = makeIsolatedDocumentsDirectory().path
         app.launch()
         openFirstDocument()
     }
 
     override func tearDownWithError() throws {
+        app?.terminate()
         app = nil
     }
 
@@ -42,6 +47,14 @@ final class DoneToggleUITests: XCTestCase {
         _ = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'dash-'"))
                         .element(boundBy: 0)
                         .waitForExistence(timeout: 5)
+    }
+
+    private func makeIsolatedDocumentsDirectory() -> URL {
+        let testRun = ProcessInfo.processInfo.globallyUniqueString
+        let testName = name.replacingOccurrences(of: "/", with: "-")
+        return URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent("TaskamiUITests", isDirectory: true)
+            .appendingPathComponent("\(testRun)-\(testName)", isDirectory: true)
     }
 
     // MARK: - Helpers

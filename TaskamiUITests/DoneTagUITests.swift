@@ -9,17 +9,22 @@ import XCTest
 ///    cell display was never updated — model was correct, visual was stale.
 /// 2. Dash button toggle: verify @done appears and disappears reliably.
 final class DoneTagUITests: XCTestCase {
+    private enum LaunchEnvironment {
+        static let directory = "TASKAMI_UI_TEST_DIRECTORY"
+    }
 
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment[LaunchEnvironment.directory] = makeIsolatedDocumentsDirectory().path
         app.launch()
         openFirstDocument()
     }
 
     override func tearDownWithError() throws {
+        app?.terminate()
         app = nil
     }
 
@@ -33,6 +38,14 @@ final class DoneTagUITests: XCTestCase {
             app.buttons["+"].tap()
         }
         _ = dashButtons.element(boundBy: 0).waitForExistence(timeout: 5)
+    }
+
+    private func makeIsolatedDocumentsDirectory() -> URL {
+        let testRun = ProcessInfo.processInfo.globallyUniqueString
+        let testName = name.replacingOccurrences(of: "/", with: "-")
+        return URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent("TaskamiUITests", isDirectory: true)
+            .appendingPathComponent("\(testRun)-\(testName)", isDirectory: true)
     }
 
     // MARK: - Element helpers

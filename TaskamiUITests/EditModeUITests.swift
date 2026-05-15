@@ -7,17 +7,22 @@ import XCTest
 /// the @done tag shifted cells off-screen, making cellForItem(at:) return nil
 /// in beginEditing. Fixed by adding a scroll+retry in beginEditing.
 final class EditModeUITests: XCTestCase {
+    private enum LaunchEnvironment {
+        static let directory = "TASKAMI_UI_TEST_DIRECTORY"
+    }
 
     private var app: XCUIApplication!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        app.launchEnvironment[LaunchEnvironment.directory] = makeIsolatedDocumentsDirectory().path
         app.launch()
         openFirstDocument()
     }
 
     override func tearDownWithError() throws {
+        app?.terminate()
         app = nil
     }
 
@@ -32,6 +37,14 @@ final class EditModeUITests: XCTestCase {
             app.buttons["+"].tap()
         }
         _ = itemCells.element(boundBy: 0).waitForExistence(timeout: 5)
+    }
+
+    private func makeIsolatedDocumentsDirectory() -> URL {
+        let testRun = ProcessInfo.processInfo.globallyUniqueString
+        let testName = name.replacingOccurrences(of: "/", with: "-")
+        return URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent("TaskamiUITests", isDirectory: true)
+            .appendingPathComponent("\(testRun)-\(testName)", isDirectory: true)
     }
 
     // MARK: - Helpers
