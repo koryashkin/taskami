@@ -78,6 +78,28 @@ final class EditModeUITests: XCTestCase {
         tapAndExpectKeyboard(cells.element(boundBy: 0), label: "first cell")
     }
 
+    /// The project summary line disappears in edit mode, but entering edit mode must
+    /// not collapse the row and make the rest of the document jump upward.
+    func testStartingProjectEditKeepsFollowingCellStationary() throws {
+        let cells = itemCells
+        XCTAssertGreaterThan(cells.count, 1, "Need at least two item cells")
+        let project = cells.element(boundBy: 0)
+        let followingCell = cells.element(boundBy: 1)
+        XCTAssertTrue(followingCell.waitForExistence(timeout: 3))
+        let frameBefore = followingCell.frame
+
+        project.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
+        let frameAfter = followingCell.frame
+
+        XCTAssertEqual(
+            frameAfter.minY,
+            frameBefore.minY,
+            accuracy: 2,
+            "Starting project edit moved the following cell from \(frameBefore) to \(frameAfter)"
+        )
+    }
+
     /// Core regression: toggle done on one task, then tap a different task to edit.
     /// Before the fix, beginEditing silently failed if the height change from
     /// the toggle pushed the target cell off-screen.

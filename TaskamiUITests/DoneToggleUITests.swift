@@ -33,20 +33,23 @@ final class DoneToggleUITests: XCTestCase {
     /// Opens the first document in the list, or creates one if none exist.
     private func openFirstDocument() {
         // Wait for the document list to appear
-        let docList = app.collectionViews.firstMatch
-        guard docList.waitForExistence(timeout: 5) else { return }
+        let browser = app.collectionViews.firstMatch
+        guard browser.waitForExistence(timeout: 5) else { return }
 
-        if app.cells.count > 0 {
-            app.cells.firstMatch.tap()
+        if browser.cells.count > 0 {
+            browser.cells.firstMatch.tap()
         } else {
             // Create a new document via the "+" button
             app.buttons["+"].tap()
         }
 
         // Wait for the editor (dash button) to appear — up to 5 s
-        _ = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'dash-'"))
-                        .element(boundBy: 0)
-                        .waitForExistence(timeout: 5)
+        let firstDash = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'dash-'"))
+            .element(boundBy: 0)
+        if !firstDash.waitForExistence(timeout: 5), browser.cells.firstMatch.exists {
+            browser.cells.firstMatch.tap()
+        }
+        XCTAssertTrue(firstDash.waitForExistence(timeout: 5), "Editor did not open")
     }
 
     private func makeIsolatedDocumentsDirectory() -> URL {
@@ -65,19 +68,25 @@ final class DoneToggleUITests: XCTestCase {
         return (0..<query.count).map { query.element(boundBy: $0) }
     }
 
+    private var hittableDashButtons: [XCUIElement] {
+        dashButtons.filter(\.isHittable)
+    }
+
     /// Taps `button` `count` times, asserting the accessibilityValue
     /// alternates between "done" and "undone" on every tap.
     private func toggleRepeatedly(_ button: XCUIElement, label: String, times count: Int) {
         var expectDone = button.value as? String != "done"
+        let identifier = button.identifier
         for tap in 1...count {
-            button.tap()
+            let currentButton = app.buttons[identifier]
+            currentButton.tap()
             let expectedValue = expectDone ? "done" : "undone"
             let predicate = NSPredicate(format: "value == %@", expectedValue)
-            let expectation = XCTNSPredicateExpectation(predicate: predicate, object: button)
+            let expectation = XCTNSPredicateExpectation(predicate: predicate, object: currentButton)
             let result = XCTWaiter.wait(for: [expectation], timeout: 1.5)
             XCTAssertEqual(
                 result, .completed,
-                "\(label) tap \(tap): expected '\(expectedValue)' but got '\(button.value as? String ?? "nil")' — visual freeze"
+                "\(label) tap \(tap): expected '\(expectedValue)' but got '\(currentButton.value as? String ?? "nil")' — visual freeze"
             )
             expectDone.toggle()
         }
@@ -87,7 +96,7 @@ final class DoneToggleUITests: XCTestCase {
 
     /// Tap the first visible task 6 times, then the second visible task 6 times.
     func testToggleDoneOnTwoConsecutiveTasks() throws {
-        let buttons = dashButtons
+        let buttons = hittableDashButtons
         guard buttons.count >= 2 else {
             XCTFail("Need ≥2 visible task dash buttons (found \(buttons.count))")
             return
@@ -101,7 +110,7 @@ final class DoneToggleUITests: XCTestCase {
     /// Replicates the exact repro case: toggle items below the initial viewport.
     func testToggleDoneAfterScrolling() throws {
         // First toggle top items a few times so the layout has some history
-        let initialButtons = dashButtons
+        let initialButtons = hittableDashButtons
         if !initialButtons.isEmpty {
             toggleRepeatedly(initialButtons[0], label: "pre-scroll-task", times: 4)
         }
@@ -110,7 +119,7 @@ final class DoneToggleUITests: XCTestCase {
         app.swipeUp()
         app.swipeUp()
 
-        let buttons = dashButtons
+        let buttons = hittableDashButtons
         guard !buttons.isEmpty else {
             XCTFail("No dash buttons visible after scrolling")
             return

@@ -81,7 +81,7 @@ final class EditorDragDropHandler: NSObject, UICollectionViewDragDelegate, UICol
         // Use animated:false — animated apply is async on iOS 15+ and races with the
         // isApplyingSnapshot guard.
         if movedAny {
-            editorVC.applySnapshot(animated: false)
+            editorVC.applySnapshot(animated: false, reloadProjectCounters: true)
             editorVC.onDocumentChanged?()
         }
     }

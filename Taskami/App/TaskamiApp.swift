@@ -20,9 +20,9 @@ struct TaskamiApp: App {
                     guard let type else { return }
                     appDelegate.pendingShortcutType = nil
                     switch type {
-                    case "com.koryashkin.taskami.newTask":
+                    case "com.taskami.app.newTask":
                         appState.shortcutNewTask = true
-                    case "com.koryashkin.taskami.search":
+                    case "com.taskami.app.search":
                         appState.shortcutActivateSearch = true
                     default: break
                     }

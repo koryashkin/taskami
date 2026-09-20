@@ -71,14 +71,7 @@ final class RemindersService {
     // MARK: - Private helpers
 
     private func requestAccess() async -> Bool {
-        if #available(iOS 17, *) {
-            return (try? await store.requestFullAccessToReminders()) ?? false
-        }
-        return await withCheckedContinuation { cont in
-            store.requestAccess(to: .reminder) { granted, _ in
-                cont.resume(returning: granted)
-            }
-        }
+        (try? await store.requestFullAccessToReminders()) ?? false
     }
 
     private func findOrCreateCalendar() -> EKCalendar {

@@ -5,7 +5,7 @@ import WidgetKit
 /// Data is written to an App Group UserDefaults so the widget extension can read it.
 struct WidgetDataStore {
 
-    static let appGroupID = "group.com.koryashkin.taskami"
+    static let appGroupID = "group.com.taskami.app"
     static let tasksKey = "widgetTodayTasks"
 
     struct WidgetTask: Codable {

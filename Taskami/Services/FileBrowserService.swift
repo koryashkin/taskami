@@ -17,13 +17,19 @@ final class FileBrowserService {
 
     var currentDirectory: URL
     var items: [FileItem] = []
-    var sortOrder: SortOrder = .nameAscending
+    var sortOrder: SortOrder {
+        didSet {
+            guard oldValue != sortOrder else { return }
+            refresh()
+        }
+    }
     var isLoading: Bool = false
 
     private let fileManager = FileManager.default
 
-    init(directory: URL) {
+    init(directory: URL, sortOrder: SortOrder = .nameAscending) {
         self.currentDirectory = directory
+        self.sortOrder = sortOrder
         refresh()
     }
 
@@ -85,6 +91,9 @@ final class FileBrowserService {
             fileName += ".taskpaper"
         }
         let url = currentDirectory.appendingPathComponent(fileName)
+        guard !fileManager.fileExists(atPath: url.path) else {
+            throw CocoaError(.fileWriteFileExists, userInfo: [NSFilePathErrorKey: url.path])
+        }
         let defaultContent = Bundle.main.url(forResource: "DefaultTaskList", withExtension: "taskpaper")
             .flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
         try defaultContent.write(to: url, atomically: true, encoding: .utf8)

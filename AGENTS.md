@@ -47,4 +47,4 @@ mcp__XcodeBuildMCP__test_sim -only-testing TaskamiTests
 - `reconfigureItems` + `apply(animatingDifferences: false)` silently skips the cell registration handler for stable-identity items — use `animatingDifferences: true` or call `configure` directly.
 - `DispatchQueue.main.async` deferral for `visibleCells` scan races with `preferredLayoutAttributesFitting` height changes — the cell can be off-screen by the time the block runs.
 - `UIButton(type: .custom)` absorbs its own touch so `didSelectItemAt` does NOT also fire when the dash button is tapped.
-- Logger subsystem is `"com.taskami"` (not the bundle ID `"com.koryashkin.taskami"`). Use `subsystemFilter: ["com.taskami"]` when capturing logs.
+- Logger subsystem is `"com.taskami"` (not the bundle ID `"com.taskami.app"`). Use `subsystemFilter: ["com.taskami"]` when capturing logs.

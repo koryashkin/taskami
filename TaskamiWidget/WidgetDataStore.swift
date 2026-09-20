@@ -3,7 +3,7 @@ import WidgetKit
 
 struct WidgetDataStore {
 
-    static let appGroupID = "group.com.koryashkin.taskami"
+    static let appGroupID = "group.com.taskami.app"
     static let tasksKey = "widgetTodayTasks"
 
     struct WidgetTask: Codable {

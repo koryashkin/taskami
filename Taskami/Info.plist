@@ -19,6 +19,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 
 	<!-- Privacy usage descriptions -->
 	<key>NSFaceIDUsageDescription</key>
@@ -69,7 +71,7 @@
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>New Task</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>com.koryashkin.taskami.newTask</string>
+			<string>com.taskami.app.newTask</string>
 			<key>UIApplicationShortcutItemIconType</key>
 			<string>UIApplicationShortcutIconTypePlus</string>
 		</dict>
@@ -77,7 +79,7 @@
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Search</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>com.koryashkin.taskami.search</string>
+			<string>com.taskami.app.search</string>
 			<key>UIApplicationShortcutItemIconType</key>
 			<string>UIApplicationShortcutIconTypeSearch</string>
 		</dict>

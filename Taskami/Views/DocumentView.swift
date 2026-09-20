@@ -10,6 +10,7 @@ struct DocumentView: View {
     @State private var documentService = DocumentService()
     @State private var document: TaskDocument?
     @State private var searchText = ""
+    @State private var appliedSearchText = ""
     @State private var isSearching = false
     @State private var error: Error?
     @State private var editorVC: DocumentEditorViewController?
@@ -33,9 +34,10 @@ struct DocumentView: View {
             if let document {
                 DocumentEditorView(
                     document: document,
-                    searchText: searchText,
+                    searchText: appliedSearchText,
                     theme: effectiveTheme,
                     addDateToDone: appState.preferences.addDateToDone,
+                    autocorrectionEnabled: appState.preferences.autocorrectionEnabled,
                     dueTintingEnabled: appState.preferences.dueTintingEnabled,
                     onDocumentChanged: {
                         documentService.scheduleAutosave()
@@ -75,9 +77,23 @@ struct DocumentView: View {
                     document: document,
                     searchText: $searchText,
                     recentSearches: appState.preferences.recentSearches,
-                    onClearRecent: { appState.preferences.recentSearches = [] }
+                    onClearRecent: { appState.preferences.recentSearches = [] },
+                    onSelect: applySearch
                 )
             }
+        }
+        .onChange(of: searchText) { _, query in
+            if appState.preferences.liveSearchEnabled || query.isEmpty {
+                appliedSearchText = query
+            }
+        }
+        .onChange(of: appState.preferences.liveSearchEnabled) { _, enabled in
+            if enabled {
+                appliedSearchText = searchText
+            }
+        }
+        .onSubmit(of: .search) {
+            applySearch(searchText)
         }
         .onChange(of: isSearching) { _, searching in
             if !searching && !searchText.isEmpty {
@@ -180,6 +196,11 @@ struct DocumentView: View {
             log.error("Failed to open \(fileURL.lastPathComponent): \(error)")
             self.error = error
         }
+    }
+
+    private func applySearch(_ query: String) {
+        appliedSearchText = query
+        appState.addRecentSearch(query)
     }
 
     private func syncReminders() {

@@ -5,6 +5,7 @@ struct SearchSuggestionsView: View {
     @Binding var searchText: String
     var recentSearches: [String] = []
     var onClearRecent: (() -> Void)?
+    var onSelect: ((String) -> Void)?
 
     private var uniqueTags: [String] {
         var seen = Set<String>()
@@ -28,7 +29,7 @@ struct SearchSuggestionsView: View {
             Section {
                 ForEach(recentSearches, id: \.self) { query in
                     Button {
-                        searchText = query
+                        select(query)
                     } label: {
                         Label(query, systemImage: "clock")
                     }
@@ -48,7 +49,7 @@ struct SearchSuggestionsView: View {
             Section("Tags") {
                 ForEach(uniqueTags, id: \.self) { tag in
                     Button {
-                        searchText = "@\(tag)"
+                        select("@\(tag)")
                     } label: {
                         Label("@\(tag)", systemImage: "tag")
                     }
@@ -60,7 +61,7 @@ struct SearchSuggestionsView: View {
             Section("Projects") {
                 ForEach(projects) { project in
                     Button {
-                        searchText = "project = \"\(project.content)\""
+                        select("project = \"\(project.content)\"")
                     } label: {
                         Label(project.content, systemImage: "folder")
                     }
@@ -69,15 +70,20 @@ struct SearchSuggestionsView: View {
         }
 
         Section("Queries") {
-            Button { searchText = "not @done" } label: {
+            Button { select("not @done") } label: {
                 Label("Not Done", systemImage: "circle")
             }
-            Button { searchText = "@done" } label: {
+            Button { select("@done") } label: {
                 Label("Done", systemImage: "checkmark.circle")
             }
-            Button { searchText = "type = task" } label: {
+            Button { select("type = task") } label: {
                 Label("All Tasks", systemImage: "list.bullet")
             }
         }
+    }
+
+    private func select(_ query: String) {
+        searchText = query
+        onSelect?(query)
     }
 }

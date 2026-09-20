@@ -22,6 +22,7 @@ final class DocumentEditorViewController: UIViewController {
     /// Whether to append today's date to @done when toggling an item done.
     /// Mirrors AppPreferences.addDateToDone — updated by DocumentEditorView.updateUIViewController.
     var addDateToDone: Bool = true
+    var autocorrectionEnabled: Bool = true
     var dueTintingEnabled: Bool = false {
         didSet {
             guard oldValue != dueTintingEnabled, isViewLoaded else { return }
@@ -177,7 +178,12 @@ final class DocumentEditorViewController: UIViewController {
     private func setupDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<TaskItemCell, UUID> { [weak self] cell, _, itemID in
             guard let self, let item = self.document?.item(withID: itemID) else { return }
-            cell.configure(with: item, highlighter: self.highlighter, addDateToDone: self.addDateToDone)
+            cell.configure(
+                with: item,
+                highlighter: self.highlighter,
+                addDateToDone: self.addDateToDone,
+                autocorrectionEnabled: self.autocorrectionEnabled
+            )
             cell.delegate = self
         }
 
@@ -271,7 +277,7 @@ final class DocumentEditorViewController: UIViewController {
     }
 
     @objc private func undoRedoDidHappen() {
-        applySnapshot(animated: false)
+        applySnapshot(animated: false, reloadProjectCounters: true)
         onFoldStateChanged?()
     }
 
@@ -346,7 +352,11 @@ final class DocumentEditorViewController: UIViewController {
 
     // MARK: - Snapshot
 
-    func applySnapshot(animated: Bool, caller: String = #function) {
+    func applySnapshot(
+        animated: Bool,
+        reloadProjectCounters: Bool = false,
+        caller: String = #function
+    ) {
         guard let document else { return }
 
         // If the focused item was removed from the document, pop the focus stack.
@@ -359,7 +369,13 @@ final class DocumentEditorViewController: UIViewController {
         // mid-apply and tries to apply again). Defer one run loop tick instead.
         guard !isApplyingSnapshot else {
             log.debug("applySnapshot deferred (already applying) from \(caller)")
-            DispatchQueue.main.async { [weak self] in self?.applySnapshot(animated: animated, caller: caller) }
+            DispatchQueue.main.async { [weak self] in
+                self?.applySnapshot(
+                    animated: animated,
+                    reloadProjectCounters: reloadProjectCounters,
+                    caller: caller
+                )
+            }
             return
         }
 
@@ -377,6 +393,13 @@ final class DocumentEditorViewController: UIViewController {
         var snapshot = NSDiffableDataSourceSnapshot<Int, UUID>()
         snapshot.appendSections([0])
         snapshot.appendItems(filteredItems.map(\.id))
+        if reloadProjectCounters {
+            let currentIDs = Set(dataSource.snapshot().itemIdentifiers)
+            let existingProjectIDs = filteredItems.compactMap { item -> UUID? in
+                item.type == .project && currentIDs.contains(item.id) ? item.id : nil
+            }
+            snapshot.reloadItems(existingProjectIDs)
+        }
 
         isApplyingSnapshot = true
         dataSource.apply(snapshot, animatingDifferences: animated)
@@ -403,7 +426,7 @@ final class DocumentEditorViewController: UIViewController {
     /// Reconfigures a single item without rebuilding the snapshot.
     /// Use this for content-only changes (toggleDone, cellDidCommit) where the item list
     /// and order are unchanged.
-    private func reconfigureItem(_ itemID: UUID) {
+    private func reconfigureItem(_ itemID: UUID, moveAccessibilityFocus: Bool = true) {
         guard dataSource.indexPath(for: itemID) != nil else {
             log.warning("reconfigureItem: \(itemID.uuidString.prefix(8)) not in snapshot, falling back to applySnapshot")
             applySnapshot(animated: false)
@@ -417,12 +440,28 @@ final class DocumentEditorViewController: UIViewController {
         if let cell = collectionView.visibleCells
             .compactMap({ $0 as? TaskItemCell })
             .first(where: { $0.item?.id == itemID }) {
-            cell.configure(with: item, highlighter: highlighter, addDateToDone: addDateToDone)
+            cell.configure(
+                with: item,
+                highlighter: highlighter,
+                addDateToDone: addDateToDone,
+                autocorrectionEnabled: autocorrectionEnabled
+            )
             collectionView.layoutIfNeeded()
-            UIAccessibility.post(notification: .layoutChanged, argument: nil)
+            if moveAccessibilityFocus && UIAccessibility.isVoiceOverRunning {
+                UIAccessibility.post(notification: .layoutChanged, argument: cell)
+            }
         }
         // If the cell is off-screen, the registration handler will configure it correctly
         // when it comes into view, because item is a reference type updated in-place.
+    }
+
+    /// Project progress is derived from descendant task state, so changing one task must
+    /// also redraw every containing project (including nested project ancestors).
+    private func reconfigureProjectAncestors(of item: TaskItem) {
+        guard item.type == .task else { return }
+        for project in item.ancestors where project.type == .project {
+            reconfigureItem(project.id, moveAccessibilityFocus: false)
+        }
     }
 
     private func isCellFullyVisible(at indexPath: IndexPath) -> Bool {
@@ -527,7 +566,7 @@ final class DocumentEditorViewController: UIViewController {
             document.appendItem(newItem)
         }
 
-        applySnapshot(animated: false)
+        applySnapshot(animated: false, reloadProjectCounters: true)
         onDocumentChanged?()
 
         DispatchQueue.main.async { [weak self] in
@@ -549,7 +588,7 @@ final class DocumentEditorViewController: UIViewController {
 
         document.removeItem(item)
         docUndoManager.registerDelete(item: item, parent: parent, index: index, document: document)
-        applySnapshot(animated: false)
+        applySnapshot(animated: false, reloadProjectCounters: true)
         onDocumentChanged?()
     }
 
@@ -562,6 +601,7 @@ final class DocumentEditorViewController: UIViewController {
         item.toggleDone(addDate: addDateToDone)
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
         reconfigureItem(item.id)
+        reconfigureProjectAncestors(of: item)
         onDocumentChanged?()
     }
 
@@ -572,7 +612,7 @@ final class DocumentEditorViewController: UIViewController {
         let oldLevel = item.indentLevel
         document.indentItem(item)
         docUndoManager.registerIndentChange(item: item, oldLevel: oldLevel, newLevel: item.indentLevel, document: document)
-        applySnapshot(animated: false)
+        applySnapshot(animated: false, reloadProjectCounters: true)
         onDocumentChanged?()
     }
 
@@ -581,7 +621,7 @@ final class DocumentEditorViewController: UIViewController {
         let oldLevel = item.indentLevel
         document.outdentItem(item)
         docUndoManager.registerIndentChange(item: item, oldLevel: oldLevel, newLevel: item.indentLevel, document: document)
-        applySnapshot(animated: false)
+        applySnapshot(animated: false, reloadProjectCounters: true)
         onDocumentChanged?()
     }
 }
@@ -659,6 +699,7 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         guard let item = cell.item, let document else { return }
         let oldContent = item.content
         let oldType = item.type
+        let wasDone = item.isDone
 
         // Re-detect item type from content (TaskPaper: line ending with ":" = project).
         // Existing projects keep their type when renamed without ":" so renaming doesn't
@@ -681,9 +722,12 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         if item.type != oldType {
             // Type changed (e.g. task → project): full snapshot needed to update the dash
             // label visibility and cell layout, not just reconfigure the content.
-            applySnapshot(animated: false)
+            applySnapshot(animated: false, reloadProjectCounters: true)
         } else {
             reconfigureItem(item.id)
+        }
+        if wasDone != item.isDone {
+            reconfigureProjectAncestors(of: item)
         }
         onDocumentChanged?()
     }
@@ -724,12 +768,21 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
     func cellDidToggleDone(_ cell: TaskItemCell, oldContent: String) {
         guard let document, let item = cell.item else { return }
         // The cell already toggled the model and updated its own display.
-        // Only register undo and schedule autosave here — do NOT call reconfigureItem.
+        // Do not reconfigure that task cell: doing so during its button touch callback
+        // can invalidate the accessibility element used for rapid repeated taps.
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
-        // Flush layout before notifying accessibility so XCTest gets accurate element
-        // frames after the cell height change shifts sibling cells.
+        // Redraw derived project counters after UIKit finishes the current touch cycle.
+        DispatchQueue.main.async { [weak self, weak item] in
+            guard let self, let item else { return }
+            self.reconfigureProjectAncestors(of: item)
+        }
+        // Flush layout before moving VoiceOver focus to the updated cell. Do not post a
+        // global layout-change notification when VoiceOver is off: it invalidates the
+        // automation accessibility snapshot between rapid taps.
         collectionView.layoutIfNeeded()
-        UIAccessibility.post(notification: .layoutChanged, argument: nil)
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(notification: .layoutChanged, argument: cell)
+        }
         onDocumentChanged?()
     }
 

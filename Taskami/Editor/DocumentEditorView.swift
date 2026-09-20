@@ -7,6 +7,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
     var searchText: String
     var theme: EditorTheme
     var addDateToDone: Bool = true
+    var autocorrectionEnabled: Bool = true
     var dueTintingEnabled: Bool = false
     var onDocumentChanged: (() -> Void)?
     var onFoldStateChanged: (() -> Void)?
@@ -19,6 +20,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
         vc.theme = theme
         vc.searchText = searchText
         vc.addDateToDone = addDateToDone
+        vc.autocorrectionEnabled = autocorrectionEnabled
         vc.dueTintingEnabled = dueTintingEnabled
         vc.setDocument(document)
         vc.onDocumentChanged = onDocumentChanged
@@ -34,6 +36,7 @@ struct DocumentEditorView: UIViewControllerRepresentable {
         vc.theme = theme
         vc.searchText = searchText
         vc.addDateToDone = addDateToDone
+        vc.autocorrectionEnabled = autocorrectionEnabled
         vc.dueTintingEnabled = dueTintingEnabled
         vc.onActivateSearch = onActivateSearch
 
