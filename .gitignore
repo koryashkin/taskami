@@ -3,6 +3,10 @@
 .AppleDouble
 .LSOverride
 
+# Local agent/editor configuration
+.claude/
+.xcodebuildmcp/
+
 # Xcode user data
 *.xcuserstate
 xcuserdata/
@@ -17,6 +21,7 @@ xcuserdata/
 # Build
 build/
 DerivedData/
+*.xcresult
 *.ipa
 *.dSYM.zip
 *.dSYM
@@ -39,5 +44,10 @@ fastlane/test_output
 *.foldstate
 
 # Credentials / secrets
+.env
+.env.*
+!.env.example
 *.p12
 *.mobileprovision
+*.cer
+*.key

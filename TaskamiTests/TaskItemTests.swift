@@ -1,9 +1,27 @@
 import Foundation
 import Testing
+import UIKit
 @testable import Taskami
 
 @Suite("TaskItem Tests")
 struct TaskItemTests {
+
+    @MainActor
+    @Test("Editor cell disables autocorrection when the preference is off")
+    func editorCellDisablesAutocorrection() {
+        let cell = TaskItemCell(frame: CGRect(x: 0, y: 0, width: 320, height: 44))
+        let item = TaskItem(type: .task, content: "Write release notes")
+        cell.configure(
+            with: item,
+            highlighter: TaskPaperTextHighlighter(theme: .light),
+            autocorrectionEnabled: false
+        )
+
+        cell.beginEditing(inputAccessoryView: nil)
+
+        #expect(cell.editingTextView?.autocorrectionType == .no)
+        cell.dismissEditing()
+    }
 
     // MARK: - toggleDone
 

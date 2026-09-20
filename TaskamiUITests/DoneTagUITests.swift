@@ -31,13 +31,18 @@ final class DoneTagUITests: XCTestCase {
     // MARK: - Navigation helpers
 
     private func openFirstDocument() {
-        guard app.collectionViews.firstMatch.waitForExistence(timeout: 5) else { return }
-        if app.cells.count > 0 {
-            app.cells.firstMatch.tap()
+        let browser = app.collectionViews.firstMatch
+        guard browser.waitForExistence(timeout: 5) else { return }
+        if browser.cells.count > 0 {
+            browser.cells.firstMatch.tap()
         } else {
             app.buttons["+"].tap()
         }
-        _ = dashButtons.element(boundBy: 0).waitForExistence(timeout: 5)
+        let firstDash = dashButtons.element(boundBy: 0)
+        if !firstDash.waitForExistence(timeout: 5), browser.cells.firstMatch.exists {
+            browser.cells.firstMatch.tap()
+        }
+        XCTAssertTrue(firstDash.waitForExistence(timeout: 5), "Editor did not open")
     }
 
     private func makeIsolatedDocumentsDirectory() -> URL {
@@ -65,25 +70,78 @@ final class DoneTagUITests: XCTestCase {
         return app.cells[cellID]
     }
 
+    private func tapDash(_ dash: XCUIElement) {
+        app.buttons[dash.identifier].tap()
+    }
+
+    private var welcomeProject: XCUIElement {
+        app.cells.matching(NSPredicate(format: "label == 'Welcome'")).firstMatch
+    }
+
     // MARK: - Assertion helpers
 
     /// Wait until the cell's accessibilityValue (= item.content) contains `@done`.
     @discardableResult
     private func waitForDoneTag(in cell: XCUIElement, timeout: TimeInterval = 2) -> Bool {
+        let currentCell = app.cells[cell.identifier]
         let pred = NSPredicate(format: "value CONTAINS '@done'")
-        let exp = XCTNSPredicateExpectation(predicate: pred, object: cell)
+        let exp = XCTNSPredicateExpectation(predicate: pred, object: currentCell)
         return XCTWaiter.wait(for: [exp], timeout: timeout) == .completed
     }
 
     /// Wait until the cell's accessibilityValue no longer contains `@done`.
     @discardableResult
     private func waitForNoDoneTag(in cell: XCUIElement, timeout: TimeInterval = 2) -> Bool {
+        let currentCell = app.cells[cell.identifier]
         let pred = NSPredicate(format: "NOT (value CONTAINS '@done')")
-        let exp = XCTNSPredicateExpectation(predicate: pred, object: cell)
+        let exp = XCTNSPredicateExpectation(predicate: pred, object: currentCell)
         return XCTWaiter.wait(for: [exp], timeout: timeout) == .completed
     }
 
     // MARK: - Dash button tests
+
+    /// Completing a child task must immediately redraw its parent project's progress counter.
+    func testProjectDoneCounterUpdatesAfterDashToggle() throws {
+        let project = welcomeProject
+        XCTAssertTrue(project.waitForExistence(timeout: 3), "Welcome project did not appear")
+        XCTAssertEqual(project.value as? String, "0 of 3 tasks done")
+
+        let dash = dashButtons.element(boundBy: 0)
+        tapDash(dash)
+
+        let refreshedProject = welcomeProject
+        let updated = NSPredicate(format: "value == '1 of 3 tasks done'")
+        let expectation = XCTNSPredicateExpectation(predicate: updated, object: refreshedProject)
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 2), .completed,
+                       "Project counter did not update after completing a child task; value=\(refreshedProject.value ?? "nil")")
+    }
+
+    /// Adding a sibling task inside a project must immediately increase its total count.
+    func testProjectTotalUpdatesAfterAddingChildTask() throws {
+        let project = welcomeProject
+        XCTAssertTrue(project.waitForExistence(timeout: 3), "Welcome project did not appear")
+        XCTAssertEqual(project.value as? String, "0 of 3 tasks done")
+
+        let firstTask = cell(for: dashButtons.element(boundBy: 0))
+        firstTask.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3),
+                      "Keyboard did not appear for the first child task")
+        app.typeText("\r")
+
+        let dismissKeyboard = app.buttons["accessory-dismiss"]
+        XCTAssertTrue(dismissKeyboard.waitForExistence(timeout: 3),
+                      "New child task did not enter edit mode")
+        dismissKeyboard.tap()
+        app.swipeDown()
+
+        let refreshedProject = welcomeProject
+        XCTAssertTrue(refreshedProject.waitForExistence(timeout: 3),
+                      "Welcome project did not return after adding the child task")
+        let updated = NSPredicate(format: "value == '0 of 4 tasks done'")
+        let expectation = XCTNSPredicateExpectation(predicate: updated, object: refreshedProject)
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 2), .completed,
+                       "Project total did not update after adding a child task; value=\(refreshedProject.value ?? "nil")")
+    }
 
     /// Tapping the dash button on an undone task should append @done(date) to content.
     func testDashButtonAddsAtDoneTag() throws {
@@ -92,11 +150,11 @@ final class DoneTagUITests: XCTestCase {
 
         // Ensure starting state is undone
         if dash.value as? String == "done" {
-            dash.tap()
+            tapDash(dash)
             XCTAssertTrue(waitForNoDoneTag(in: cell), "setup: could not clear done state")
         }
 
-        dash.tap()
+        tapDash(dash)
         XCTAssertTrue(waitForDoneTag(in: cell),
                       "@done tag not added to cell content after dash tap; value=\(cell.value ?? "nil")")
     }
@@ -108,11 +166,11 @@ final class DoneTagUITests: XCTestCase {
 
         // Ensure starting state is done
         if dash.value as? String != "done" {
-            dash.tap()
+            tapDash(dash)
             XCTAssertTrue(waitForDoneTag(in: cell), "setup: could not set done state")
         }
 
-        dash.tap()
+        tapDash(dash)
         XCTAssertTrue(waitForNoDoneTag(in: cell),
                       "@done tag not removed from cell content after dash tap; value=\(cell.value ?? "nil")")
     }
@@ -124,17 +182,17 @@ final class DoneTagUITests: XCTestCase {
 
         // Start from undone
         if dash.value as? String == "done" {
-            dash.tap()
+            tapDash(dash)
             XCTAssertTrue(waitForNoDoneTag(in: cell), "setup")
         }
 
-        dash.tap()
+        tapDash(dash)
         XCTAssertTrue(waitForDoneTag(in: cell), "step 1: @done not added")
 
-        dash.tap()
+        tapDash(dash)
         XCTAssertTrue(waitForNoDoneTag(in: cell), "step 2: @done not removed")
 
-        dash.tap()
+        tapDash(dash)
         XCTAssertTrue(waitForDoneTag(in: cell), "step 3: @done not re-added")
     }
 
@@ -147,7 +205,7 @@ final class DoneTagUITests: XCTestCase {
 
         // Ensure starting state is undone
         if dash.value as? String == "done" {
-            dash.tap()
+            tapDash(dash)
             XCTAssertTrue(waitForNoDoneTag(in: cell), "setup: could not clear done state")
         }
 
@@ -176,7 +234,7 @@ final class DoneTagUITests: XCTestCase {
 
         // Ensure starting state is done
         if dash.value as? String != "done" {
-            dash.tap()
+            tapDash(dash)
             XCTAssertTrue(waitForDoneTag(in: cell), "setup: could not set done state")
         }
 

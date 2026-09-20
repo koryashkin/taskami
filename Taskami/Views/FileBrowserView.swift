@@ -2,7 +2,20 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct FileBrowserView: View {
+    private enum CreateOperationKind {
+        case file
+        case folder
+
+        var alertTitle: String {
+            switch self {
+            case .file: return "Unable to Create File"
+            case .folder: return "Unable to Create Folder"
+            }
+        }
+    }
+
     @Environment(AppState.self) var appState
+    @State private var nestedFileBrowser: FileBrowserService?
     @State private var searchText = ""
     @State private var showingNewFileDialog = false
     @State private var showingNewFolderDialog = false
@@ -11,12 +24,28 @@ struct FileBrowserView: View {
     @State private var showingOPMLPicker = false
     @State private var importError: String?
     @State private var showingImportError = false
+    @State private var createOperationKind: CreateOperationKind?
+    @State private var createError: String?
+    @State private var showingCreateError = false
+
+    init(
+        directory: URL? = nil,
+        sortOrder: FileBrowserService.SortOrder = .nameAscending
+    ) {
+        _nestedFileBrowser = State(
+            initialValue: directory.map { FileBrowserService(directory: $0, sortOrder: sortOrder) }
+        )
+    }
+
+    private var fileBrowser: FileBrowserService {
+        nestedFileBrowser ?? appState.fileBrowser
+    }
 
     private var filteredItems: [FileItem] {
         if searchText.isEmpty {
-            return appState.fileBrowser.items
+            return fileBrowser.items
         }
-        return appState.fileBrowser.items.filter {
+        return fileBrowser.items.filter {
             $0.name.localizedCaseInsensitiveContains(searchText)
         }
     }
@@ -36,12 +65,14 @@ struct FileBrowserView: View {
             }
             .onDelete(perform: deleteItems)
         }
-        .navigationTitle(appState.fileBrowser.currentDirectory.lastPathComponent)
+        .navigationTitle(fileBrowser.currentDirectory.lastPathComponent)
         .searchable(text: $searchText, prompt: "Filter files")
         .navigationDestination(for: FileItem.self) { item in
             if item.isDirectory {
-                FileBrowserView()
-                    .onAppear { appState.fileBrowser.navigate(to: item.url) }
+                FileBrowserView(
+                    directory: item.url,
+                    sortOrder: appState.preferences.sortOrder
+                )
             } else {
                 DocumentView(fileURL: item.url)
             }
@@ -75,12 +106,12 @@ struct FileBrowserView: View {
                 Menu("Sort", systemImage: "arrow.up.arrow.down") {
                     ForEach(FileBrowserService.SortOrder.allCases, id: \.self) { order in
                         Button {
-                            appState.fileBrowser.sortOrder = order
-                            appState.fileBrowser.refresh()
+                            appState.preferences.sortOrder = order
+                            fileBrowser.sortOrder = order
                         } label: {
                             HStack {
                                 Text(order.rawValue)
-                                if appState.fileBrowser.sortOrder == order {
+                                if fileBrowser.sortOrder == order {
                                     Image(systemName: "checkmark")
                                 }
                             }
@@ -90,14 +121,21 @@ struct FileBrowserView: View {
             }
         }
         .refreshable {
-            appState.fileBrowser.refresh()
+            fileBrowser.refresh()
+        }
+        .onChange(of: appState.preferences.sortOrder) { _, order in
+            fileBrowser.sortOrder = order
         }
         .alert("New File", isPresented: $showingNewFileDialog) {
             TextField("File name", text: $newItemName)
             Button("Cancel", role: .cancel) {}
             Button("Create") {
                 guard !newItemName.isEmpty else { return }
-                try? appState.fileBrowser.createFile(named: newItemName)
+                do {
+                    _ = try fileBrowser.createFile(named: newItemName)
+                } catch {
+                    presentCreateError(error, for: .file)
+                }
             }
         }
         .alert("New Folder", isPresented: $showingNewFolderDialog) {
@@ -105,7 +143,11 @@ struct FileBrowserView: View {
             Button("Cancel", role: .cancel) {}
             Button("Create") {
                 guard !newItemName.isEmpty else { return }
-                try? appState.fileBrowser.createFolder(named: newItemName)
+                do {
+                    _ = try fileBrowser.createFolder(named: newItemName)
+                } catch {
+                    presentCreateError(error, for: .folder)
+                }
             }
         }
         .sheet(isPresented: $showingSettings) {
@@ -123,6 +165,14 @@ struct FileBrowserView: View {
         )
         .alert("Import Error", isPresented: $showingImportError, presenting: importError) { _ in
             Button("OK", role: .cancel) {}
+        } message: { msg in
+            Text(msg)
+        }
+        .alert(createOperationKind?.alertTitle ?? "Unable to Create", isPresented: $showingCreateError, presenting: createError) { _ in
+            Button("OK", role: .cancel) {
+                createError = nil
+                createOperationKind = nil
+            }
         } message: { msg in
             Text(msg)
         }
@@ -145,7 +195,7 @@ struct FileBrowserView: View {
         defer { if accessing { url.stopAccessingSecurityScopedResource() } }
         do {
             let result = try OPMLImporter.importFrom(url: url)
-            let dir = appState.fileBrowser.currentDirectory
+            let dir = fileBrowser.currentDirectory
             var dest = dir.appendingPathComponent(result.suggestedTitle).appendingPathExtension("taskpaper")
             var counter = 1
             while FileManager.default.fileExists(atPath: dest.path) {
@@ -153,7 +203,7 @@ struct FileBrowserView: View {
                 counter += 1
             }
             try result.taskPaperContent.write(to: dest, atomically: true, encoding: .utf8)
-            appState.fileBrowser.refresh()
+            fileBrowser.refresh()
         } catch {
             importError = error.localizedDescription
             showingImportError = true
@@ -163,7 +213,13 @@ struct FileBrowserView: View {
     private func deleteItems(at offsets: IndexSet) {
         for index in offsets {
             let item = filteredItems[index]
-            try? appState.fileBrowser.deleteItem(at: item.url)
+            try? fileBrowser.deleteItem(at: item.url)
         }
+    }
+
+    private func presentCreateError(_ error: Error, for kind: CreateOperationKind) {
+        createOperationKind = kind
+        createError = error.localizedDescription
+        showingCreateError = true
     }
 }

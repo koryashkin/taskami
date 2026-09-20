@@ -9,10 +9,13 @@
 /* Begin PBXBuildFile section */
 		00EA7F1D05F39E0ECEF52658 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED58DF2D92BC5FA1E28AD97C /* AppPreferences.swift */; };
 		01DFF6DCC6B1490208CDB9EB /* TaskPaperSerializerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA17080349AA4EF2B600E626 /* TaskPaperSerializerTests.swift */; };
+		0A1D48D4F3B146E1A3F98C10 /* DocumentServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9C5CF2E947410AA7785F48 /* DocumentServiceTests.swift */; };
 		113DC0B1695E82B021C5DC6B /* DoneToggleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5330B3428AEE2994656E8C /* DoneToggleUITests.swift */; };
+		12DAE37B4A5B4EBF8D79B763 /* FileCreationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C4C8495A454016A40FD779 /* FileCreationUITests.swift */; };
 		15BB9F086DFEBA509F8A30D0 /* LegacyImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71C26E3E7491A44E499CEFD /* LegacyImportService.swift */; };
 		18F34C62BDB2C12F38A85025 /* QueryTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6318DB449694FAC9E70E5B /* QueryTokenizer.swift */; };
 		1D801BB4E64E06DBA6EB28EA /* EditorTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F56D201449226F878A614 /* EditorTheme.swift */; };
+		1E344C5DEE1F49CB87AE04C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66FF58BF1F7B4024B7C0C0C0 /* Assets.xcassets */; };
 		25BADDEDB51A6CC683F0CDFF /* TaskItemCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D80466DA9339A66D949CD1 /* TaskItemCell.swift */; };
 		2C5B1FD6C29209F126FBB36C /* ConflictResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413A8452D1A7C9F3A993AB80 /* ConflictResolver.swift */; };
 		2E548A5B71DC1DAEDDBFB024 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C398DE9B1AFA09BD9070C3ED /* EmptyStateView.swift */; };
@@ -22,6 +25,7 @@
 		3A9A0F29D6C5CBFEE2E6806A /* EditorKeyboardAccessoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86863540DA0FEE4D05FC2268 /* EditorKeyboardAccessoryView.swift */; };
 		3C7AED98E545D7C11AFE320F /* TaskPaperParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5825BD329F2C0289CDFBE3A /* TaskPaperParser.swift */; };
 		3F1EA4EA7A8BD83456C40E6A /* QueryEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB1AD41DA1C8EE8CCBCB2C45 /* QueryEngine.swift */; };
+		4767FB31EAB04B62B66572D7 /* DatePickerSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */; };
 		47DD8622EC47AB11D74AB960 /* CodableColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C146E8D173084B3118535A1C /* CodableColor.swift */; };
 		505CF3EC8065E930576017EB /* EditorDragDropHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B560B7ECE8F5F51783AB3E7C /* EditorDragDropHandler.swift */; };
 		5287E627ACD2A5017493EC0A /* FileBrowserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3757791E708DF776C81B01CD /* FileBrowserService.swift */; };
@@ -29,57 +33,64 @@
 		59228B9229C7C0B1DAD8DD3A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC6A528041F57BB3814F497 /* ContentView.swift */; };
 		5B5BD0BC3416585821165EB8 /* DocumentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E66BC38BCD21E41296D8E5E /* DocumentService.swift */; };
 		5BC9E0F8C0266898279D54E5 /* FileCoordinatorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */; };
+		5C971B1DFB8D4378B1F50444 /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */; };
 		5EA560C6BDC3390F580EE26B /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C3B0D3ED32EDB931C39FE4 /* FileItem.swift */; };
 		65968549AA302F8A2EE44E02 /* TaskItemTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F499F67987EC0169DE19455 /* TaskItemTextView.swift */; };
 		66F887D34514A96EAE268B32 /* TaskPaperSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED09CE4BB446155BA6786D5D /* TaskPaperSerializer.swift */; };
 		68FD06E08262FA64EDC68E30 /* TaskItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7DCC361A381998DC2CB7A4 /* TaskItemTests.swift */; };
 		69DC92B0F85F223A1E6F5505 /* FileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8CA9B3CA0C10EE6B5C0FA5D /* FileRowView.swift */; };
+		6C7E4934700C424192BD2771 /* HTMLExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */; };
 		6E64DC629D7FAB60C87449D4 /* TaskItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138C1974381E6BAE06CEB5FD /* TaskItem.swift */; };
 		722BA6874CDF213ADAD61402 /* DocumentFilePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2F3CA30774103599F48696 /* DocumentFilePresenter.swift */; };
 		7A357471757D59A92CD6A13A /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF8CC919F6A3AF078F31F2 /* Tag.swift */; };
 		7D5EB19D2006A78B0A89F7DD /* FileBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94CF8EE92B1CA7A6AB5564A /* FileBrowserView.swift */; };
+		7F2D0B6581834ED8AA73ED7F /* DateTagParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D27FDDD82445079926F2C5 /* DateTagParser.swift */; };
+		80D1223184984939B6043A87 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3149F66B559E493C90A1CB59 /* AppDelegate.swift */; };
 		8560A404235AEA3241B10702 /* ErrorBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E426425116A580458A046B /* ErrorBannerView.swift */; };
 		86538001B19B3364AAB93FED /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C05BF5A6FF3FC63E950EA1 /* AppState.swift */; };
+		86848C1B4A1A4FC581B3954A /* TaskDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */; };
 		8DDF9F6B9082FB628558018F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDBCE89D599D5B9C17138D7 /* SettingsView.swift */; };
 		8EE3129A2472AA4B1B6F978D /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58ADDE31FF2E9866BE18C5FB /* AuthenticationService.swift */; };
+		913BD405FF1B48DB8CF75723 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1199683654AE4D9D99D84B2E /* EventKit.framework */; };
 		954E1CD51C917897F63E14A3 /* QueryASTParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC9E6554C8D166ED0A9FEE69 /* QueryASTParser.swift */; };
 		9734359D646656D5B72B8539 /* TaskDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6460ECAEC6BEFBF6B477E9 /* TaskDocument.swift */; };
+		97B5F066962647CDA18BACF8 /* HTMLExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */; };
 		9F959FCC04A6492FD4488F99 /* DoneTagUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BCCEA50B1FD152D079FA68 /* DoneTagUITests.swift */; };
+		A03E5D831F8A4C6A927B104F /* TaskamiWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B3329EE9A59A4CAEB857E09B /* TaskamiWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A0F7DA971EA4418B917D2EF3 /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */; };
 		A120A9DC97997C29F0689E0B /* LockScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13050BBC5FC7267872BD22C5 /* LockScreenView.swift */; };
 		A43CFD3BEF607F3E9DE7155E /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE614D1C51846549C22D6F9 /* AppError.swift */; };
 		A7D3849EE509123C7EE0BAAE /* DefaultTaskList.taskpaper in Resources */ = {isa = PBXBuildFile; fileRef = 61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */; };
 		AB2E6FCF12562F3C89A0A259 /* QueryEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */; };
 		B1422BD570434775C59AD92D /* TagParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75516F9295F89864CF20B6B /* TagParser.swift */; };
+		B16810241B3042D18A5A103F /* DateTagParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */; };
 		B2156FAE9F5136502596E605 /* DocumentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */; };
+		B6162C11B6C74B3E98170DFF /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */; };
 		B78A5CB3B0BC75D8B8C46834 /* EditModeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B4427E33FFC917508DBE57 /* EditModeUITests.swift */; };
 		B958DEE88C7E66B23FF100E6 /* LocalAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */; };
-		913BD405FF1B48DB8CF75723 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1199683654AE4D9D99D84B2E /* EventKit.framework */; };
-		E0E987D074C74695A318C87F /* OPMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */; };
-		A0F7DA971EA4418B917D2EF3 /* RemindersService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */; };
-		80D1223184984939B6043A87 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3149F66B559E493C90A1CB59 /* AppDelegate.swift */; };
-		B6162C11B6C74B3E98170DFF /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */; };
-		DEA9A160D73E4B91AF3B3CB4 /* TaskamiWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */; };
-		5C971B1DFB8D4378B1F50444 /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */; };
-		EB965770B4D249399D06CCDF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E94D107107C40ABB8128100 /* WidgetKit.framework */; };
-		E3CB88394A0C4009A4B88ED2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDF940D8FDD14D68B46080B5 /* SwiftUI.framework */; };
 		BBBAC85B20C3B67906963827 /* SearchSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133FE08FF6DA32B1F779A6D2 /* SearchSuggestionsView.swift */; };
 		C01B5690955F40A10BA96D43 /* ItemType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C82AEE3017F2A7807F3BD81 /* ItemType.swift */; };
+		CC1DE388C37645E4A88D1583 /* FocusBreadcrumbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */; };
 		D5102FDBD1C02567AE4C864D /* TaskamiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DAF76B827F2D372F554F19 /* TaskamiApp.swift */; };
+		D8856EF30748407EA139EC20 /* CommandPaletteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40884D6CD1D4411D99788022 /* CommandPaletteViewController.swift */; };
 		D99AB7ABE35764D78A660882 /* FolderRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63A3F2943F224ED9D3FAE4A /* FolderRowView.swift */; };
 		DC8CB0227CC2A58EBB289A10 /* DocumentEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92E8C899AB189973C25A4E0 /* DocumentEditorViewController.swift */; };
+		DEA9A160D73E4B91AF3B3CB4 /* TaskamiWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */; };
+		E0E987D074C74695A318C87F /* OPMLImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */; };
+		E3CB88394A0C4009A4B88ED2 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDF940D8FDD14D68B46080B5 /* SwiftUI.framework */; };
+		EB965770B4D249399D06CCDF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E94D107107C40ABB8128100 /* WidgetKit.framework */; };
 		F38D97A5FC6FB93B1EABAA7C /* FontAndColorSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3FEC298289EABDAF86A010 /* FontAndColorSettingsView.swift */; };
 		F6D6A969B26D1F70E15AB4C3 /* TaskPaperParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */; };
-		7F2D0B6581834ED8AA73ED7F /* DateTagParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D27FDDD82445079926F2C5 /* DateTagParser.swift */; };
-		B16810241B3042D18A5A103F /* DateTagParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */; };
-		97B5F066962647CDA18BACF8 /* HTMLExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */; };
-		86848C1B4A1A4FC581B3954A /* TaskDocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */; };
-		6C7E4934700C424192BD2771 /* HTMLExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */; };
-		4767FB31EAB04B62B66572D7 /* DatePickerSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */; };
-		D8856EF30748407EA139EC20 /* CommandPaletteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40884D6CD1D4411D99788022 /* CommandPaletteViewController.swift */; };
-		CC1DE388C37645E4A88D1583 /* FocusBreadcrumbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		71626F626942414E8BB40BDC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F6BD6D5008A80F8B4AAFB1B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B18786A0ACAF40809058BABC;
+			remoteInfo = TaskamiWidget;
+		};
 		CA83BCEA74DB99DF00EE1600 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F6BD6D5008A80F8B4AAFB1B8 /* Project object */;
@@ -94,26 +105,41 @@
 			remoteGlobalIDString = 22E3F6942C2FB0097FACC772;
 			remoteInfo = Taskami;
 		};
-		71626F626942414E8BB40BDC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F6BD6D5008A80F8B4AAFB1B8 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B18786A0ACAF40809058BABC;
-			remoteInfo = TaskamiWidget;
-		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C1A83E7462D94FDC89B0415A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A03E5D831F8A4C6A927B104F /* TaskamiWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0F5330B3428AEE2994656E8C /* DoneToggleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneToggleUITests.swift; sourceTree = "<group>"; };
 		0F5F56D201449226F878A614 /* EditorTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorTheme.swift; sourceTree = "<group>"; };
+		1199683654AE4D9D99D84B2E /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		13050BBC5FC7267872BD22C5 /* LockScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreenView.swift; sourceTree = "<group>"; };
 		133FE08FF6DA32B1F779A6D2 /* SearchSuggestionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSuggestionsView.swift; sourceTree = "<group>"; };
 		138C1974381E6BAE06CEB5FD /* TaskItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItem.swift; sourceTree = "<group>"; };
+		18D27FDDD82445079926F2C5 /* DateTagParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTagParser.swift; sourceTree = "<group>"; };
 		1AE614D1C51846549C22D6F9 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		1C82AEE3017F2A7807F3BD81 /* ItemType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemType.swift; sourceTree = "<group>"; };
+		226CAF732B18498DBE3738B4 /* TaskamiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TaskamiWidget.entitlements; sourceTree = "<group>"; };
+		3149F66B559E493C90A1CB59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3757791E708DF776C81B01CD /* FileBrowserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserService.swift; sourceTree = "<group>"; };
+		3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
+		40884D6CD1D4411D99788022 /* CommandPaletteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteViewController.swift; sourceTree = "<group>"; };
 		413A8452D1A7C9F3A993AB80 /* ConflictResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConflictResolver.swift; sourceTree = "<group>"; };
+		43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheetViewController.swift; sourceTree = "<group>"; };
 		4B6318DB449694FAC9E70E5B /* QueryTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryTokenizer.swift; sourceTree = "<group>"; };
+		53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskamiWidget.swift; sourceTree = "<group>"; };
 		56DAF76B827F2D372F554F19 /* TaskamiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskamiApp.swift; sourceTree = "<group>"; };
 		58ADDE31FF2E9866BE18C5FB /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		5AC6A528041F57BB3814F497 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -121,28 +147,21 @@
 		5E66BC38BCD21E41296D8E5E /* DocumentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentService.swift; sourceTree = "<group>"; };
 		5FCAA7CB9ABD9983E0CBD163 /* DocumentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentEditorView.swift; sourceTree = "<group>"; };
 		60C3B0D3ED32EDB931C39FE4 /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
-		61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */ = {isa = PBXFileReference; path = DefaultTaskList.taskpaper; sourceTree = "<group>"; };
+		61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */ = {isa = PBXFileReference; lastKnownFileType = text; path = DefaultTaskList.taskpaper; sourceTree = "<group>"; };
+		62C4C8495A454016A40FD779 /* FileCreationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCreationUITests.swift; sourceTree = "<group>"; };
+		66FF58BF1F7B4024B7C0C0C0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		68458307BB09ECB2DC71111D /* TaskamiTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TaskamiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A9C5CF2E947410AA7785F48 /* DocumentServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentServiceTests.swift; sourceTree = "<group>"; };
 		6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParserTests.swift; sourceTree = "<group>"; };
+		6E94D107107C40ABB8128100 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		6EDBCE89D599D5B9C17138D7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataStore.swift; sourceTree = "<group>"; };
+		7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDocumentTests.swift; sourceTree = "<group>"; };
 		7D2F3CA30774103599F48696 /* DocumentFilePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentFilePresenter.swift; sourceTree = "<group>"; };
 		7E550097544F2B153FB08057 /* TagParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagParserTests.swift; sourceTree = "<group>"; };
 		86863540DA0FEE4D05FC2268 /* EditorKeyboardAccessoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorKeyboardAccessoryView.swift; sourceTree = "<group>"; };
 		909E0A91A8311C1D396039E8 /* DocumentUndoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentUndoManager.swift; sourceTree = "<group>"; };
 		93F15F1E1DA95887AF606533 /* LocalAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LocalAuthentication.framework; path = System/Library/Frameworks/LocalAuthentication.framework; sourceTree = SDKROOT; };
-		1199683654AE4D9D99D84B2E /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
-		F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPMLImporter.swift; sourceTree = "<group>"; };
-		3AB7E3F6630441D3A4BB30A9 /* RemindersService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemindersService.swift; sourceTree = "<group>"; };
-		D57E32E05D1A486391B7AEC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3149F66B559E493C90A1CB59 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataStore.swift; sourceTree = "<group>"; };
-		53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskamiWidget.swift; sourceTree = "<group>"; };
-		763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataStore.swift; sourceTree = "<group>"; };
-		226CAF732B18498DBE3738B4 /* TaskamiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TaskamiWidget.entitlements; sourceTree = "<group>"; };
-		C95B91E4FF774E558EB1A53F /* Taskami.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Taskami.entitlements; sourceTree = "<group>"; };
-		B3329EE9A59A4CAEB857E09B /* TaskamiWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TaskamiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		6E94D107107C40ABB8128100 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
-		FDF940D8FDD14D68B46080B5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		96C05BF5A6FF3FC63E950EA1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		9F499F67987EC0169DE19455 /* TaskItemTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTextView.swift; sourceTree = "<group>"; };
 		A0B4427E33FFC917508DBE57 /* EditModeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModeUITests.swift; sourceTree = "<group>"; };
@@ -150,6 +169,8 @@
 		A4E426425116A580458A046B /* ErrorBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBannerView.swift; sourceTree = "<group>"; };
 		A8CA9B3CA0C10EE6B5C0FA5D /* FileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRowView.swift; sourceTree = "<group>"; };
 		AA0B0BE1857B80070911023E /* TaskamiUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TaskamiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLExporterTests.swift; sourceTree = "<group>"; };
+		B3329EE9A59A4CAEB857E09B /* TaskamiWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TaskamiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B560B7ECE8F5F51783AB3E7C /* EditorDragDropHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorDragDropHandler.swift; sourceTree = "<group>"; };
 		BD3FEC298289EABDAF86A010 /* FontAndColorSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAndColorSettingsView.swift; sourceTree = "<group>"; };
 		C146E8D173084B3118535A1C /* CodableColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableColor.swift; sourceTree = "<group>"; };
@@ -157,6 +178,8 @@
 		C7D80466DA9339A66D949CD1 /* TaskItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemCell.swift; sourceTree = "<group>"; };
 		C92E8C899AB189973C25A4E0 /* DocumentEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentEditorViewController.swift; sourceTree = "<group>"; };
 		C94CF8EE92B1CA7A6AB5564A /* FileBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserView.swift; sourceTree = "<group>"; };
+		C95B91E4FF774E558EB1A53F /* Taskami.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Taskami.entitlements; sourceTree = "<group>"; };
+		D57E32E05D1A486391B7AEC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryEngineTests.swift; sourceTree = "<group>"; };
 		D71C26E3E7491A44E499CEFD /* LegacyImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyImportService.swift; sourceTree = "<group>"; };
 		D75516F9295F89864CF20B6B /* TagParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagParser.swift; sourceTree = "<group>"; };
@@ -164,41 +187,39 @@
 		DA7DCC361A381998DC2CB7A4 /* TaskItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemTests.swift; sourceTree = "<group>"; };
 		DB1AD41DA1C8EE8CCBCB2C45 /* QueryEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryEngine.swift; sourceTree = "<group>"; };
 		DE2DE47D5AD4A42A8D5227A3 /* TaskPaperTextHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperTextHighlighter.swift; sourceTree = "<group>"; };
+		E29FB99B0CAE4CAE8C0C0E26 /* WidgetDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataStore.swift; sourceTree = "<group>"; };
+		E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTagParserTests.swift; sourceTree = "<group>"; };
 		E4EF8CC919F6A3AF078F31F2 /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		E5825BD329F2C0289CDFBE3A /* TaskPaperParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParser.swift; sourceTree = "<group>"; };
 		E63A3F2943F224ED9D3FAE4A /* FolderRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderRowView.swift; sourceTree = "<group>"; };
 		EC9E6554C8D166ED0A9FEE69 /* QueryASTParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryASTParser.swift; sourceTree = "<group>"; };
+		ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLExporter.swift; sourceTree = "<group>"; };
 		ED09CE4BB446155BA6786D5D /* TaskPaperSerializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperSerializer.swift; sourceTree = "<group>"; };
 		ED58DF2D92BC5FA1E28AD97C /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
-		ED8728E382737A0AF8223ADF /* Taskami.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Taskami.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED8728E382737A0AF8223ADF /* Taskami.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Taskami.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5F9D3A7FC1345B3BDB3DEDD /* OPMLImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPMLImporter.swift; sourceTree = "<group>"; };
 		FC523F2D8AAB478F9E838E07 /* FileCoordinatorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCoordinatorService.swift; sourceTree = "<group>"; };
-		FFD0A72C6ABD628A24FB2665 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
-		18D27FDDD82445079926F2C5 /* DateTagParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTagParser.swift; sourceTree = "<group>"; };
-		E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTagParserTests.swift; sourceTree = "<group>"; };
-		AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLExporterTests.swift; sourceTree = "<group>"; };
-		7789F4EDD14C418993B1BAD4 /* TaskDocumentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDocumentTests.swift; sourceTree = "<group>"; };
-		ECFABF05905C4CA4A65D01F3 /* HTMLExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLExporter.swift; sourceTree = "<group>"; };
-		43D232285FDD45A6948ABC76 /* DatePickerSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheetViewController.swift; sourceTree = "<group>"; };
-		40884D6CD1D4411D99788022 /* CommandPaletteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteViewController.swift; sourceTree = "<group>"; };
 		FC74E05796764B59A7D9243C /* FocusBreadcrumbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusBreadcrumbView.swift; sourceTree = "<group>"; };
+		FDF940D8FDD14D68B46080B5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		FFD0A72C6ABD628A24FB2665 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		116D00AFD7154FF7A78447B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB965770B4D249399D06CCDF /* WidgetKit.framework in Frameworks */,
+				E3CB88394A0C4009A4B88ED2 /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		650EDCC06FC72C2D05ED3B42 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B958DEE88C7E66B23FF100E6 /* LocalAuthentication.framework in Frameworks */,
 				913BD405FF1B48DB8CF75723 /* EventKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		116D00AFD7154FF7A78447B1 /* Frameworks (Widget) */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EB965770B4D249399D06CCDF /* WidgetKit.framework in Frameworks */,
-				E3CB88394A0C4009A4B88ED2 /* SwiftUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,16 +295,6 @@
 			);
 			sourceTree = "<group>";
 		};
-		F3F2F391D6E24795A57914AE /* TaskamiWidget */ = {
-			isa = PBXGroup;
-			children = (
-				53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */,
-				763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */,
-				226CAF732B18498DBE3738B4 /* TaskamiWidget.entitlements */,
-			);
-			path = TaskamiWidget;
-			sourceTree = "<group>";
-		};
 		6D58123B10751BD378CF5EA1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -299,6 +310,7 @@
 			isa = PBXGroup;
 			children = (
 				E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */,
+				0A9C5CF2E947410AA7785F48 /* DocumentServiceTests.swift */,
 				AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */,
 				D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */,
 				7E550097544F2B153FB08057 /* TagParserTests.swift */,
@@ -316,6 +328,7 @@
 				A1BCCEA50B1FD152D079FA68 /* DoneTagUITests.swift */,
 				0F5330B3428AEE2994656E8C /* DoneToggleUITests.swift */,
 				A0B4427E33FFC917508DBE57 /* EditModeUITests.swift */,
+				62C4C8495A454016A40FD779 /* FileCreationUITests.swift */,
 			);
 			path = TaskamiUITests;
 			sourceTree = "<group>";
@@ -411,9 +424,20 @@
 		EA43D9210CDD094E7F6765C1 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				66FF58BF1F7B4024B7C0C0C0 /* Assets.xcassets */,
 				61CEC085EC8CA5CA0C61D8FD /* DefaultTaskList.taskpaper */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		F3F2F391D6E24795A57914AE /* TaskamiWidget */ = {
+			isa = PBXGroup;
+			children = (
+				53C1C4BCFC674ED79582F51E /* TaskamiWidget.swift */,
+				763CF561D9DE49B9B77929D5 /* WidgetDataStore.swift */,
+				226CAF732B18498DBE3738B4 /* TaskamiWidget.entitlements */,
+			);
+			path = TaskamiWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -444,6 +468,7 @@
 				8DB9FBA09545E6C83D2A1B36 /* Sources */,
 				6F3D65C4BB3B070B6CA31FAF /* Resources */,
 				650EDCC06FC72C2D05ED3B42 /* Frameworks */,
+				C1A83E7462D94FDC89B0415A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -456,6 +481,24 @@
 			productName = Taskami;
 			productReference = ED8728E382737A0AF8223ADF /* Taskami.app */;
 			productType = "com.apple.product-type.application";
+		};
+		94A6203E879B8A592CED53B0 /* TaskamiUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2C77DA4D4C46502454064FD9 /* Build configuration list for PBXNativeTarget "TaskamiUITests" */;
+			buildPhases = (
+				2B17D0BB3624BE504DAB7C85 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				062E8980D6A72A6DAE6F787D /* PBXTargetDependency */,
+			);
+			name = TaskamiUITests;
+			packageProductDependencies = (
+			);
+			productName = TaskamiUITests;
+			productReference = AA0B0BE1857B80070911023E /* TaskamiUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		B18786A0ACAF40809058BABC /* TaskamiWidget */ = {
 			isa = PBXNativeTarget;
@@ -476,24 +519,6 @@
 			productReference = B3329EE9A59A4CAEB857E09B /* TaskamiWidget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		94A6203E879B8A592CED53B0 /* TaskamiUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2C77DA4D4C46502454064FD9 /* Build configuration list for PBXNativeTarget "TaskamiUITests" */;
-			buildPhases = (
-				2B17D0BB3624BE504DAB7C85 /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				062E8980D6A72A6DAE6F787D /* PBXTargetDependency */,
-			);
-			name = TaskamiUITests;
-			packageProductDependencies = (
-			);
-			productName = TaskamiUITests;
-			productReference = AA0B0BE1857B80070911023E /* TaskamiUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -507,7 +532,6 @@
 						ProvisioningStyle = Automatic;
 					};
 					22E3F6942C2FB0097FACC772 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					94A6203E879B8A592CED53B0 = {
@@ -515,7 +539,6 @@
 						TestTargetID = 22E3F6942C2FB0097FACC772;
 					};
 					B18786A0ACAF40809058BABC = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -543,18 +566,19 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		4BB376CB17B94E398F886833 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6F3D65C4BB3B070B6CA31FAF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E344C5DEE1F49CB87AE04C7 /* Assets.xcassets in Resources */,
 				A7D3849EE509123C7EE0BAAE /* DefaultTaskList.taskpaper in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4BB376CB17B94E398F886833 /* Resources (Widget) */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -568,6 +592,7 @@
 				9F959FCC04A6492FD4488F99 /* DoneTagUITests.swift in Sources */,
 				113DC0B1695E82B021C5DC6B /* DoneToggleUITests.swift in Sources */,
 				B78A5CB3B0BC75D8B8C46834 /* EditModeUITests.swift in Sources */,
+				12DAE37B4A5B4EBF8D79B763 /* FileCreationUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,6 +601,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B16810241B3042D18A5A103F /* DateTagParserTests.swift in Sources */,
+				0A1D48D4F3B146E1A3F98C10 /* DocumentServiceTests.swift in Sources */,
 				97B5F066962647CDA18BACF8 /* HTMLExporterTests.swift in Sources */,
 				86848C1B4A1A4FC581B3954A /* TaskDocumentTests.swift in Sources */,
 				AB2E6FCF12562F3C89A0A259 /* QueryEngineTests.swift in Sources */,
@@ -583,6 +609,15 @@
 				68FD06E08262FA64EDC68E30 /* TaskItemTests.swift in Sources */,
 				F6D6A969B26D1F70E15AB4C3 /* TaskPaperParserTests.swift in Sources */,
 				01DFF6DCC6B1490208CDB9EB /* TaskPaperSerializerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EA6B2B52F814B439B9DD2B2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DEA9A160D73E4B91AF3B3CB4 /* TaskamiWidget.swift in Sources */,
+				5C971B1DFB8D4378B1F50444 /* WidgetDataStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -645,15 +680,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5EA6B2B52F814B439B9DD2B2 /* Sources (Widget) */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DEA9A160D73E4B91AF3B3CB4 /* TaskamiWidget.swift in Sources */,
-				5C971B1DFB8D4378B1F50444 /* WidgetDataStore.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -662,15 +688,15 @@
 			target = 22E3F6942C2FB0097FACC772 /* Taskami */;
 			targetProxy = CA83BCEA74DB99DF00EE1600 /* PBXContainerItemProxy */;
 		};
-		6CC635C8E51E21EF2EDDA043 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 22E3F6942C2FB0097FACC772 /* Taskami */;
-			targetProxy = FF07C36C1A68000C8A7D7A45 /* PBXContainerItemProxy */;
-		};
 		3A6E9A605DDE4173B9EAB6B4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B18786A0ACAF40809058BABC /* TaskamiWidget */;
 			targetProxy = 71626F626942414E8BB40BDC /* PBXContainerItemProxy */;
+		};
+		6CC635C8E51E21EF2EDDA043 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22E3F6942C2FB0097FACC772 /* Taskami */;
+			targetProxy = FF07C36C1A68000C8A7D7A45 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -739,14 +765,13 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Taskami/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami;
+				PRODUCT_BUNDLE_IDENTIFIER = com.taskami.app;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -764,13 +789,35 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.taskami.app.uitests;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Taskami;
 			};
 			name = Release;
+		};
+		5E736DE3D73345B88CC25895 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TaskamiWidget/TaskamiWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TaskamiWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.taskami.app.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 		920819BFF86AF30F2A377D91 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -783,7 +830,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.taskami.app.uitests;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -799,14 +846,13 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Taskami/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami;
+				PRODUCT_BUNDLE_IDENTIFIER = com.taskami.app;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -887,13 +933,35 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.taskami.app.tests;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Taskami.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Taskami";
 			};
 			name = Debug;
+		};
+		EDA94EF644944383ADD5C746 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TaskamiWidget/TaskamiWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TaskamiWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.taskami.app.widget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
 		};
 		F21010C4A4E7D2CAC54BBBE8 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -906,59 +974,11 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.taskami.app.tests;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Taskami.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Taskami";
-			};
-			name = Release;
-		};
-		5E736DE3D73345B88CC25895 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = TaskamiWidget/TaskamiWidget.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = TaskamiWidget;
-				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.widget;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.9;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		EDA94EF644944383ADD5C746 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = TaskamiWidget/TaskamiWidget.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = TaskamiWidget;
-				INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier = "com.apple.widgetkit-extension";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.koryashkin.taskami.widget;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.9;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -983,6 +1003,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		2E05253A039E414A9844846F /* Build configuration list for PBXNativeTarget "TaskamiWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E736DE3D73345B88CC25895 /* Debug */,
+				EDA94EF644944383ADD5C746 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		7F85CDBB0749EC3D6992ECF2 /* Build configuration list for PBXNativeTarget "Taskami" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -997,15 +1026,6 @@
 			buildConfigurations = (
 				E51936DD08006C3AF870C3A2 /* Debug */,
 				01D53401F347F0C8BF0520A9 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
-		2E05253A039E414A9844846F /* Build configuration list for PBXNativeTarget "TaskamiWidget" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5E736DE3D73345B88CC25895 /* Debug */,
-				EDA94EF644944383ADD5C746 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

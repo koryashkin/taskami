@@ -42,6 +42,7 @@ final class TaskItemCell: UICollectionViewCell {
     private(set) var isInEditMode = false
     /// Mirrors DocumentEditorViewController.addDateToDone — set via configure(with:highlighter:addDateToDone:).
     private var addDateToDone: Bool = true
+    private var autocorrectionEnabled: Bool = true
 
     /// The live text content while editing (for accessory actions that need it mid-edit).
     var textViewCurrentContent: String { textView.text ?? "" }
@@ -103,7 +104,8 @@ final class TaskItemCell: UICollectionViewCell {
             disclosureButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
 
             dashButton.leadingAnchor.constraint(equalTo: disclosureButton.trailingAnchor),
-            dashButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            dashButton.topAnchor.constraint(equalTo: contentView.topAnchor),
+            dashButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
 
             textView.leadingAnchor.constraint(equalTo: dashButton.trailingAnchor),
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
@@ -114,8 +116,14 @@ final class TaskItemCell: UICollectionViewCell {
 
     // MARK: - Configure (display mode)
 
-    func configure(with item: TaskItem, highlighter: TaskPaperTextHighlighter, addDateToDone: Bool = true) {
+    func configure(
+        with item: TaskItem,
+        highlighter: TaskPaperTextHighlighter,
+        addDateToDone: Bool = true,
+        autocorrectionEnabled: Bool = true
+    ) {
         self.addDateToDone = addDateToDone
+        self.autocorrectionEnabled = autocorrectionEnabled
         log.debug("configure: '\(item.content.prefix(30))' editMode=\(self.isInEditMode)")
         self.item = item
         self.highlighter = highlighter
@@ -130,12 +138,14 @@ final class TaskItemCell: UICollectionViewCell {
         if isTask {
             let color = item.isDone ? highlighter.theme.doneColor.uiColor : highlighter.theme.taskColor.uiColor
             let attrs: [NSAttributedString.Key: Any] = [.font: highlighter.theme.font, .foregroundColor: color]
-            dashButton.setAttributedTitle(NSAttributedString(string: "- ", attributes: attrs), for: .normal)
-            dashWidthConstraint.isActive = false
+            dashButton.setAttributedTitle(NSAttributedString(string: "-", attributes: attrs), for: .normal)
+            dashWidthConstraint.constant = 44
+            dashWidthConstraint.isActive = true
             // Accessibility: stable ID + value so UI tests can find and verify the button
             dashButton.accessibilityIdentifier = "dash-\(item.id.uuidString)"
             dashButton.accessibilityValue = item.isDone ? "done" : "undone"
         } else {
+            dashWidthConstraint.constant = 0
             dashWidthConstraint.isActive = true
         }
 
@@ -177,6 +187,11 @@ final class TaskItemCell: UICollectionViewCell {
         switch item.type {
         case .project:
             accessibilityLabel = item.content
+            let tasks = item.allDescendants.filter { $0.type == .task }
+            if !tasks.isEmpty {
+                let done = tasks.filter(\.isDone).count
+                accessibilityValue = "\(done) of \(tasks.count) tasks done"
+            }
             accessibilityTraits = [.header]
             accessibilityHint = item.children.isEmpty ? nil
                 : (item.isCollapsed ? "Collapsed. Double-tap to expand." : "Expanded. Double-tap to collapse.")
@@ -228,7 +243,7 @@ final class TaskItemCell: UICollectionViewCell {
         textView.font = highlighter.theme.font
         textView.textColor = highlighter.theme.textColor.uiColor
         textView.tintColor = highlighter.theme.cursorColor.uiColor
-        textView.autocorrectionType = .default
+        textView.autocorrectionType = autocorrectionEnabled ? .default : .no
         textView.autocapitalizationType = .sentences
         textView.isEditable = true
         textView.isSelectable = true
@@ -303,7 +318,12 @@ final class TaskItemCell: UICollectionViewCell {
         // through cellForItem(at:) which can race with UICollectionView layout passes.
         let oldContent = item.content
         item.toggleDone(addDate: addDateToDone)
-        configure(with: item, highlighter: highlighter, addDateToDone: addDateToDone)
+        configure(
+            with: item,
+            highlighter: highlighter,
+            addDateToDone: addDateToDone,
+            autocorrectionEnabled: autocorrectionEnabled
+        )
         delegate?.cellDidToggleDone(self, oldContent: oldContent)
         if UIAccessibility.isVoiceOverRunning {
             UIAccessibility.post(notification: .announcement, argument: item.isDone ? "Done" : "Not done")
@@ -318,7 +338,8 @@ final class TaskItemCell: UICollectionViewCell {
         // Never reuse a cell mid-edit
         if isInEditMode { dismissEditing() }
         textView.attributedText = nil
-        dashWidthConstraint.isActive = false
+        dashWidthConstraint.constant = 0
+        dashWidthConstraint.isActive = true
         dashButton.isHidden = false
         disclosureWidthConstraint.constant = 0
         disclosureButton.isHidden = false

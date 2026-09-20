@@ -3,6 +3,11 @@ import Observation
 
 @Observable
 final class AppPreferences {
+    private enum UITestEnvironment {
+        static let sortOrder = "TASKAMI_UI_TEST_SORT_ORDER"
+        static let liveSearch = "TASKAMI_UI_TEST_LIVE_SEARCH"
+    }
+
     var editorTheme: EditorTheme {
         didSet { saveTheme() }
     }
@@ -36,6 +41,7 @@ final class AppPreferences {
 
     init() {
         let defaults = UserDefaults.standard
+        let environment = ProcessInfo.processInfo.environment
 
         // Load theme
         if let data = defaults.data(forKey: "editorTheme"),
@@ -45,10 +51,17 @@ final class AppPreferences {
             self.editorTheme = .light
         }
 
-        self.sortOrder = FileBrowserService.SortOrder(rawValue: defaults.string(forKey: "sortOrder") ?? "") ?? .nameAscending
+        self.sortOrder = environment[UITestEnvironment.sortOrder]
+            .flatMap(FileBrowserService.SortOrder.init(rawValue:))
+            ?? FileBrowserService.SortOrder(rawValue: defaults.string(forKey: "sortOrder") ?? "")
+            ?? .nameAscending
         self.autocorrectionEnabled = defaults.object(forKey: "autocorrection") as? Bool ?? true
         self.addDateToDone = defaults.object(forKey: "addDateToDone") as? Bool ?? true
-        self.liveSearchEnabled = defaults.object(forKey: "liveSearch") as? Bool ?? true
+        if let override = environment[UITestEnvironment.liveSearch] {
+            self.liveSearchEnabled = override != "0"
+        } else {
+            self.liveSearchEnabled = defaults.object(forKey: "liveSearch") as? Bool ?? true
+        }
         self.showFileExtensions = defaults.object(forKey: "showExtensions") as? Bool ?? false
         self.biometricLockEnabled = defaults.object(forKey: "biometricLock") as? Bool ?? false
         self.dynamicTypeEnabled = defaults.object(forKey: "dynamicType") as? Bool ?? false

@@ -17,8 +17,12 @@ final class AppState {
     var shortcutActivateSearch: Bool = false
 
     init() {
-        self.preferences = AppPreferences()
-        self.fileBrowser = FileBrowserService(directory: FileBrowserService.defaultDirectory())
+        let preferences = AppPreferences()
+        self.preferences = preferences
+        self.fileBrowser = FileBrowserService(
+            directory: FileBrowserService.defaultDirectory(),
+            sortOrder: preferences.sortOrder
+        )
         self.authService = AuthenticationService()
     }
 

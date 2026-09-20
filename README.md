@@ -1,125 +1,93 @@
-# Taskami
+<p align="center">
+  <img src="docs/assets/logo.png" width="144" alt="Taskami logo">
+</p>
 
-A modern TaskPaper-compatible outliner for iOS, built with Swift and UIKit.
+<h1 align="center">Taskami</h1>
 
-Taskami reads and writes plain `.taskpaper` files — a simple, human-readable format used by the original TaskPaper for Mac. Your files stay yours: no proprietary format, no lock-in.
+<p align="center">
+  A fast, native TaskPaper-compatible outliner for iPhone and iPad.
+</p>
 
----
+Taskami keeps projects, tasks, notes, and metadata in readable plain-text
+`.taskpaper` files. There is no proprietary document format and no third-party
+runtime dependency.
 
-## Features
+<p align="center">
+  <img src="docs/assets/file-browser.jpg" width="280" alt="Taskami document browser">
+  &nbsp;&nbsp;
+  <img src="docs/assets/editor.jpg" width="280" alt="Taskami outline editor">
+</p>
 
-### TaskPaper Format
+## Highlights
 
-- Full `.taskpaper` compatibility — projects, tasks, and notes with `@tag(value)` metadata
-- Round-trips cleanly with TaskPaper for Mac and any plain-text editor
-- Preserves original encoding and line endings
-
-### Editing
-
-- Tap any item to edit; Return creates a new task below
-- Backspace on an empty line deletes the item
-- Indent / outdent with Tab / Shift-Tab or the keyboard accessory bar
-- Drag-and-drop to reorder items within the document
-- Toggle `@done` via the dash button, swipe action, or keyboard accessory
-
-### Outline Focus & Folding
-
-- **Fold/unfold** subtrees with the disclosure triangle — collapsed items remain searchable
-- **Focus In** — swipe an item to zoom into its subtree, hiding everything else; a breadcrumb bar shows your path
-- **Focus Out** — step back up the hierarchy; nested focus levels are remembered
-- Fold state and cursor position are persisted per-document across app restarts and undo/redo
-
-### Date & Tag Intelligence
-
-- `@due` and `@start` tags are date-aware: natural language input (`today`, `tomorrow`, `next monday`, `in 3 weeks`) is normalized to ISO `yyyy-MM-dd` on commit
-- **Inline date picker** — tap the calendar button in the keyboard accessory to set or update a `@due` / `@start` date without typing
-- Date tags are color-coded by proximity: red (overdue), orange (today), yellow (within 7 days)
-- **Progress bar** — project cells show a compact `▓▓▓░░░░░ 3/5` summary of completed descendant tasks
-- **Cost aggregation** — `@cost(N)` values across a project's children are summed and displayed in the project cell
-
-### Search & Filtering
-
-- Full-text search across all items, including inside collapsed subtrees
-- **Query syntax** — filter by tag, type, indent level, and more:
-  - `@due < today` — overdue tasks
-  - `@priority = high` — tasks by tag value
-  - `type = project` — only projects
-  - `@done` — all completed items
-  - Operators: `=`, `!=`, `<`, `<=`, `>`, `>=`, `contains`, `beginswith`, `endswith`, `like`, `matches`
-  - Combine with `and`, `or`, `not`
-
-### Themes & Appearance
-
-- Light, Dark, and Sepia editor themes
-- Configurable font family and size
-- Syntax coloring: projects, tasks, notes, tags, and done items each have distinct colors
-
-### Free-Scroll Mode
-
-- Lock the keyboard open while scrolling the document freely — useful for reading context while writing
-- Toggle via the scroll button in the keyboard accessory; resets automatically when the keyboard dismisses
-
-### iCloud & File Management
-
-- iCloud Drive integration — browse, open, and create `.taskpaper` files from any location
-- NSFileCoordinator-based reads and writes for safe concurrent access
-- 1-second debounced autosave; reloads automatically when the file changes on disk
-
----
+- Native iOS editor with self-sizing rows, drag and drop, undo/redo, and keyboard shortcuts
+- TaskPaper projects, tasks, notes, and `@tag(value)` metadata
+- Folding and focus mode for navigating large outlines
+- Full-text search plus structured queries such as `@due < today`
+- Natural-language `@due` and `@start` dates with an inline date picker
+- Project progress and `@cost(N)` aggregation
+- Light, dark, and sepia themes with configurable typography
+- iCloud Drive and Files integration, autosave, OPML import, and HTML export
+- Reminders integration, biometric lock, and a Today widget
 
 ## Requirements
 
-- iOS 17+
-- Xcode 15+
+- iOS 17 or later
+- Xcode 16 or later
 
----
+## Build
 
-## Building
+1. Clone the repository.
+2. Open `Taskami.xcodeproj` in Xcode.
+3. Select the `Taskami` scheme and an iOS simulator.
+4. Build and run.
 
-```
-open Taskami.xcodeproj
-```
+The project has no external package dependencies. For device builds and the
+widget, choose your own development team and replace the sample bundle and App
+Group identifiers with identifiers registered to that team.
 
-Select a simulator or device and press Run. No additional dependencies are required.
-
-### Tests
+## Tests
 
 ```sh
 # All tests
-xcodebuild test -scheme Taskami -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test \
+  -project Taskami.xcodeproj \
+  -scheme Taskami \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+  CODE_SIGNING_ALLOWED=NO
 
-# Unit tests only
-xcodebuild test -scheme Taskami -destination '...' -only-testing TaskamiTests
-
-# UI tests only
-xcodebuild test -scheme Taskami -destination '...' -only-testing TaskamiUITests
+# Unit tests only: add -only-testing:TaskamiTests
+# UI tests only: add -only-testing:TaskamiUITests
 ```
 
----
+## TaskPaper format
 
-## File Format
-
-Taskami uses the [TaskPaper](https://guide.taskpaper.com) plain-text format:
-
-```
+```taskpaper
 Inbox:
-	- Buy milk @due(2024-12-01)
-	- Call dentist @due(today) @priority(high)
+    - Buy milk @due(today)
+    - Call dentist @priority(high)
 
-Work:
-	Project Alpha: @due(next friday)
-		- Write spec @done(2024-11-20)
-		- Review PR
-		Notes go here without a dash prefix
+Launch:
+    - Write release notes @done(2026-09-18)
+    - Publish build @due(next friday)
+    Notes can live alongside tasks without a dash prefix.
 ```
 
-- Lines ending with `:` are **projects**
-- Lines starting with `- ` are **tasks**
-- Everything else is a **note**
-- Tags use `@name` or `@name(value)` syntax and can appear anywhere on a line
+- A line ending in `:` is a project.
+- A line beginning with `- ` is a task.
+- Any other line is a note.
+- Tags use `@name` or `@name(value)` syntax.
 
----
+See the [TaskPaper guide](https://guide.taskpaper.com) for the underlying format.
+
+## Contributing
+
+Bug reports and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md)
+for the development workflow and [SECURITY.md](SECURITY.md) for responsible
+security reporting.
 
 ## License
 
-MIT. See [LICENSE.md](LICENSE.md).
+See [LICENSE.md](LICENSE.md). The repository currently uses a public-domain-style
+dedication with the additional condition stated in that file; it is not the MIT
+license.

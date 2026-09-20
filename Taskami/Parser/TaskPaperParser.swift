@@ -20,8 +20,6 @@ struct TaskPaperParser {
     static func parseLine(_ line: String) -> TaskItem {
         let s = line.trimmingCharacters(in: .newlines)
 
-        let fullLength = s.count
-
         // Count leading tabs -> indent level
         var indentLevel = 0
         var idx = s.startIndex
