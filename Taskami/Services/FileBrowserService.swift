@@ -1,6 +1,20 @@
 import Foundation
 import Observation
 
+enum FileBrowserServiceError: LocalizedError {
+    case invalidName
+    case outsideCurrentDirectory
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidName:
+            return "Choose a non-empty file or folder name without path separators."
+        case .outsideCurrentDirectory:
+            return "This operation is limited to the current folder."
+        }
+    }
+}
+
 @Observable
 final class FileBrowserService {
     private enum UITestEnvironment {
@@ -86,11 +100,12 @@ final class FileBrowserService {
     }
 
     func createFile(named name: String) throws -> URL {
-        var fileName = name
+        var fileName = try validatedName(name)
         if !fileName.hasSuffix(".taskpaper") {
             fileName += ".taskpaper"
         }
         let url = currentDirectory.appendingPathComponent(fileName)
+        try validateCurrentDirectoryChild(url)
         guard !fileManager.fileExists(atPath: url.path) else {
             throw CocoaError(.fileWriteFileExists, userInfo: [NSFilePathErrorKey: url.path])
         }
@@ -102,25 +117,49 @@ final class FileBrowserService {
     }
 
     func createFolder(named name: String) throws -> URL {
-        let url = currentDirectory.appendingPathComponent(name)
+        let url = currentDirectory.appendingPathComponent(try validatedName(name))
+        try validateCurrentDirectoryChild(url)
         try fileManager.createDirectory(at: url, withIntermediateDirectories: false)
         refresh()
         return url
     }
 
     func deleteItem(at url: URL) throws {
+        try validateCurrentDirectoryChild(url)
         try fileManager.removeItem(at: url)
         refresh()
     }
 
     func renameItem(at url: URL, to newName: String) throws -> URL {
-        let newURL = url.deletingLastPathComponent().appendingPathComponent(newName)
+        try validateCurrentDirectoryChild(url)
+        let newURL = currentDirectory.appendingPathComponent(try validatedName(newName))
+        try validateCurrentDirectoryChild(newURL)
         try fileManager.moveItem(at: url, to: newURL)
         refresh()
         return newURL
     }
 
     // MARK: - Private
+
+    private func validatedName(_ rawName: String) throws -> String {
+        let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty,
+              name != ".",
+              name != "..",
+              !name.contains("/"),
+              !name.contains("\\") else {
+            throw FileBrowserServiceError.invalidName
+        }
+        return name
+    }
+
+    private func validateCurrentDirectoryChild(_ url: URL) throws {
+        let expectedParent = currentDirectory.standardizedFileURL
+        let actualParent = url.deletingLastPathComponent().standardizedFileURL
+        guard actualParent == expectedParent else {
+            throw FileBrowserServiceError.outsideCurrentDirectory
+        }
+    }
 
     private func compareBySortOrder(_ a: FileItem, _ b: FileItem) -> Bool {
         switch sortOrder {

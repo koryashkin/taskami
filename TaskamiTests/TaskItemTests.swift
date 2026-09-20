@@ -109,6 +109,36 @@ struct TaskItemTests {
         #expect(item.tags.contains { $0.name == "done" })
     }
 
+    @Test("Removing done removes every duplicate done tag from content")
+    func removingDuplicateDoneTagsRemovesAllOccurrences() {
+        let item = TaskItem(
+            type: .task,
+            content: "Buy milk @done @done",
+            tags: TagParser.parseTags(in: "Buy milk @done @done")
+        )
+
+        item.toggleDone()
+
+        #expect(item.content == "Buy milk")
+        #expect(item.tags.isEmpty)
+        #expect(!item.isDone)
+    }
+
+    @Test("Removing done preserves similarly named tags")
+    func removingDonePreservesSimilarTagNames() {
+        let item = TaskItem(
+            type: .task,
+            content: "Buy milk @doneLater @done",
+            tags: TagParser.parseTags(in: "Buy milk @doneLater @done")
+        )
+
+        item.toggleDone()
+
+        #expect(item.content == "Buy milk @doneLater")
+        #expect(item.tags == [Tag(name: "doneLater")])
+        #expect(!item.isDone)
+    }
+
     // MARK: - completionProgress
 
     @Test("completionProgress is nil for item with no task descendants")

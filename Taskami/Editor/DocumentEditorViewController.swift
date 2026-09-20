@@ -599,6 +599,7 @@ final class DocumentEditorViewController: UIViewController {
         log.debug("toggleDone: '\(item.content.prefix(30))'")
         let oldContent = item.content
         item.toggleDone(addDate: addDateToDone)
+        document.markChanged()
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
         reconfigureItem(item.id)
         reconfigureProjectAncestors(of: item)
@@ -697,7 +698,7 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
 
     func cellDidCommit(_ cell: TaskItemCell, newContent: String) {
         guard let item = cell.item, let document else { return }
-        let oldContent = item.content
+        let oldContent = cell.contentAtStartOfEditing ?? item.content
         let oldType = item.type
         let wasDone = item.isDone
 
@@ -716,7 +717,10 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         item.content = DateTagParser.normalizeContent(item.content)
         item.tags = TagParser.parseTags(in: item.content)
 
-        docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
+        if oldContent != item.content {
+            document.markChanged()
+            docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
+        }
         if cell === editingCell { editingCell = nil }
 
         if item.type != oldType {
@@ -761,7 +765,11 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
     }
 
     func cellDidChange(_ cell: TaskItemCell, content: String) {
-        document?.hasUnsavedChanges = true
+        guard let item = cell.item, let document else { return }
+        guard item.content != content else { return }
+        item.content = content
+        item.tags = TagParser.parseTags(in: content)
+        document.markChanged()
         onDocumentChanged?()
     }
 
@@ -771,6 +779,7 @@ extension DocumentEditorViewController: TaskItemCellDelegate {
         // Do not reconfigure that task cell: doing so during its button touch callback
         // can invalidate the accessibility element used for rapid repeated taps.
         docUndoManager.registerContentChange(item: item, oldContent: oldContent, newContent: item.content, document: document)
+        document.markChanged()
         // Redraw derived project counters after UIKit finishes the current touch cycle.
         DispatchQueue.main.async { [weak self, weak item] in
             guard let self, let item else { return }
@@ -938,6 +947,7 @@ extension DocumentEditorViewController: EditorKeyboardAccessoryDelegate {
             guard let self, let item, let document = self.document else { return }
             let oldContent = item.content
             DateTagParser.insertOrUpdateDateTag(named: tagName, date: date, in: item)
+            document.markChanged()
             self.docUndoManager.registerContentChange(
                 item: item, oldContent: oldContent, newContent: item.content, document: document
             )

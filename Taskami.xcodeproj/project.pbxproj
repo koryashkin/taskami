@@ -10,6 +10,7 @@
 		00EA7F1D05F39E0ECEF52658 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED58DF2D92BC5FA1E28AD97C /* AppPreferences.swift */; };
 		01DFF6DCC6B1490208CDB9EB /* TaskPaperSerializerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA17080349AA4EF2B600E626 /* TaskPaperSerializerTests.swift */; };
 		0A1D48D4F3B146E1A3F98C10 /* DocumentServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9C5CF2E947410AA7785F48 /* DocumentServiceTests.swift */; };
+		F10000000000000000000002 /* FileBrowserServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000001 /* FileBrowserServiceTests.swift */; };
 		113DC0B1695E82B021C5DC6B /* DoneToggleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5330B3428AEE2994656E8C /* DoneToggleUITests.swift */; };
 		12DAE37B4A5B4EBF8D79B763 /* FileCreationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C4C8495A454016A40FD779 /* FileCreationUITests.swift */; };
 		15BB9F086DFEBA509F8A30D0 /* LegacyImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D71C26E3E7491A44E499CEFD /* LegacyImportService.swift */; };
@@ -152,6 +153,7 @@
 		66FF58BF1F7B4024B7C0C0C0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		68458307BB09ECB2DC71111D /* TaskamiTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TaskamiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A9C5CF2E947410AA7785F48 /* DocumentServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentServiceTests.swift; sourceTree = "<group>"; };
+		F10000000000000000000001 /* FileBrowserServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserServiceTests.swift; sourceTree = "<group>"; };
 		6C05E11C066BC25C9C9F3AAD /* TaskPaperParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParserTests.swift; sourceTree = "<group>"; };
 		6E94D107107C40ABB8128100 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		6EDBCE89D599D5B9C17138D7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -311,6 +313,7 @@
 			children = (
 				E31FFCCD83B7426995CE8A3E /* DateTagParserTests.swift */,
 				0A9C5CF2E947410AA7785F48 /* DocumentServiceTests.swift */,
+				F10000000000000000000001 /* FileBrowserServiceTests.swift */,
 				AC40F302EBB44AA5AA36EFD4 /* HTMLExporterTests.swift */,
 				D638EEF3BAF8D2A8249D851C /* QueryEngineTests.swift */,
 				7E550097544F2B153FB08057 /* TagParserTests.swift */,
@@ -602,6 +605,7 @@
 			files = (
 				B16810241B3042D18A5A103F /* DateTagParserTests.swift in Sources */,
 				0A1D48D4F3B146E1A3F98C10 /* DocumentServiceTests.swift in Sources */,
+				F10000000000000000000002 /* FileBrowserServiceTests.swift in Sources */,
 				97B5F066962647CDA18BACF8 /* HTMLExporterTests.swift in Sources */,
 				86848C1B4A1A4FC581B3954A /* TaskDocumentTests.swift in Sources */,
 				AB2E6FCF12562F3C89A0A259 /* QueryEngineTests.swift in Sources */,

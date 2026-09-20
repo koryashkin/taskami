@@ -8,22 +8,23 @@ final class FileCreationUITests: XCTestCase {
     }
 
     private var app: XCUIApplication!
+    private var testDirectory: URL!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        let directory = makeIsolatedDocumentsDirectory()
-        app.launchEnvironment[LaunchEnvironment.directory] = directory.path
+        testDirectory = makeIsolatedDocumentsDirectory()
+        app.launchEnvironment[LaunchEnvironment.directory] = testDirectory.path
 
         if name.contains("PersistedSort") {
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try FileManager.default.createDirectory(at: testDirectory, withIntermediateDirectories: true)
             try "- Alpha\n".write(
-                to: directory.appendingPathComponent("Alpha.taskpaper"),
+                to: testDirectory.appendingPathComponent("Alpha.taskpaper"),
                 atomically: true,
                 encoding: .utf8
             )
             try "- Zulu\n".write(
-                to: directory.appendingPathComponent("Zulu.taskpaper"),
+                to: testDirectory.appendingPathComponent("Zulu.taskpaper"),
                 atomically: true,
                 encoding: .utf8
             )
@@ -120,6 +121,31 @@ final class FileCreationUITests: XCTestCase {
         let removed = NSPredicate(format: "exists == false")
         let expectation = XCTNSPredicateExpectation(predicate: removed, object: trackedCell)
         XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 2), .completed)
+    }
+
+    func testTypingAutosavesBeforeEditingEnds() throws {
+        XCTAssertTrue(app.collectionViews.firstMatch.waitForExistence(timeout: 5))
+        app.cells.firstMatch.tap()
+
+        let itemCells = app.cells.matching(NSPredicate(format: "identifier BEGINSWITH 'item-'"))
+        let firstCell = itemCells.element(boundBy: 0)
+        XCTAssertTrue(firstCell.waitForExistence(timeout: 5))
+        firstCell.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 2))
+
+        let marker = "autosave-marker"
+        app.typeText(marker)
+
+        let documentURL = testDirectory.appendingPathComponent("Test.taskpaper")
+        let saved = NSPredicate { _, _ in
+            (try? String(contentsOf: documentURL, encoding: .utf8))?.contains(marker) == true
+        }
+        let expectation = XCTNSPredicateExpectation(predicate: saved, object: nil)
+        XCTAssertEqual(
+            XCTWaiter.wait(for: [expectation], timeout: 3),
+            .completed,
+            "Typing should persist after the debounce while the editor remains active"
+        )
     }
 
     private func makeIsolatedDocumentsDirectory() -> URL {

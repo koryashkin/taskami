@@ -43,6 +43,7 @@ final class TaskItemCell: UICollectionViewCell {
     /// Mirrors DocumentEditorViewController.addDateToDone — set via configure(with:highlighter:addDateToDone:).
     private var addDateToDone: Bool = true
     private var autocorrectionEnabled: Bool = true
+    private(set) var contentAtStartOfEditing: String?
 
     /// The live text content while editing (for accessory actions that need it mid-edit).
     var textViewCurrentContent: String { textView.text ?? "" }
@@ -234,6 +235,7 @@ final class TaskItemCell: UICollectionViewCell {
         log.debug("beginEditing: '\(item.content.prefix(40))'")
 
         isInEditMode = true
+        contentAtStartOfEditing = item.content
 
         // Re-enable interaction so the textView can become first responder
         textView.isUserInteractionEnabled = true
@@ -275,6 +277,7 @@ final class TaskItemCell: UICollectionViewCell {
         log.debug("commitEditing: '\(newContent.prefix(40))'")
         endEditMode()
         delegate?.cellDidCommit(self, newContent: newContent)
+        contentAtStartOfEditing = nil
     }
 
     func dismissEditing() {
@@ -345,6 +348,7 @@ final class TaskItemCell: UICollectionViewCell {
         disclosureButton.isHidden = false
         disclosureButton.setImage(nil, for: .normal)
         item = nil
+        contentAtStartOfEditing = nil
         delegate = nil
         highlighter = nil
     }

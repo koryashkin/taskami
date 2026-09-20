@@ -54,9 +54,30 @@ final class TaskItem: Identifiable {
     }
 
     func removeTag(named name: String) {
-        guard let tag = tag(named: name) else { return }
-        tags.removeAll { $0.name.caseInsensitiveCompare(name) == .orderedSame }
-        rebuildContent(removingTag: tag)
+        let matchingRanges = TagParser.parseTagsWithRanges(in: content)
+            .compactMap { parsed -> Range<String.Index>? in
+                parsed.tag.name.caseInsensitiveCompare(name) == .orderedSame ? parsed.range : nil
+            }
+        guard !matchingRanges.isEmpty else { return }
+
+        // Remove ranges from the end so earlier String indices remain valid.
+        // Include one adjacent separator where available, while matching only
+        // parsed tags so @done never damages text such as @doneLater.
+        for tagRange in matchingRanges.reversed() {
+            var removalRange = tagRange
+            if removalRange.lowerBound > content.startIndex {
+                let previous = content.index(before: removalRange.lowerBound)
+                if content[previous].isWhitespace {
+                    removalRange = previous..<removalRange.upperBound
+                }
+            } else if removalRange.upperBound < content.endIndex,
+                      content[removalRange.upperBound].isWhitespace {
+                removalRange = removalRange.lowerBound..<content.index(after: removalRange.upperBound)
+            }
+            content.removeSubrange(removalRange)
+        }
+
+        tags = TagParser.parseTags(in: content)
     }
 
     func toggleDone(addDate: Bool = true) {
@@ -134,17 +155,6 @@ final class TaskItem: Identifiable {
         }
     }
 
-    private func rebuildContent(removingTag tag: Tag) {
-        let tagStr = tag.description
-        // Remove " @tag" or "@tag " or standalone "@tag"
-        if let range = content.range(of: " " + tagStr) {
-            content.removeSubrange(range)
-        } else if let range = content.range(of: tagStr + " ") {
-            content.removeSubrange(range)
-        } else if let range = content.range(of: tagStr) {
-            content.removeSubrange(range)
-        }
-    }
 }
 
 extension TaskItem: Equatable {

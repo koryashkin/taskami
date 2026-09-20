@@ -5,6 +5,19 @@ import Foundation
 @Suite("TaskDocument Tests")
 struct TaskDocumentTests {
 
+    @Test("Saving an older revision does not clear newer unsaved changes")
+    func savingOlderRevisionKeepsDocumentDirty() {
+        let document = TaskDocument(fileURL: URL(fileURLWithPath: "/tmp/Revision.taskpaper"))
+
+        document.markChanged()
+        let savedRevision = document.revision
+        document.markChanged()
+        document.markSaved(ifRevisionMatches: savedRevision)
+
+        #expect(document.hasUnsavedChanges)
+        #expect(document.revision > savedRevision)
+    }
+
     private func makeDoc() -> TaskDocument {
         // Structure:
         //   Project A:        [0]
@@ -268,5 +281,17 @@ struct TaskDocumentTests {
         doc.outdentItem(subtask)
         #expect(subtask.indentLevel < originalLevel)
         #expect(subtask.parent?.content == "Project A")
+    }
+
+    @Test("moveItem rejects moving an item inside its own subtree")
+    func moveItemRejectsDescendantAsParent() {
+        let doc = makeDoc()
+        let project = doc.items[0]
+        let descendant = project.children[0].children[0]
+
+        doc.moveItem(project, toParent: descendant, atIndex: 0)
+
+        #expect(doc.items.first?.id == project.id)
+        #expect(descendant.parent?.id == project.children[0].id)
     }
 }

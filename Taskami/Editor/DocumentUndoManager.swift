@@ -15,7 +15,7 @@ final class DocumentUndoManager {
             let currentContent = targetItem.content
             targetItem.content = oldContent
             targetItem.tags = TagParser.parseTags(in: oldContent)
-            doc.hasUnsavedChanges = true
+            doc.markChanged()
             self?.registerContentChange(item: targetItem, oldContent: currentContent, newContent: oldContent, document: doc)
         }
     }
@@ -52,7 +52,7 @@ final class DocumentUndoManager {
                 savedItem.indentLevel = 0
                 doc.items.insert(savedItem, at: clampedIndex)
             }
-            doc.hasUnsavedChanges = true
+            doc.markChanged()
             self?.registerInsert(item: savedItem, parent: targetParent, index: index, document: doc)
         }
     }

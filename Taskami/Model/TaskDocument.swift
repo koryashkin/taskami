@@ -9,6 +9,7 @@ final class TaskDocument: Identifiable {
     var encoding: String.Encoding
     var lineEnding: String
     var hasUnsavedChanges: Bool
+    private(set) var revision: UInt = 0
 
     init(
         fileURL: URL,
@@ -32,6 +33,27 @@ final class TaskDocument: Identifiable {
             result.append(contentsOf: item.selfAndDescendants)
         }
         return result
+    }
+
+    /// Records an in-memory mutation that must reach disk.
+    /// Each mutation receives a new revision so an older asynchronous save cannot
+    /// mark a newer edit as persisted.
+    func markChanged() {
+        revision &+= 1
+        hasUnsavedChanges = true
+    }
+
+    /// Clears the dirty state only when the completed write represents the latest
+    /// in-memory revision.
+    func markSaved(ifRevisionMatches savedRevision: UInt) {
+        guard revision == savedRevision else { return }
+        hasUnsavedChanges = false
+    }
+
+    /// Replaces the in-memory document from disk and invalidates any older save.
+    func markLoadedFromDisk() {
+        revision &+= 1
+        hasUnsavedChanges = false
     }
 
     /// Items flattened in depth-first order, respecting fold state.
@@ -139,7 +161,7 @@ final class TaskDocument: Identifiable {
         } else {
             items.insert(newItem, at: index + 1)
         }
-        hasUnsavedChanges = true
+        markChanged()
     }
 
     func insertItem(_ newItem: TaskItem, before existingItem: TaskItem) {
@@ -155,14 +177,14 @@ final class TaskDocument: Identifiable {
             guard let index = items.firstIndex(where: { $0.id == existingItem.id }) else { return }
             items.insert(newItem, at: index)
         }
-        hasUnsavedChanges = true
+        markChanged()
     }
 
     func appendItem(_ newItem: TaskItem) {
         newItem.parent = nil
         newItem.indentLevel = 0
         items.append(newItem)
-        hasUnsavedChanges = true
+        markChanged()
     }
 
     func removeItem(_ item: TaskItem) {
@@ -172,10 +194,17 @@ final class TaskDocument: Identifiable {
             items.removeAll { $0.id == item.id }
         }
         item.parent = nil
-        hasUnsavedChanges = true
+        markChanged()
     }
 
     func moveItem(_ item: TaskItem, toParent newParent: TaskItem?, atIndex index: Int) {
+        // A parent cannot be inserted into itself or one of its descendants.
+        // Either would create a cycle and make tree traversals recurse forever.
+        guard newParent !== item,
+              newParent?.ancestors.contains(where: { $0.id == item.id }) != true else {
+            return
+        }
+
         // Remove from current location
         if let oldParent = item.parent {
             oldParent.children.removeAll { $0.id == item.id }
@@ -197,7 +226,7 @@ final class TaskDocument: Identifiable {
 
         // Update children indent levels recursively
         updateChildIndentLevels(of: item)
-        hasUnsavedChanges = true
+        markChanged()
     }
 
     func indentItem(_ item: TaskItem) {
@@ -226,7 +255,7 @@ final class TaskDocument: Identifiable {
         newParent.children.append(item)
 
         updateChildIndentLevels(of: item)
-        hasUnsavedChanges = true
+        markChanged()
     }
 
     func outdentItem(_ item: TaskItem) {
@@ -260,7 +289,7 @@ final class TaskDocument: Identifiable {
         }
 
         updateChildIndentLevels(of: item)
-        hasUnsavedChanges = true
+        markChanged()
     }
 
     private func updateChildIndentLevels(of item: TaskItem) {

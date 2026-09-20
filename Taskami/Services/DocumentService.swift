@@ -91,9 +91,10 @@ final class DocumentService {
             throw DocumentServiceError.externalChangePending
         }
 
+        let revision = document.revision
         let content = TaskPaperSerializer.serialize(document.items, lineEnding: document.lineEnding)
         try await fileCoordinator.write(content, to: document.fileURL, encoding: document.encoding, initiator: filePresenter)
-        document.hasUnsavedChanges = false
+        document.markSaved(ifRevisionMatches: revision)
     }
 
     /// Close: remove file presenter, clear state.
@@ -134,7 +135,8 @@ final class DocumentService {
 
         document.items = items
         document.encoding = encoding
-        document.hasUnsavedChanges = false
+        document.lineEnding = content.contains("\r\n") ? "\r\n" : "\n"
+        document.markLoadedFromDisk()
         loadAndApplyEditorState(for: document)
         log.debug("reloadFromDisk: \(document.fileURL.lastPathComponent)")
     }
